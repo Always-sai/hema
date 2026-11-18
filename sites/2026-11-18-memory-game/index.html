@@ -1,0 +1,1303 @@
+<!doctype html>
+<html lang="en" data-project="memory-game">
+<head>
+<meta charset="utf-8">
+<title>Memory Match Game – Calm Forest Cards</title>
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<style>
+:root{
+  --bg:#f7f3ea;
+  --bg-soft:#f0ebe0;
+  --bg-elevated:#fffdf8;
+  --accent:#2f7c52;
+  --accent-soft:#3f9567;
+  --accent-muted:#c2ddc9;
+  --danger:#b34141;
+  --text:#26312b;
+  --muted:#6b746f;
+  --border:#d7d0c2;
+  --radius-lg:18px;
+  --radius-md:12px;
+  --radius-pill:999px;
+  --shadow-soft:0 12px 30px rgba(23,56,32,.16);
+  --shadow-subtle:0 1px 3px rgba(15,32,21,.16);
+  --transition-fast:.18s ease-out;
+  --transition-med:.26s ease-out;
+  --focus-ring:0 0 0 2px #fff,0 0 0 4px var(--accent-soft);
+}
+*,
+*::before,
+*::after{box-sizing:border-box;}
+html,body{margin:0;padding:0;}
+body{
+  min-height:100vh;
+  font-family:system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+  color:var(--text);
+  background:radial-gradient(circle at top,var(--bg-elevated),var(--bg)) fixed;
+  -webkit-font-smoothing:antialiased;
+}
+body::before{
+  content:"";
+  position:fixed;
+  inset:-40vmax;
+  background:
+    radial-gradient(circle at 10% 20%,rgba(47,124,82,.07) 0,transparent 55%),
+    radial-gradient(circle at 80% 0,rgba(81,130,98,.08) 0,transparent 60%),
+    radial-gradient(circle at 0 80%,rgba(173,212,180,.15) 0,transparent 55%);
+  opacity:.85;
+  pointer-events:none;
+  z-index:-1;
+}
+a{color:var(--accent-soft);text-decoration:none;}
+a:hover,a:focus-visible{text-decoration:underline;}
+button{
+  font:inherit;
+  border:none;
+  cursor:pointer;
+  background:none;
+  padding:0;
+  color:inherit;
+}
+img{max-width:100%;display:block;}
+main{display:block;}
+.app-shell{
+  max-width:1120px;
+  margin:0 auto;
+  padding:1.5rem 1.25rem 2.5rem;
+}
+@media(min-width:768px){
+  .app-shell{padding:2.25rem 1.75rem 3rem;}
+}
+
+/* Top navigation */
+.app-header{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:1rem;
+  margin-bottom:1.75rem;
+}
+.brand{
+  display:flex;
+  align-items:center;
+  gap:.65rem;
+}
+.brand-logo{
+  width:38px;
+  height:38px;
+  border-radius:40% 60% 45% 55%;
+  background:conic-gradient(from 150deg,var(--accent),var(--accent-soft),#77b88d,var(--accent));
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  box-shadow:var(--shadow-subtle);
+}
+.brand-logo svg{width:24px;height:24px;fill:#fdfbf6;}
+.brand-text-title{
+  font-weight:650;
+  letter-spacing:.03em;
+  font-size:1.02rem;
+  text-transform:uppercase;
+}
+.brand-text-sub{
+  font-size:.77rem;
+  color:var(--muted);
+}
+.nav-links{
+  display:flex;
+  align-items:center;
+  gap:.75rem;
+  font-size:.88rem;
+}
+.nav-link{
+  padding:.4rem .8rem;
+  border-radius:999px;
+  color:var(--muted);
+}
+.nav-link[aria-current="page"]{
+  background:rgba(47,124,82,.09);
+  color:var(--accent);
+  font-weight:550;
+}
+
+/* Hero */
+.hero{
+  background:linear-gradient(145deg,rgba(255,255,255,.96),rgba(237,233,223,.96));
+  border-radius:var(--radius-lg);
+  box-shadow:var(--shadow-soft);
+  padding:1.5rem 1.4rem 1.7rem;
+  margin-bottom:1.6rem;
+  position:relative;
+  overflow:hidden;
+}
+@media(min-width:720px){
+  .hero{
+    display:grid;
+    grid-template-columns:minmax(0,3.1fr) minmax(0,2.2fr);
+    gap:1.8rem;
+    padding:1.8rem 1.9rem 1.9rem;
+  }
+}
+.hero::before{
+  content:"";
+  position:absolute;
+  inset:-30%;
+  background:
+    radial-gradient(circle at 0 0,rgba(47,124,82,.06) 0,transparent 55%),
+    radial-gradient(circle at 100% 100%,rgba(197,219,200,.25) 0,transparent 60%);
+  opacity:.8;
+  pointer-events:none;
+}
+.hero-main{position:relative;z-index:1;}
+.hero-kicker{
+  display:inline-flex;
+  align-items:center;
+  gap:.4rem;
+  font-size:.78rem;
+  padding:.18rem .55rem;
+  border-radius:var(--radius-pill);
+  background:rgba(47,124,82,.06);
+  color:var(--accent-soft);
+  margin-bottom:.7rem;
+}
+.hero-kicker-pill{
+  width:.55rem;
+  height:.55rem;
+  border-radius:50%;
+  background:radial-gradient(circle at 30% 30%,#fdfdfb,var(--accent));
+}
+.hero-title{
+  font-size:1.75rem;
+  line-height:1.2;
+  margin:0 0 .55rem;
+  letter-spacing:-.02em;
+}
+@media(min-width:720px){
+  .hero-title{font-size:2rem;}
+}
+.hero-sub{
+  margin:0 0 1rem;
+  font-size:.96rem;
+  color:var(--muted);
+}
+.hero-highlights{
+  display:flex;
+  flex-wrap:wrap;
+  gap:.65rem;
+  margin-bottom:1.15rem;
+}
+.hero-chip{
+  font-size:.78rem;
+  padding:.38rem .68rem;
+  border-radius:var(--radius-pill);
+  background:rgba(47,124,82,.04);
+  color:var(--muted);
+  display:inline-flex;
+  align-items:center;
+  gap:.35rem;
+}
+.hero-chip-dot{
+  width:.42rem;
+  height:.42rem;
+  border-radius:999px;
+  background:var(--accent-muted);
+}
+.hero-cta-group{
+  display:flex;
+  flex-wrap:wrap;
+  gap:.6rem;
+}
+.btn{
+  border-radius:var(--radius-pill);
+  padding:.6rem 1rem;
+  font-size:.9rem;
+  font-weight:550;
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  gap:.4rem;
+  transition:background-color var(--transition-fast),color var(--transition-fast),transform var(--transition-fast),box-shadow var(--transition-fast),border-color var(--transition-fast);
+  border:1px solid transparent;
+}
+.btn-primary{
+  background:linear-gradient(135deg,var(--accent),var(--accent-soft));
+  color:#fdfaf6;
+  box-shadow:0 10px 24px rgba(47,124,82,.35);
+}
+.btn-primary:hover,
+.btn-primary:focus-visible{
+  transform:translateY(-1px);
+  box-shadow:0 14px 32px rgba(47,124,82,.42);
+}
+.btn-ghost{
+  background:rgba(47,124,82,.04);
+  color:var(--accent);
+  border-color:rgba(47,124,82,.15);
+}
+.btn-ghost:hover,
+.btn-ghost:focus-visible{
+  background:rgba(47,124,82,.09);
+}
+.hero-secondary{
+  position:relative;
+  z-index:1;
+  margin-top:1.3rem;
+}
+@media(min-width:720px){
+  .hero-secondary{margin-top:0;}
+}
+.hero-panel{
+  background:rgba(247,243,234,.97);
+  border-radius:var(--radius-lg);
+  border:1px solid rgba(176,167,147,.4);
+  padding:1.1rem 1rem;
+  box-shadow:0 10px 18px rgba(112,95,60,.12);
+  position:relative;
+  overflow:hidden;
+}
+.hero-panel::before{
+  content:"";
+  position:absolute;
+  right:-22%;
+  top:-18%;
+  width:160px;
+  height:160px;
+  border-radius:50%;
+  background:radial-gradient(circle,#e9f3eb 0,#c5decf 45%,transparent 70%);
+  opacity:.95;
+}
+.hero-panel-heading{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:.5rem;
+  margin-bottom:.5rem;
+}
+.hero-panel-title{
+  font-size:.86rem;
+  letter-spacing:.08em;
+  text-transform:uppercase;
+  color:var(--muted);
+}
+.hero-mini-stat{
+  font-size:.8rem;
+  color:var(--accent);
+}
+.hero-panel-body{
+  font-size:.86rem;
+  color:var(--muted);
+  margin-bottom:.7rem;
+}
+.hero-mini-legend{
+  display:flex;
+  flex-wrap:wrap;
+  gap:.4rem;
+  font-size:.78rem;
+}
+.hero-badge{
+  display:inline-flex;
+  align-items:center;
+  gap:.3rem;
+  padding:.28rem .6rem;
+  border-radius:999px;
+  background:rgba(47,124,82,.06);
+}
+.hero-badge-indicator{
+  width:.55rem;
+  height:.55rem;
+  border-radius:50%;
+  background:conic-gradient(from 120deg,#fbe1b4,#e0f0d8,#acd4b8,#fbe1b4);
+}
+
+/* Layout: controls & game */
+.app-main-layout{
+  display:grid;
+  grid-template-columns:minmax(0,1.8fr);
+  gap:1.5rem;
+}
+@media(min-width:960px){
+  .app-main-layout{
+    grid-template-columns:minmax(0,2.2fr) minmax(260px,1.3fr);
+    align-items:flex-start;
+  }
+}
+
+/* Control panel */
+.surface{
+  background:rgba(255,253,248,.96);
+  border-radius:var(--radius-lg);
+  border:1px solid var(--border);
+  box-shadow:var(--shadow-subtle);
+  padding:1rem;
+}
+@media(min-width:640px){
+  .surface{padding:1.15rem 1.2rem;}
+}
+.surface-header{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:.75rem;
+  margin-bottom:.75rem;
+}
+.surface-title-group{
+  display:flex;
+  flex-direction:column;
+  gap:.1rem;
+}
+.surface-title{
+  font-size:.98rem;
+  font-weight:600;
+}
+.surface-sub{
+  font-size:.8rem;
+  color:var(--muted);
+}
+.badge-pill{
+  padding:.32rem .7rem;
+  border-radius:999px;
+  font-size:.78rem;
+  background:rgba(47,124,82,.06);
+  color:var(--accent);
+}
+.control-grid{
+  display:flex;
+  flex-wrap:wrap;
+  gap:.75rem 1rem;
+  align-items:flex-end;
+}
+
+/* Difficulty segmented */
+.segmented{
+  display:inline-flex;
+  border-radius:999px;
+  padding:.12rem;
+  background:rgba(47,124,82,.05);
+  border:1px solid rgba(47,124,82,.18);
+}
+.segmented legend{position:absolute;left:-9999px;}
+.segmented-option{
+  position:relative;
+}
+.segmented input{
+  position:absolute;
+  opacity:0;
+  pointer-events:none;
+}
+.segmented label{
+  display:inline-flex;
+  align-items:center;
+  gap:.3rem;
+  font-size:.78rem;
+  padding:.35rem .7rem;
+  border-radius:999px;
+  color:var(--muted);
+  cursor:pointer;
+  transition:background-color var(--transition-fast),color var(--transition-fast),transform var(--transition-fast);
+}
+.segmented label span{
+  font-variant-numeric:tabular-nums;
+}
+.segmented input:checked+label{
+  background:#fff;
+  color:var(--accent);
+  box-shadow:0 6px 14px rgba(47,124,82,.18);
+  transform:translateY(-1px);
+}
+.segmented label:focus-visible{
+  outline:none;
+  box-shadow:var(--focus-ring);
+}
+
+/* Controls right side */
+.control-actions{
+  display:flex;
+  flex-wrap:wrap;
+  gap:.5rem;
+  margin-left:auto;
+}
+.control-actions .btn{
+  padding:.45rem .8rem;
+  font-size:.8rem;
+}
+.btn-quiet{
+  background:transparent;
+  border-radius:999px;
+  border:1px dashed rgba(107,116,111,.5);
+  color:var(--muted);
+}
+.btn-quiet:hover,
+.btn-quiet:focus-visible{
+  border-style:solid;
+  border-color:var(--accent-soft);
+  color:var(--accent-soft);
+}
+
+/* Stats row */
+.stats-row{
+  display:flex;
+  flex-wrap:wrap;
+  gap:.75rem;
+  margin-top:.85rem;
+  font-size:.8rem;
+}
+.stat-chip{
+  min-width:90px;
+  padding:.42rem .7rem;
+  border-radius:var(--radius-pill);
+  background:rgba(47,124,82,.03);
+  border:1px solid rgba(191,179,158,.9);
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:.35rem;
+}
+.stat-chip-label{
+  color:var(--muted);
+}
+.stat-chip-value{
+  font-variant-numeric:tabular-nums;
+  font-weight:600;
+}
+.stat-chip--alert{
+  border-color:rgba(179,65,65,.65);
+  background:rgba(179,65,65,.02);
+  color:var(--danger);
+}
+.stat-chip--success{
+  border-color:rgba(47,124,82,.5);
+}
+
+/* Game board */
+.game-wrapper{
+  background:rgba(255,253,248,.98);
+  border-radius:var(--radius-lg);
+  border:1px solid var(--border);
+  box-shadow:var(--shadow-soft);
+  padding:1rem;
+  position:relative;
+}
+@media(min-width:640px){
+  .game-wrapper{padding:1.25rem 1.3rem 1.4rem;}
+}
+.game-header{
+  display:flex;
+  flex-wrap:wrap;
+  align-items:center;
+  gap:.6rem;
+  margin-bottom:.9rem;
+}
+.game-title{
+  font-size:1rem;
+  font-weight:600;
+}
+.game-meta{
+  font-size:.78rem;
+  color:var(--muted);
+}
+.game-status-pill{
+  margin-left:auto;
+  padding:.28rem .6rem;
+  border-radius:var(--radius-pill);
+  background:rgba(47,124,82,.05);
+  font-size:.78rem;
+  color:var(--accent);
+}
+.game-grid{
+  display:grid;
+  grid-template-columns:repeat(4,minmax(0,1fr));
+  gap:.55rem;
+}
+@media(min-width:550px){
+  .game-grid{gap:.7rem;}
+}
+@media(min-width:720px){
+  .game-grid{grid-template-columns:repeat(6,minmax(0,1fr));}
+}
+.game-card{
+  position:relative;
+  aspect-ratio:3/4;
+  border-radius:14px;
+  border:1px solid rgba(183,172,152,.9);
+  background:linear-gradient(145deg,#f5efe2,#efe6d5);
+  overflow:hidden;
+  cursor:pointer;
+  transform-style:preserve-3d;
+  transition:transform .4s var(--transition-med),box-shadow var(--transition-fast),border-color var(--transition-fast),background-color var(--transition-fast),filter var(--transition-fast);
+  box-shadow:0 6px 14px rgba(112,95,60,.18);
+}
+.game-card-inner{
+  position:absolute;
+  inset:0;
+  transform-style:preserve-3d;
+  transition:transform .4s var(--transition-med);
+}
+.game-card-face{
+  position:absolute;
+  inset:0;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  backface-visibility:hidden;
+  padding:.5rem;
+}
+.game-card-back{
+  background:radial-gradient(circle at 20% 0,rgba(255,255,255,.9),rgba(192,181,160,.85));
+  color:var(--accent);
+  flex-direction:column;
+  gap:.4rem;
+  font-size:.8rem;
+}
+.card-back-mark{
+  width:44px;
+  height:44px;
+  border-radius:35% 65% 55% 45%;
+  background:conic-gradient(from 180deg,#99c7a3,#2f7c52,#c5decf,#99c7a3);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+}
+.card-back-mark svg{
+  width:26px;
+  height:26px;
+  fill:#fdfaf4;
+}
+.card-back-label{
+  font-weight:550;
+  letter-spacing:.07em;
+  text-transform:uppercase;
+}
+.game-card-front{
+  transform:rotateY(180deg);
+  background:radial-gradient(circle at 20% 0,#fdfaf6,#e8efe5);
+  font-size:1.6rem;
+}
+.game-card[data-state="face-up"] .game-card-inner,
+.game-card[data-state="matched"] .game-card-inner{
+  transform:rotateY(180deg);
+}
+.game-card[data-state="matched"]{
+  border-color:rgba(47,124,82,.85);
+  box-shadow:0 8px 18px rgba(47,124,82,.3);
+}
+.game-card[data-state="face-down"]:hover{
+  transform:translateY(-2px);
+  box-shadow:0 10px 22px rgba(112,95,60,.26);
+}
+.game-card:focus-visible{
+  outline:none;
+  box-shadow:var(--focus-ring);
+}
+.game-card[aria-disabled="true"]{
+  cursor:default;
+}
+
+/* Icons on cards */
+.card-symbol{
+  width:70%;
+  height:70%;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+}
+
+/* Overlay / announcer */
+.announce{
+  position:absolute;
+  inset:auto 1rem 1rem;
+  left:1rem;
+  right:1rem;
+  border-radius:var(--radius-md);
+  background:rgba(247,243,234,.98);
+  border:1px solid rgba(47,124,82,.35);
+  box-shadow:0 10px 20px rgba(47,124,82,.32);
+  padding:.65rem .8rem;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:.6rem;
+  font-size:.82rem;
+  color:var(--accent);
+}
+@media(min-width:640px){
+  .announce{inset:auto 1.5rem 1.25rem;}
+}
+.announce span{
+  font-weight:550;
+}
+.announce button{
+  font-size:.78rem;
+}
+
+/* Empty / helper state */
+.game-empty{
+  border-radius:var(--radius-md);
+  padding:1rem;
+  background:rgba(47,124,82,.03);
+  border:1px dashed rgba(176,167,147,.9);
+  font-size:.85rem;
+  color:var(--muted);
+  display:flex;
+  align-items:flex-start;
+  gap:.65rem;
+  margin-top:.7rem;
+}
+.game-empty-icon{
+  width:22px;
+  height:22px;
+  border-radius:50%;
+  background:rgba(47,124,82,.08);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  color:var(--accent);
+}
+
+/* Sidebar section */
+.sidebar-section{
+  display:flex;
+  flex-direction:column;
+  gap:1rem;
+}
+.note-card{
+  background:rgba(255,253,248,.96);
+  border-radius:var(--radius-lg);
+  border:1px solid var(--border);
+  padding:1rem;
+  box-shadow:var(--shadow-subtle);
+  font-size:.86rem;
+  color:var(--muted);
+}
+.note-card h2{
+  margin:.1rem 0 .5rem;
+  font-size:.92rem;
+  color:var(--text);
+}
+.note-list{
+  padding-left:1rem;
+  margin:.2rem 0 0;
+}
+.note-list li{margin-bottom:.25rem;}
+.keyboard-legend{
+  display:flex;
+  flex-wrap:wrap;
+  gap:.35rem;
+  margin-top:.5rem;
+}
+.kbd{
+  padding:.2rem .35rem;
+  border-radius:6px;
+  border:1px solid rgba(155,146,128,.8);
+  background:#f6f1e5;
+  font-size:.74rem;
+  font-family:ui-monospace,Menlo,monospace;
+}
+
+/* Footer */
+.app-footer{
+  margin-top:2.2rem;
+  padding-top:1.2rem;
+  border-top:1px solid rgba(176,167,147,.7);
+  font-size:.78rem;
+  color:var(--muted);
+  display:flex;
+  flex-wrap:wrap;
+  gap:.5rem;
+  justify-content:space-between;
+  align-items:center;
+}
+.footer-credit{
+  display:flex;
+  align-items:center;
+  gap:.35rem;
+}
+.footer-credit-pill{
+  padding:.18rem .5rem;
+  border-radius:999px;
+  background:rgba(47,124,82,.06);
+  color:var(--accent);
+}
+
+/* Accessibility */
+:focus-visible{
+  outline:none;
+  box-shadow:var(--focus-ring);
+}
+
+/* Reduced motion */
+@media (prefers-reduced-motion:reduce){
+  *{scroll-behavior:auto!important;animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important;}
+  .game-card,
+  .game-card-inner{transition:none!important;}
+}
+</style>
+</head>
+<body>
+<div class="app-shell">
+  <header class="app-header">
+    <div class="brand">
+      <div class="brand-logo" aria-hidden="true">
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M5 20c3.5-1.2 6-3.9 7.7-7.6C14.3 9 16 6.9 19 5.5c.4-.2.5.1.4.4C18.2 11.7 14 16.8 7.9 19.1 6.8 19.5 5.9 19.8 5 20z"/>
+        </svg>
+      </div>
+      <div>
+        <div class="brand-text-title">Memory Match</div>
+        <div class="brand-text-sub">Calm focus in a forest of cards</div>
+      </div>
+    </div>
+    <nav class="nav-links" aria-label="Primary">
+      <span class="nav-link" aria-current="page">Play</span>
+      <button class="nav-link" type="button" id="nav-how">How it works</button>
+    </nav>
+  </header>
+
+  <main>
+    <section class="hero" aria-labelledby="hero-title">
+      <div class="hero-main">
+        <div class="hero-kicker">
+          <span class="hero-kicker-pill"></span>
+          <span>Mindful Memory Match</span>
+        </div>
+        <h1 id="hero-title" class="hero-title">Flip forest cards. Train your focus in minutes.</h1>
+        <p class="hero-sub">
+          Choose a difficulty, then uncover gentle plant icons two at a time. Match pairs quickly to beat your best time with as few moves as possible.
+        </p>
+        <div class="hero-highlights" aria-hidden="true">
+          <div class="hero-chip">
+            <span class="hero-chip-dot"></span>
+            <span>3 levels · 12–24 cards</span>
+          </div>
+          <div class="hero-chip">
+            <span class="hero-chip-dot"></span>
+            <span>Move counter &amp; timer</span>
+          </div>
+          <div class="hero-chip">
+            <span class="hero-chip-dot"></span>
+            <span>Keyboard &amp; screen reader friendly</span>
+          </div>
+        </div>
+        <div class="hero-cta-group">
+          <button type="button" class="btn btn-primary" id="hero-start">
+            Start fresh game
+            <span aria-hidden="true">↻</span>
+          </button>
+          <button type="button" class="btn btn-ghost" id="hero-focus">
+            Focus mode tips
+          </button>
+        </div>
+      </div>
+      <aside class="hero-secondary" aria-label="Session snapshot">
+        <div class="hero-panel">
+          <div class="hero-panel-heading">
+            <div class="hero-panel-title">Current session</div>
+            <div class="hero-mini-stat"><span id="mini-best-label">Best easy run: </span><span id="mini-best-value">—</span></div>
+          </div>
+          <p class="hero-panel-body">
+            Flip steadily, avoid rushing, and notice how your attention feels as you play. Matching cards is just the prompt; staying present is the real practice.
+          </p>
+          <div class="hero-mini-legend">
+            <div class="hero-badge">
+              <span class="hero-badge-indicator"></span>
+              <span>Low-stress scorekeeping</span>
+            </div>
+            <div class="hero-badge">
+              <span aria-hidden="true">☀︎</span>
+              <span>Pause anytime without penalty</span>
+            </div>
+          </div>
+        </div>
+      </aside>
+    </section>
+
+    <section aria-label="Game area and controls">
+      <div class="surface" aria-label="Game controls">
+        <div class="surface-header">
+          <div class="surface-title-group">
+            <div class="surface-title">Game controls</div>
+            <div class="surface-sub">Pick a level, then flip any card to begin the timer.</div>
+          </div>
+          <div class="badge-pill" id="control-difficulty-label">Difficulty: Easy</div>
+        </div>
+        <form class="control-grid" id="control-form">
+          <fieldset class="segmented" aria-label="Difficulty">
+            <legend>Difficulty</legend>
+            <div class="segmented-option">
+              <input type="radio" id="diff-easy" name="difficulty" value="easy" checked>
+              <label for="diff-easy">
+                <span aria-hidden="true">🌱</span>
+                <span>Easy · 12</span>
+              </label>
+            </div>
+            <div class="segmented-option">
+              <input type="radio" id="diff-medium" name="difficulty" value="medium">
+              <label for="diff-medium">
+                <span aria-hidden="true">🌿</span>
+                <span>Medium · 16</span>
+              </label>
+            </div>
+            <div class="segmented-option">
+              <input type="radio" id="diff-hard" name="difficulty" value="hard">
+              <label for="diff-hard">
+                <span aria-hidden="true">🌲</span>
+                <span>Hard · 24</span>
+              </label>
+            </div>
+          </fieldset>
+          <div class="control-actions">
+            <button type="button" class="btn btn-ghost" id="btn-restart" aria-describedby="restart-hint">
+              <span aria-hidden="true">↻</span>
+              <span>Restart</span>
+            </button>
+            <button type="button" class="btn btn-quiet" id="btn-pause">
+              <span aria-hidden="true">⏸</span>
+              <span id="pause-label">Pause timer</span>
+            </button>
+          </div>
+        </form>
+        <p id="restart-hint" class="surface-sub" style="margin-top:.5rem;">
+          Restart shuffles cards for the selected level without changing your best scores.
+        </p>
+        <div class="stats-row" aria-label="Game statistics">
+          <div class="stat-chip">
+            <span class="stat-chip-label">Moves</span>
+            <span class="stat-chip-value" id="stat-moves">0</span>
+          </div>
+          <div class="stat-chip">
+            <span class="stat-chip-label">Time</span>
+            <span class="stat-chip-value" id="stat-time">00:00</span>
+          </div>
+          <div class="stat-chip">
+            <span class="stat-chip-label">Matched</span>
+            <span class="stat-chip-value" id="stat-matched">0</span>
+          </div>
+          <div class="stat-chip stat-chip--success">
+            <span class="stat-chip-label">Best score</span>
+            <span class="stat-chip-value" id="stat-best">—</span>
+          </div>
+          <div class="stat-chip stat-chip--alert" id="stat-hint" hidden>
+            <span class="stat-chip-label">Hint</span>
+            <span class="stat-chip-value" id="stat-hint-text">Take a breath and scan slowly.</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="app-main-layout" style="margin-top:1.5rem;">
+        <section class="game-wrapper" aria-label="Memory match board">
+          <div class="game-header">
+            <div>
+              <h2 class="game-title">Forest memory board</h2>
+              <p class="game-meta" id="game-meta">Easy · 6 pairs · 12 cards</p>
+            </div>
+            <div class="game-status-pill" id="game-status">Ready when you are</div>
+          </div>
+          <div class="game-grid" id="game-grid" aria-label="Game cards"></div>
+          <div class="game-empty" id="game-empty" aria-live="polite">
+            <div class="game-empty-icon" aria-hidden="true">i</div>
+            <div>
+              <strong>No cards yet.</strong> Choose a difficulty above to grow a new forest of cards, then flip any card to begin your mindful matching run.
+            </div>
+          </div>
+          <div class="announce" id="game-announce" role="status" aria-live="polite" hidden>
+            <div><span id="announce-main"></span> <span id="announce-sub"></span></div>
+            <button type="button" class="btn btn-ghost" id="announce-action">Play again</button>
+          </div>
+        </section>
+
+        <aside class="sidebar-section" aria-label="Tips and keyboard shortcuts">
+          <section class="note-card" id="how-section">
+            <h2>How the Memory Match Game works</h2>
+            <ol class="note-list">
+              <li>Select a difficulty and press <strong>Restart</strong> to deal fresh cards.</li>
+              <li>Flip two cards at a time. If they match, they stay face up.</li>
+              <li>If they do not match, they flip back after a short pause.</li>
+              <li>Clear all pairs to finish the round and log your score.</li>
+            </ol>
+            <p style="margin-top:.6rem;">
+              Your aim is to match all pairs with the fewest moves and the calmest pace. The timer starts on your first flip and pauses whenever you need a break.
+            </p>
+          </section>
+
+          <section class="note-card">
+            <h2>Keyboard &amp; focus-friendly play</h2>
+            <p>Cards are arranged in reading order. You can navigate and flip without a mouse:</p>
+            <div class="keyboard-legend" aria-label="Keyboard shortcuts">
+              <span><span class="kbd">Tab</span> / <span class="kbd">Shift+Tab</span> move focus</span>
+              <span><span class="kbd">Space</span> / <span class="kbd">Enter</span> flip card or press buttons</span>
+              <span><span class="kbd">R</span> restart current level</span>
+              <span><span class="kbd">P</span> pause or resume timer</span>
+            </div>
+            <p style="margin-top:.5rem;">
+              If you prefer less animation, your operating system’s “Reduce Motion” setting is respected.
+            </p>
+          </section>
+        </aside>
+      </div>
+    </section>
+  </main>
+
+  <footer class="app-footer">
+    <div>&copy; 2026 Memory Match Game. Designed for quiet, focused breaks.</div>
+    <div class="footer-credit">
+      <span class="footer-credit-pill">Made with Daily AI Website Factory</span>
+    </div>
+  </footer>
+</div>
+
+<script>
+(function(){
+  const difficulties = {
+    easy:{cards:12,label:'Easy · 6 pairs · 12 cards'},
+    medium:{cards:16,label:'Medium · 8 pairs · 16 cards'},
+    hard:{cards:24,label:'Hard · 12 pairs · 24 cards'}
+  };
+  const symbols = [
+    'leaf','sprout','fern','tree','water','sun',
+    'mtn','seed','rock','mush','flower','wind'
+  ];
+  const gridEl = document.getElementById('game-grid');
+  const metaEl = document.getElementById('game-meta');
+  const statusEl = document.getElementById('game-status');
+  const movesEl = document.getElementById('stat-moves');
+  const timeEl = document.getElementById('stat-time');
+  const matchedEl = document.getElementById('stat-matched');
+  const bestEl = document.getElementById('stat-best');
+  const diffLabelEl = document.getElementById('control-difficulty-label');
+  const emptyEl = document.getElementById('game-empty');
+  const announceEl = document.getElementById('game-announce');
+  const announceMainEl = document.getElementById('announce-main');
+  const announceSubEl = document.getElementById('announce-sub');
+  const announceActionEl = document.getElementById('announce-action');
+  const hintChip = document.getElementById('stat-hint');
+  const heroStartBtn = document.getElementById('hero-start');
+  const heroFocusBtn = document.getElementById('hero-focus');
+  const navHowBtn = document.getElementById('nav-how');
+  const howSection = document.getElementById('how-section');
+  const pauseBtn = document.getElementById('btn-pause');
+  const pauseLabel = document.getElementById('pause-label');
+  const restartBtn = document.getElementById('btn-restart');
+  const miniBestLabel = document.getElementById('mini-best-label');
+  const miniBestValue = document.getElementById('mini-best-value');
+
+  let state = {
+    difficulty:'easy',
+    cards:[],
+    firstIndex:null,
+    secondIndex:null,
+    locked:false,
+    moves:0,
+    matchedPairs:0,
+    totalPairs:0,
+    started:false,
+    paused:false,
+    startTime:null,
+    elapsedMs:0,
+    timerId:null,
+    hintTimeout:null
+  };
+
+  function formatTime(ms){
+    const total = Math.floor(ms/1000);
+    const m = Math.floor(total/60);
+    const s = total%60;
+    return `${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
+  }
+  function storageKey(diff){return `memory-game-best-${diff}`;}
+  function loadBest(diff){
+    try{
+      const raw = localStorage.getItem(storageKey(diff));
+      if(!raw) return null;
+      return JSON.parse(raw);
+    }catch(e){return null;}
+  }
+  function saveBest(diff,score){
+    try{
+      localStorage.setItem(storageKey(diff),JSON.stringify(score));
+    }catch(e){}
+  }
+  function updateBestUI(){
+    const best = loadBest(state.difficulty);
+    if(!best){bestEl.textContent='—';}
+    else{
+      bestEl.textContent = `${best.moves} moves · ${formatTime(best.timeMs)}`;
+    }
+    const easyBest = loadBest('easy');
+    if(easyBest){
+      miniBestLabel.textContent = 'Best easy run: ';
+      miniBestValue.textContent = `${easyBest.moves} moves, ${formatTime(easyBest.timeMs)}`;
+    }else{
+      miniBestLabel.textContent = 'First easy run awaits: ';
+      miniBestValue.textContent = 'Pick Easy & press Restart';
+    }
+  }
+
+  function createSymbolNode(type){
+    const span = document.createElement('span');
+    span.className='card-symbol';
+    span.setAttribute('aria-hidden','true');
+    span.innerHTML = ({
+      leaf:`<svg viewBox="0 0 24 24"><path d="M4 18C4 9 10 4 20 4c0 10-5 16-14 16-.6 0-1-.4-1-1 0-1.2.2-2.3.6-3.4C8.5 14 11 12 13 9.5 10 11 7.8 12.7 6 15c-.8 1.1-1.4 2.4-2 3z" fill="#2f7c52"/></svg>`,
+      sprout:`<svg viewBox="0 0 24 24"><path d="M11 20v-5.2C8.5 15 6.6 14 5 12.2 4.3 11.4 4 10.6 4 9.8c2.7 0 4.6.9 6 2.4V9c0-2.8 2.2-5 5-5h2c0 2.8-2.2 5-5 5h-.4c.3.9.4 1.8.4 2.8V20h-1z" fill="#2f7c52"/></svg>`,
+      fern:`<svg viewBox="0 0 24 24"><path d="M6 20c2-3.5 4.6-6 8.3-7.7L10 12l4-2-3.3-.3L15 7l-3.5.5L14 4l.5-.5C18 5 20 8.5 20 12.5 15 13 10.9 16.1 8 20H6z" fill="#2f7c52"/></svg>`,
+      tree:`<svg viewBox="0 0 24 24"><path d="M11 21v-3H9l2-3H9l2.5-4H9l4-7 4 7h-2.5L17 15h-2l2 3h-2v3h-4z" fill="#2f7c52"/></svg>`,
+      water:`<svg viewBox="0 0 24 24"><path d="M6 14c1.2 1.8 2.5 2.8 4 2.8 1.5 0 2.8-1 4-2.8 1.2 1.8 2.5 2.8 4 2.8.4 0 .7 0 1-.1-.8 2.5-3 4.3-6 4.3-2.9 0-5.2-1.8-6-4.3.3.1.6.1 1 .1 1.5 0 2.8-1 4-2.8" fill="none" stroke="#2f7c52" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>`,
+      sun:`<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="4" fill="#2f7c52"/><g stroke="#2f7c52" stroke-width="1.4" stroke-linecap="round"><path d="M12 3v2.5M12 18.5V21M4.2 4.2l1.8 1.8M18 18l1.8 1.8M3 12h2.5M18.5 12H21M4.2 19.8 6 18M18 6l1.8-1.8"/></g></svg>`,
+      mtn:`<svg viewBox="0 0 24 24"><path d="M3 19 9.5 6l2.5 5 1.5-3L21 19H3z" fill="#2f7c52"/><path d="m12 11-2-3-1.5 3H12z" fill="#f7f3ea"/></svg>`,
+      seed:`<svg viewBox="0 0 24 24"><path d="M8 18c0-5.5 3-9 8-10-1 5-4.5 8-8 8z" fill="#2f7c52"/><path d="M8 18c-1.7 0-3-1.3-3-3 0-2.5 1.4-4.8 3.5-6" fill="none" stroke="#2f7c52" stroke-width="1.4" stroke-linecap="round"/></svg>`,
+      rock:`<svg viewBox="0 0 24 24"><path d="M5 18 9 6h6l4 8-2 4H5z" fill="#2f7c52"/><path d="M9 6 7 11l3 1" fill="none" stroke="#f7f3ea" stroke-width="1.2"/></svg>`,
+      mush:`<svg viewBox="0 0 24 24"><path d="M6 11c0-3 2.7-5 6-5s6 2 6 5H6z" fill="#2f7c52"/><path d="M11 11v4.5c0 1-.4 1.5-1.2 1.5H9" fill="none" stroke="#2f7c52" stroke-width="1.4" stroke-linecap="round"/><circle cx="11" cy="8.5" r=".7" fill="#f7f3ea"/><circle cx="14" cy="9.2" r=".6" fill="#f7f3ea"/></svg>`,
+      flower:`<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="2" fill="#f7f3ea"/><g fill="#2f7c52"><circle cx="12" cy="7.5" r="2"/><circle cx="12" cy="16.5" r="2"/><circle cx="7.5" cy="12" r="2"/><circle cx="16.5" cy="12" r="2"/><circle cx="8.8" cy="8.8" r="2"/><circle cx="15.2" cy="8.8" r="2"/><circle cx="8.8" cy="15.2" r="2"/><circle cx="15.2" cy="15.2" r="2"/></g></svg>`,
+      wind:`<svg viewBox="0 0 24 24"><path d="M5 9h8.5A2.5 2.5 0 1 0 11 6.5" fill="none" stroke="#2f7c52" stroke-width="1.5" stroke-linecap="round"/><path d="M4 14h11.5A2.5 2.5 0 1 1 13 16.5" fill="none" stroke="#2f7c52" stroke-width="1.5" stroke-linecap="round"/></svg>`
+    })[type] || '';
+    return span;
+  }
+
+  function dealCards(){
+    clearTimers();
+    state.cards=[];
+    state.firstIndex=null;
+    state.secondIndex=null;
+    state.locked=false;
+    state.moves=0;
+    state.matchedPairs=0;
+    state.totalPairs=difficulties[state.difficulty].cards/2;
+    state.started=false;
+    state.paused=false;
+    state.startTime=null;
+    state.elapsedMs=0;
+    movesEl.textContent='0';
+    timeEl.textContent='00:00';
+    matchedEl.textContent='0';
+    pauseLabel.textContent='Pause timer';
+    pauseBtn.setAttribute('aria-pressed','false');
+    const totalCards = difficulties[state.difficulty].cards;
+    const neededPairs = totalCards/2;
+    const chosen = symbols.slice(0,neededPairs);
+    const cards = [];
+    chosen.forEach((sym,idx)=>{
+      cards.push({id:`${sym}-${idx}-a`,symbol:sym,matched:false,state:'face-down'});
+      cards.push({id:`${sym}-${idx}-b`,symbol:sym,matched:false,state:'face-down'});
+    });
+    // shuffle
+    for(let i=cards.length-1;i>0;i--){
+      const j=Math.floor(Math.random()*(i+1));
+      [cards[i],cards[j]]=[cards[j],cards[i]];
+    }
+    state.cards=cards;
+    renderGrid();
+    emptyEl.hidden=true;
+    statusEl.textContent='Flip any card to begin';
+    metaEl.textContent=difficulties[state.difficulty].label;
+    hideAnnouncement();
+    scheduleHint();
+  }
+
+  function renderGrid(){
+    gridEl.innerHTML='';
+    state.cards.forEach((card,idx)=>{
+      const btn = document.createElement('button');
+      btn.type='button';
+      btn.className='game-card';
+      btn.dataset.index=idx;
+      btn.dataset.state=card.state;
+      btn.setAttribute('aria-pressed',card.state==='face-up' || card.matched ? 'true':'false');
+      btn.setAttribute('aria-label',card.matched?'Matched pair':'Hidden card');
+      if(card.matched) btn.setAttribute('aria-disabled','true');
+      const inner=document.createElement('div');
+      inner.className='game-card-inner';
+      const back=document.createElement('div');
+      back.className='game-card-face game-card-back';
+      back.innerHTML='<div class="card-back-mark">'+
+        '<svg viewBox="0 0 24 24"><path d="M5 20c3.5-1.2 6-3.9 7.7-7.6C14.3 9 16 6.9 19 5.5c.4-.2.5.1.4.4C18.2 11.7 14 16.8 7.9 19.1 6.8 19.5 5.9 19.8 5 20z" fill="#fdfbf6"/></svg>'+
+        '</div><div class="card-back-label">Flip</div>';
+      const front=document.createElement('div');
+      front.className='game-card-face game-card-front';
+      front.appendChild(createSymbolNode(card.symbol));
+      inner.appendChild(back);
+      inner.appendChild(front);
+      btn.appendChild(inner);
+      gridEl.appendChild(btn);
+    });
+  }
+
+  function startTimer(){
+    if(state.started || state.paused) return;
+    state.started=true;
+    state.startTime=Date.now()-state.elapsedMs;
+    state.timerId = setInterval(()=>{
+      state.elapsedMs = Date.now()-state.startTime;
+      timeEl.textContent = formatTime(state.elapsedMs);
+    },250);
+  }
+  function clearTimers(){
+    if(state.timerId){clearInterval(state.timerId);state.timerId=null;}
+    if(state.hintTimeout){clearTimeout(state.hintTimeout);state.hintTimeout=null;}
+    hintChip.hidden=true;
+  }
+  function togglePause(){
+    if(!state.started) return;
+    state.paused=!state.paused;
+    if(state.paused){
+      clearInterval(state.timerId);state.timerId=null;
+      statusEl.textContent='Paused · resume when ready';
+      pauseLabel.textContent='Resume timer';
+      pauseBtn.setAttribute('aria-pressed','true');
+    }else{
+      statusEl.textContent='In progress';
+      pauseLabel.textContent='Pause timer';
+      pauseBtn.setAttribute('aria-pressed','false');
+      startTimer();
+    }
+  }
+
+  function handleCardActivate(index){
+    if(state.locked || state.paused) return;
+    const card = state.cards[index];
+    if(!card || card.matched) return;
+    if(state.firstIndex===index) return;
+    startTimer();
+    if(state.firstIndex===null){
+      flipCard(index,true);
+      state.firstIndex=index;
+      return;
+    }
+    if(state.secondIndex!==null) return;
+    flipCard(index,true);
+    state.secondIndex=index;
+    state.locked=true;
+    state.moves++;
+    movesEl.textContent=String(state.moves);
+    const first = state.cards[state.firstIndex];
+    const second = state.cards[state.secondIndex];
+    if(first.symbol===second.symbol){
+      first.matched=second.matched=true;
+      state.matchedPairs++;
+      matchedEl.textContent=String(state.matchedPairs);
+      setTimeout(()=>{
+        flipCard(state.firstIndex,true,true);
+        flipCard(state.secondIndex,true,true);
+        resetSelection();
+        state.locked=false;
+        if(state.matchedPairs===state.totalPairs){
+          onWin();
+        }
+      },220);
+    }else{
+      setTimeout(()=>{
+        flipCard(state.firstIndex,false);
+        flipCard(state.secondIndex,false);
+        resetSelection();
+        state.locked=false;
+      },600);
+    }
+  }
+
+  function flipCard(index,faceUp,matched){
+    const card = state.cards[index];
+    if(!card) return;
+    card.state = faceUp ? 'face-up':'face-down';
+    if(matched) card.matched=true;
+    const elem = gridEl.querySelector(`.game-card[data-index="${index}"]`);
+    if(elem){
+      elem.dataset.state=card.state;
+      if(card.matched) elem.setAttribute('aria-disabled','true');
+      elem.setAttribute('aria-pressed',faceUp || card.matched ? 'true':'false');
+      elem.setAttribute('aria-label',card.matched?'Matched pair':(faceUp?'Face up card':'Hidden card'));
+    }
+  }
+  function resetSelection(){
+    state.firstIndex=null;
+    state.secondIndex=null;
+  }
+
+  function onWin(){
+    clearTimers();
+    statusEl.textContent='Finished · nice focus';
+    const timeMs = state.elapsedMs;
+    const score = {moves:state.moves,timeMs,timeStr:formatTime(timeMs)};
+    const best = loadBest(state.difficulty);
+    let msg,sub;
+    if(!best || timeMs<best.timeMs || (timeMs===best.timeMs && state.moves<best.moves)){
+      saveBest(state.difficulty,score);
+      msg='New personal best!';
+      sub=`${state.moves} moves in ${score.timeStr}.`;
+    }else{
+      msg='Round complete.';
+      sub=`${state.moves} moves in ${score.timeStr}. Best: ${best.moves} in ${formatTime(best.timeMs)}.`;
+    }
+    updateBestUI();
+    showAnnouncement(msg,sub);
+  }
+
+  function showAnnouncement(main,sub){
+    announceMainEl.textContent=main;
+    announceSubEl.textContent=sub||'';
+    announceEl.hidden=false;
+  }
+  function hideAnnouncement(){
+    announceEl.hidden=true;
+  }
+
+  function scheduleHint(){
+    hintChip.hidden=true;
+    if(state.hintTimeout) clearTimeout(state.hintTimeout);
+    state.hintTimeout = setTimeout(()=>{
+      if(!state.started || state.paused || state.matchedPairs===state.totalPairs) return;
+      hintChip.hidden=false;
+      document.getElementById('stat-hint-text').textContent = 'Try scanning rows from left to right.';
+    },30000);
+  }
+
+  function updateDifficulty(label){
+    diffLabelEl.textContent = `Difficulty: ${label[0].toUpperCase()}${label.slice(1)}`;
+    metaEl.textContent = difficulties[label].label;
+  }
+
+  document.getElementById('control-form').addEventListener('change',e=>{
+    if(e.target.name==='difficulty'){
+      state.difficulty = e.target.value;
+      updateDifficulty(state.difficulty);
+      updateBestUI();
+      dealCards();
+    }
+  });
+
+  gridEl.addEventListener('click',e=>{
+    const btn = e.target.closest('.game-card');
+    if(!btn) return;
+    const idx = Number(btn.dataset.index);
+    handleCardActivate(idx);
+  });
+  gridEl.addEventListener('keydown',e=>{
+    if(e.key==='Enter' || e.key===' '){
+      const btn = e.target.closest('.game-card');
+      if(!btn) return;
+      e.preventDefault();
+      const idx = Number(btn.dataset.index);
+      handleCardActivate(idx);
+    }
+  });
+
+  pauseBtn.addEventListener('click',togglePause);
+  restartBtn.addEventListener('click',()=>{dealCards();statusEl.textContent='Fresh board ready';});
+  announceActionEl.addEventListener('click',()=>{dealCards();statusEl.textContent='Fresh board ready';hideAnnouncement();});
+  heroStartBtn.addEventListener('click',()=>{dealCards();gridEl.querySelector('.game-card')?.focus();});
+  heroFocusBtn.addEventListener('click',()=>{
+    howSection.scrollIntoView({behavior:'smooth',block:'start'});
+  });
+  navHowBtn.addEventListener('click',()=>{
+    howSection.scrollIntoView({behavior:'smooth',block:'start'});
+  });
+
+  document.addEventListener('keydown',e=>{
+    if(e.target.tagName==='INPUT' || e.target.tagName==='TEXTAREA') return;
+    if(e.key==='r' || e.key==='R'){dealCards();}
+    if(e.key==='p' || e.key==='P'){togglePause();}
+  });
+
+  // Initial
+  updateBestUI();
+})();
+</script>
+</body>
+</html>
