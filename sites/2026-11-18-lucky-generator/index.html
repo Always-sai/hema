@@ -1,0 +1,633 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Lucky Number Generator – Daily Challenge</title>
+  <meta name="description" content="A playful lucky number and daily challenge generator. Your moment of serendipity, responsibly random.">
+  <style>
+    :root {
+      --bg: #f5f7ef;
+      --bg-grad: linear-gradient(130deg, #f7faf3 0%, #e6f2e2 100%);
+      --card: #fffefb;
+      --primary: #226d3d;
+      --primary-light: #6abf69;
+      --button-bg: #327c4f;
+      --button-bg-hover: #1e5d32;
+      --button-text: #fffefb;
+      --focus: #95deaa;
+      --border: #dde7d0;
+      --shadow: 0 1.5rem 2.5rem -1.5rem rgba(34,109,61,0.12);
+      --fs-hero: clamp(2rem, 5vw, 3rem);
+      --fs-base: 1.125rem;
+      --fs-sm: 1rem;
+      --fs-lg: 1.5rem;
+      --round: 1.1rem;
+      --transition: 220ms cubic-bezier(.37,1.27,.36,.94);
+      --motion: all 410ms cubic-bezier(.55, 1.4, .61, 1);
+    }
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --bg: #181f13;
+        --bg-grad: linear-gradient(120deg, #142411 0%, #284c2e 100%);
+        --card: #202d19;
+        --primary: #6ad87e;
+        --primary-light: #c3f1cb;
+        --button-bg: #226d3d;
+        --button-bg-hover: #56af5c;
+        --button-text: #f5faee;
+        --focus: #59db79;
+        --border: #30522b;
+        --shadow: 0 2rem 3.5rem -2rem rgba(130,228,118,0.13);
+      }
+    }
+    html {
+      box-sizing: border-box;
+      scroll-behavior: smooth;
+      background: var(--bg-grad);
+      min-height: 100%;
+      height: 100%;
+    }
+    *, *:before, *:after { box-sizing: inherit; }
+    body {
+      margin: 0;
+      min-height: 100vh;
+      background: var(--bg-grad);
+      font-family: system-ui, sans-serif;
+      font-size: var(--fs-base);
+      color: var(--primary);
+      display: flex;
+      flex-direction: column;
+      transition: background 540ms cubic-bezier(.36,1.3,.47,.98);
+      line-height: 1.5;
+      letter-spacing: 0.01em;
+    }
+    nav {
+      width: 100%;
+      padding: .75rem 0;
+      background: transparent;
+      border-bottom: 1px solid var(--border);
+      z-index: 2;
+    }
+    .nav-container {
+      max-width: 44rem;
+      margin: 0 auto;
+      padding: 0 1.25rem;
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: .55rem;
+      font-size: 1.2rem;
+      font-weight: 700;
+      color: var(--primary);
+      letter-spacing: 0.02em;
+      text-decoration: none;
+    }
+    .brand svg {
+      width: 1.6em; height: 1.6em; display: inline;
+    }
+    main {
+      flex: 1;
+      padding: 0;
+    }
+    .hero {
+      max-width: 44rem;
+      margin: 0 auto;
+      padding: 2.7rem 1.25rem 0 1.25rem;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+    }
+    .hero-title {
+      font-size: var(--fs-hero);
+      font-weight: 800;
+      letter-spacing: -0.018em;
+      background: linear-gradient(100deg, var(--primary), #7ead6b 80%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      margin: 0 0 .7rem 0;
+      display: inline-block;
+      line-height: 1.04;
+    }
+    .hero-desc {
+      font-size: var(--fs-lg);
+      color: #266c3e;
+      opacity: 0.85;
+      margin: 0 0 1.65rem 0;
+      font-weight: 470;
+      line-height: 1.25;
+    }
+    .hero-forest {
+      margin-bottom: 1.7rem;
+      display: inline-flex;
+      gap: .05em;
+    }
+    @media (max-width: 600px) {
+      .hero { padding-top: 1.2rem; }
+      .hero-title { font-size: 2.1rem; }
+      .hero-desc { font-size: 1.04rem; }
+    }
+    .generator-section {
+      width: 100%;
+      max-width: 33rem;
+      margin: 2.7rem auto 2.1rem auto;
+      padding: 1.7rem 1rem 2.2rem 1rem;
+      background: var(--card);
+      border-radius: var(--round);
+      box-shadow: var(--shadow);
+      border: 1px solid var(--border);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      animation: fadeInUp 0.9s .07s both cubic-bezier(.17,1.3,.13,1);
+    }
+    @media (max-width: 500px) {
+      .generator-section { margin: 1.2rem auto; padding: 1rem 0.5rem 1.5rem 0.5rem; }
+    }
+    @keyframes fadeInUp {
+      from { opacity: 0; transform: translateY(38px);}
+      to { opacity: 1; transform: none;}
+    }
+    .card-label {
+      letter-spacing: .03em;
+      font-size: var(--fs-sm);
+      font-weight: 500;
+      color: #5e9170;
+      margin-bottom: .12rem;
+      opacity: .91;
+    }
+    .lucky-number-box {
+      margin: .25rem 0 1.2rem 0;
+      display: flex;
+      justify-content: center;
+      align-items: flex-end;
+      min-height: 3.8rem;
+      flex-wrap: wrap;
+      gap: .3rem;
+    }
+    .lucky-number {
+      background: linear-gradient(120deg, #e1faec 20%, #6abf69 90%);
+      color: #18502c;
+      font-size: clamp(2rem, 4vw, 2.8rem);
+      border-radius: 1.2em;
+      min-width: 3rem;
+      min-height: 2.7rem;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 0.45em 0.7em;
+      font-weight: 750;
+      box-shadow: 0 0.4em 1.1em -0.5em #41b55733;
+      user-select: text;
+      border: 2px solid #badeb6;
+      transition: box-shadow .18s;
+      letter-spacing: .03em;
+      position: relative;
+      animation: numPop .6s cubic-bezier(.95,0,.16,1.18);
+    }
+    @keyframes numPop {
+      0% { transform: scale(.7); opacity:0;}
+      50% { transform: scale(1.17);}
+      100% { transform: scale(1); opacity:1;}
+    }
+    .empty-state {
+      color: #b5ccb7;
+      font-size: 1.2rem;
+      font-weight: 540;
+      letter-spacing: .01em;
+      margin: .9rem 0 1.2rem 0;
+      padding: .2em 0;
+      min-width:6.8rem;
+      text-align: center;
+    }
+    .challenge-card {
+      margin-top: 2.5rem;
+      width: 100%;
+      max-width: 28rem;
+      background: linear-gradient(102deg, #effbea 60%, #d6e7ce 100%);
+      border-radius: 1.1rem;
+      box-shadow: 0 1.2rem 3rem -1.3rem #aedfa154;
+      border: 1px solid #d8e7d8;
+      padding: 1.45rem 1.1rem 1.15rem 1.1rem;
+      font-size: 1.1rem;
+      font-weight: 520;
+      color: #25603e;
+      opacity: 0.97;
+      text-align: center;
+      transition: box-shadow 0.2s;
+      animation: fadeInUp 0.8s .11s both cubic-bezier(.2,1.1,.14,1);
+      min-height: 3.5rem;
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 3.7rem;
+    }
+    .challenge-empty {
+      color: #bdd4c3;
+    }
+    .actions-row {
+      margin-top: 1.3rem;
+      width: 100%;
+      display: flex;
+      gap: 0.7rem;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+    .action-btn {
+      border-radius: 1.7rem;
+      background: var(--button-bg);
+      color: var(--button-text);
+      border: none;
+      padding: 0.78em 1.6em;
+      font-size: 1.03rem;
+      font-weight: 600;
+      min-width: 7.4rem;
+      letter-spacing: .02em;
+      cursor: pointer;
+      outline: none;
+      box-shadow: 0 2px 16px -6px #1f57294d;
+      transition: background .21s, box-shadow .2s, transform .18s;
+      position: relative;
+    }
+    .action-btn:active {
+      transform: translateY(1.5px) scale(0.98);
+    }
+    .action-btn:focus-visible {
+      outline: 2.5px solid var(--focus);
+      outline-offset: 1px;
+      background: var(--button-bg-hover);
+      z-index:2;
+    }
+    .action-btn[disabled], .action-btn:disabled {
+      background: #b7ccb9;
+      color: #e7ece3;
+      cursor: not-allowed;
+      filter: grayscale(.22);
+      opacity: .67;
+      box-shadow: none;
+    }
+    .action-btn:hover:not(:disabled), .action-btn:focus-visible:not(:disabled) {
+      background: var(--button-bg-hover);
+    }
+    @media (max-width: 420px) {
+      .actions-row { flex-direction: column; gap: 0.4rem; }
+    }
+    .divider {
+      margin: 2rem auto 1.25rem auto;
+      border: 0;
+      height: 1.2px;
+      background: linear-gradient(90deg, #c9e0cf 20%, #baddbf 70%, #e7f6ed 100%);
+      border-radius: 6px;
+      width: 92%;
+      max-width:33rem;
+      opacity: .54;
+    }
+    .disclaimer-section {
+      margin: 2.6rem auto 0 auto;
+      max-width: 31rem;
+      color: #5e9170;
+      font-size: .99rem;
+      text-align: center;
+      padding: 0 .7rem;
+      opacity: .91;
+    }
+    /* Focus states for custom components */
+    .action-btn:focus-visible, .nav-link:focus-visible, .footer-link:focus-visible {
+      box-shadow: 0 0 0 3px var(--focus);
+    }
+    /* Footer */
+    footer {
+      width: 100%;
+      margin-top: auto;
+      border-top: 1px solid var(--border);
+      background: #f6f8f3;
+      padding: 1.1rem 0 .7rem 0;
+      text-align: center;
+      font-size: .98rem;
+      color: #59926b;
+    }
+    .footer-credit {
+      font-size: .9rem;
+      color: #7ba278;
+      margin-top: .45rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.34em;
+    }
+    .footer-factory {
+      display: inline-block;
+      font-weight: 500;
+      white-space: nowrap;
+      letter-spacing: .04em;
+      border-radius: 0.7em;
+      padding: 0.19em 0.77em 0.15em 0.7em;
+      border: none;
+      background: linear-gradient(100deg, #f6f7f3 60%, #e2f6e1 120%);
+      color: #247041;
+      font-size: .88em;
+      box-shadow: 0 1.5px 8px -3px #acd7a835;
+      opacity: .85;
+      margin-left: 0.2em;
+      cursor:default;
+      transition:box-shadow .16s;
+    }
+    /* Small devices tweak */
+    @media (max-width:350px) {
+      .hero-title { font-size:1.35rem;}
+      .lucky-number { font-size:1.4rem; }
+    }
+    /* Motion reduction */
+    @media (prefers-reduced-motion: reduce) {
+      *, *:before, *:after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+        scroll-behavior: auto !important;
+      }
+    }
+    /* Custom scrollbar */
+    ::-webkit-scrollbar { width: 9px; background: #e7efea;}
+    ::-webkit-scrollbar-thumb { background: #b8d5bc; border-radius:7px;}
+    ::selection { background: #bcf3be55; }
+  </style>
+</head>
+<body id="lucky-generator">
+  <nav aria-label="Site">
+    <div class="nav-container">
+      <a href="#lucky-generator" class="brand" aria-current="page">
+        <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+          <g>
+            <ellipse cx="12" cy="14.8" rx="10" ry="7.1" fill="#6abf69" opacity=".72"/>
+            <ellipse cx="12" cy="10.2" rx="7.7" ry="7.1" fill="#c0e2ba" opacity=".8"/>
+            <ellipse cx="12" cy="14.2" rx="7.6" ry="5.5" fill="#226d3d" opacity=".71"/>
+            <ellipse cx="12" cy="10.7" rx="5.2" ry="5.7" fill="#e1faec" opacity="1"/>
+          </g>
+        </svg>
+        Lucky Generator
+      </a>
+      <!-- No nav links for this simple SPA, reserved for ARIA/completeness -->
+      <div role="presentation" aria-hidden="true"></div>
+    </div>
+  </nav>
+  <main>
+    <section class="hero" aria-labelledby="hero-title">
+      <span class="hero-forest" aria-hidden="true">
+        <svg width="60" height="26" viewBox="0 0 60 26">
+          <ellipse cx="8" cy="17" rx="8" ry="7" fill="#baddbf" />
+          <ellipse cx="30" cy="10" rx="18" ry="8" fill="#e1faec"/>
+          <ellipse cx="52" cy="19" rx="7" ry="6" fill="#81bc86"/>
+          <ellipse cx="15" cy="23" rx="8" ry="3.5" fill="#71b38a"/>
+          <ellipse cx="44" cy="23.5" rx="10" ry="2.5" fill="#d6e7ce"/>
+        </svg>
+      </span>
+      <h1 id="hero-title" class="hero-title">Lucky Number Generator</h1>
+      <p class="hero-desc">Get your playful moment of luck! Generate a fresh lucky number and a daily challenge for fun inspiration.</p>
+    </section>
+    <section class="generator-section" aria-labelledby="generator-title">
+      <h2 id="generator-title" class="visually-hidden">Lucky Number &amp; Daily Challenge</h2>
+      <div class="card-label" id="lucky-label" aria-live="polite">Your Lucky Number</div>
+      <div class="lucky-number-box" id="lucky-number-box" aria-atomic="true" tabindex="0">
+        <div class="empty-state" id="number-empty">Waiting for you 🍀</div>
+      </div>
+      <div class="actions-row">
+        <button type="button" class="action-btn" id="generate-btn" aria-label="Generate lucky number and challenge">
+          <span aria-hidden="true" style="margin-right:.35em;vertical-align:middle;">✨</span> Generate
+        </button>
+        <button type="button" class="action-btn" id="reset-btn" aria-label="Reset all" disabled>
+          <span aria-hidden="true" style="margin-right:.17em;vertical-align:middle;">🔄</span> Reset
+        </button>
+      </div>
+      <div class="challenge-card" id="challenge-card" aria-live="polite">
+        <span class="challenge-empty" id="challenge-empty">Your daily challenge appears here.</span>
+      </div>
+    </section>
+    <hr class="divider" aria-hidden="true">
+    <section class="disclaimer-section" aria-label="Disclaimer">
+      <strong>Disclaimer:</strong> This Lucky Number Generator is entertainment only—numbers and challenges are randomly generated, just for fun.<br>
+      Don't take results seriously, and please use wisely!
+    </section>
+  </main>
+  <footer>
+    <div>
+      &copy; 2026 Lucky Generator
+    </div>
+    <div class="footer-credit">
+      <span>Made with</span>
+      <span aria-hidden="true" style="color:#95deaa; font-size:1.2em; vertical-align:middle;">🤖</span>
+      <span class="footer-factory">Daily AI Website Factory</span>
+    </div>
+  </footer>
+  <script>
+    // Accessibility helpers
+    (function createVisuallyHidden() {
+      if (document.querySelector('.visually-hidden')) return;
+      var style = document.createElement('style');
+      style.textContent = '.visually-hidden{position:absolute!important;height:1px;width:1px;overflow:hidden;clip:rect(1px,1px,1px,1px);white-space:nowrap;border:0;padding:0;margin:-1px;}';
+      document.head.appendChild(style);
+    })();
+
+    // Daily challenge prompts
+    const challenges = [
+      'Take a mindful five-minute walk outside.',
+      'Compliment someone today.',
+      'Try a food you\'ve never tasted.',
+      'Write down one thing you\'re grateful for.',
+      'Do 7 deep breaths with your eyes closed.',
+      'Share a smile with a stranger.',
+      'Declutter a small area around you.',
+      'Drink a big glass of water.',
+      'Unplug from all screens for 15 minutes.',
+      'Bring a touch of nature indoors today.',
+      'Give yourself a stretch break.',
+      'Listen to a favorite song.',
+      'Send a positive message to a friend.',
+      'Read a page from a book.',
+      'Try drawing something—anything!',
+      'Step outside and notice five sounds.',
+      'Recycle one item you were going to throw away.',
+      'Tell yourself: "I am enough."',
+      'Make a list of three small joys.',
+      'Share a fun fact you know.',
+      'Plan a healthy meal.',
+      'Organize your digital desktop or notes.',
+      'Pause and watch clouds for a moment.',
+      'Say "thank you" to someone today.',
+      'Take one picture of something beautiful.',
+      'Plant a seed, literal or metaphorical.',
+      'Let a small worry go, just for a moment.',
+      'Try a new stretch or posture.',
+      'Make a wish as you toss a pebble.',
+      'Light a candle for a cozy mood.'
+    ];
+    // Lucky number generator: between 1 and 999 (or more digits if 'lucky streak')
+    function generateLuckyNumber() {
+      // 8% chance of a two-number 'lucky streak'
+      if (Math.random() < 0.08) {
+        const n1 = Math.floor(Math.random()*899+100);
+        const n2 = Math.floor(Math.random()*899+100);
+        return [n1, n2];
+      }
+      // 20% chance of two-digit, 70+% chance of three-digit, rare 4-digit
+      let n;
+      const r = Math.random();
+      if (r < 0.13) n = Math.floor(Math.random()*90+10); // 10-99
+      else if (r < 0.98) n = Math.floor(Math.random()*900+100); // 100-999
+      else n = Math.floor(Math.random()*9000+1000); // 1000-9999
+      return [n];
+    }
+    // Get a new random challenge index that's not repeated if possible
+    let previousChallengeIdx = -1;
+    function getRandomChallenge() {
+      let idx;
+      do {
+        idx = Math.floor(Math.random() * challenges.length);
+      } while (challenges.length>2 && idx === previousChallengeIdx);
+      previousChallengeIdx = idx;
+      return challenges[idx];
+    }
+    // Elements
+    const numberBox = document.getElementById('lucky-number-box');
+    const numberEmpty = document.getElementById('number-empty');
+    const challengeCard = document.getElementById('challenge-card');
+    const challengeEmpty = document.getElementById('challenge-empty');
+    const generateBtn = document.getElementById('generate-btn');
+    const resetBtn = document.getElementById('reset-btn');
+
+    // Helper for content animation (support reduced motion)
+    function animatePop(el) {
+      if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+      el.style.animation = 'none';
+      void el.offsetWidth;
+      el.style.animation = null;
+    }
+
+    function renderLuckyNumber(nums) {
+      numberBox.innerHTML = '';
+      nums.forEach(function(n, i){
+        const span = document.createElement('span');
+        span.classList.add('lucky-number');
+        span.tabIndex = 0;
+        span.setAttribute('aria-label', `Lucky number: ${n}`);
+        span.textContent = n;
+        setTimeout(()=>animatePop(span), i*95 + 15);
+        numberBox.appendChild(span);
+      });
+    }
+
+    function renderChallenge(text) {
+      if (challengeEmpty) challengeEmpty.style.display = 'none';
+      challengeCard.textContent = ''; // Remove prior
+      const c = document.createElement('span');
+      c.textContent = text;
+      challengeCard.appendChild(c);
+    }
+
+    function resetGenerator() {
+      numberBox.innerHTML = '';
+      numberBox.appendChild(numberEmpty);
+      numberEmpty.textContent = 'Waiting for you 🍀';
+      if (challengeCard) {
+        challengeCard.innerHTML = '';
+        challengeEmpty.style.display = '';
+        challengeEmpty.textContent = 'Your daily challenge appears here.';
+        challengeCard.appendChild(challengeEmpty);
+      }
+      resetBtn.disabled = true;
+      generateBtn.focus();
+    }
+
+    // Event handlers
+    function generateAll() {
+      // Lucky Number
+      const luckyNums = generateLuckyNumber();
+      renderLuckyNumber(luckyNums);
+      // Challenge
+      const challenge = getRandomChallenge();
+      renderChallenge(challenge);
+      resetBtn.disabled = false;
+      // Announce for accessibility
+      setTimeout(() => {
+        numberBox.setAttribute('aria-live','polite');
+        challengeCard.setAttribute('aria-live','polite');
+      }, 80);
+    }
+
+    generateBtn.addEventListener('click', function(){
+      generateAll();
+    });
+
+    resetBtn.addEventListener('click', function(){
+      resetGenerator();
+    });
+
+    // Keyboard accessibility: Enter/Space on numberBox generates, del/backspace on reset
+    numberBox.addEventListener('keydown', function(e){
+      if(e.key==='Enter'||e.key===' '){
+        generateAll();
+        generateBtn.blur();
+        e.preventDefault();
+      }
+    });
+    numberBox.addEventListener('click', function(){
+      if (resetBtn.disabled) return;
+      numberBox.querySelectorAll('.lucky-number').forEach(function(el){
+        animatePop(el);
+      });
+    });
+
+    // Pressing delete/backspace on Reset to clear all
+    resetBtn.addEventListener('keydown', function(e){
+      if(e.key==='Backspace'||e.key==='Delete'){
+        resetGenerator();
+        e.preventDefault();
+      }
+    });
+
+    // On page load: focus on Generate for keyboarders
+    window.addEventListener('DOMContentLoaded', function(){
+      resetGenerator();
+      // Focus main Generate if not touch
+      if(window.matchMedia('(pointer:fine)').matches) {
+        setTimeout(()=>{generateBtn.focus();},160);
+      }
+    });
+    // Visible focus for tab navigation (add custom class on body)
+    let usingKeyboard = false;
+    document.body.addEventListener('keydown', function(e){
+      if(e.key==='Tab') {
+        if (!usingKeyboard) {
+          document.body.classList.add('keyboard-nav');
+          usingKeyboard = true;
+        }
+      }
+    });
+    document.body.addEventListener('mousedown', function(){
+      if(usingKeyboard) {
+        document.body.classList.remove('keyboard-nav');
+        usingKeyboard = false;
+      }
+    });
+    // Accessibility: allow users to focus the number box
+    numberBox.setAttribute('tabindex','0');
+    numberBox.setAttribute('role','region');
+    numberBox.setAttribute('aria-label','Lucky number display');
+    // Responsive: focus scroll to generator on hash change
+    window.addEventListener('hashchange', function(){
+      if(location.hash === '#lucky-generator') {
+        setTimeout(function(){
+          document.querySelector('.generator-section').scrollIntoView({behavior:'smooth', block:'start'});
+        },1);
+      }
+    });
+  </script>
+</body>
+</html>
