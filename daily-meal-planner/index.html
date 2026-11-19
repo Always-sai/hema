@@ -1,1469 +1,1083 @@
+Here is a complete, self-contained HTML document for the Daily Meal Planner. It includes a responsive layout, interactive meal filtering, a dynamic plan builder, and an ingredient checklist—all powered by vanilla JavaScript.
+```html
 <!doctype html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Daily Meal Planner</title>
-    <script crossorigin src="https://unpkg.com/react@18/umd/react.development.js"></script>
-    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
-    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
-    <style>
-        :root {
-            --primary-green: #2E7D32;
-            --primary-green-light: #4CAF50;
-            --primary-green-dark: #1B5E20;
-            --accent-cream: #FFF8F0;
-            --text-dark: #2C1810;
-            --text-medium: #5D4037;
-            --text-light: #8D6E63;
-            --border-light: #E0D6C8;
-            --shadow-light: 0 2px 8px rgba(0, 0, 0, 0.05);
-            --shadow-medium: 0 4px 16px rgba(0, 0, 0, 0.08);
-            --shadow-hover: 0 8px 24px rgba(46, 125, 50, 0.15);
-            --gradient-card: linear-gradient(135deg, #FFFFFF 0%, #F9F6F0 100%);
-            --transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-        }
-
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        body {
-            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            line-height: 1.6;
-            color: var(--text-dark);
-            background: var(--accent-cream);
-            -webkit-font-smoothing: antialiased;
-            -moz-osx-font-smoothing: grayscale;
-        }
-
-        /* Typography */
-        h1, h2, h3, h4, h5, h6 {
-            font-weight: 600;
-            line-height: 1.2;
-            color: var(--text-dark);
-            letter-spacing: -0.02em;
-        }
-
-        .hero-title {
-            font-size: clamp(2rem, 5vw, 3.5rem);
-            font-weight: 700;
-            background: linear-gradient(135deg, var(--primary-green-dark) 0%, var(--primary-green) 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-        }
-
-        .section-title {
-            font-size: clamp(1.5rem, 3vw, 2.25rem);
-            font-weight: 600;
-            color: var(--text-dark);
-        }
-
-        .card-title {
-            font-size: 1.25rem;
-            font-weight: 600;
-            color: var(--text-dark);
-        }
-
-        .body-text {
-            font-size: 1rem;
-            color: var(--text-medium);
-            line-height: 1.7;
-        }
-
-        .small-text {
-            font-size: 0.875rem;
-            color: var(--text-light);
-        }
-
-        /* Layout */
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 0 1.5rem;
-        }
-
-        .section {
-            padding: 4rem 0;
-        }
-
-        /* Header */
-        header {
-            background: rgba(255, 255, 255, 0.9);
-            backdrop-filter: blur(10px);
-            border-bottom: 1px solid var(--border-light);
-            position: sticky;
-            top: 0;
-            z-index: 100;
-            padding: 1rem 0;
-        }
-
-        nav {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .logo {
-            font-size: 1.5rem;
-            font-weight: 700;
-            color: var(--primary-green);
-            text-decoration: none;
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-        }
-
-        .nav-links {
-            display: flex;
-            gap: 2rem;
-            list-style: none;
-        }
-
-        .nav-links a {
-            text-decoration: none;
-            color: var(--text-medium);
-            font-weight: 500;
-            transition: var(--transition-smooth);
-            position: relative;
-        }
-
-        .nav-links a:hover {
-            color: var(--primary-green);
-        }
-
-        .nav-links a::after {
-            content: '';
-            position: absolute;
-            bottom: -4px;
-            left: 0;
-            width: 0;
-            height: 2px;
-            background: var(--primary-green);
-            transition: var(--transition-smooth);
-        }
-
-        .nav-links a:hover::after {
-            width: 100%;
-        }
-
-        .mobile-menu-toggle {
-            display: none;
-            background: none;
-            border: none;
-            cursor: pointer;
-            padding: 0.5rem;
-        }
-
-        .hamburger {
-            width: 24px;
-            height: 2px;
-            background: var(--text-dark);
-            position: relative;
-            transition: var(--transition-smooth);
-        }
-
-        .hamburger::before, .hamburger::after {
-            content: '';
-            position: absolute;
-            width: 24px;
-            height: 2px;
-            background: var(--text-dark);
-            transition: var(--transition-smooth);
-        }
-
-        .hamburger::before {
-            top: -6px;
-        }
-
-        .hamburger::after {
-            bottom: -6px;
-        }
-
-        .mobile-menu-toggle.active .hamburger {
-            background: transparent;
-        }
-
-        .mobile-menu-toggle.active .hamburger::before {
-            transform: rotate(45deg);
-            top: 0;
-        }
-
-        .mobile-menu-toggle.active .hamburger::after {
-            transform: rotate(-45deg);
-            bottom: 0;
-        }
-
-        /* Hero Section */
-        .hero {
-            padding: 6rem 0;
-            background: linear-gradient(135deg, rgba(255, 255, 255, 0.8) 0%, rgba(249, 246, 240, 0.8) 100%);
-            position: relative;
-            overflow: hidden;
-        }
-
-        .hero::before {
-            content: '';
-            position: absolute;
-            top: -50%;
-            right: -20%;
-            width: 60%;
-            height: 60%;
-            background: radial-gradient(circle, rgba(46, 125, 50, 0.1) 0%, transparent 70%);
-            pointer-events: none;
-        }
-
-        .hero-content {
-            position: relative;
-            z-index: 1;
-            max-width: 800px;
-            margin: 0 auto;
-            text-align: center;
-        }
-
-        .hero-description {
-            font-size: 1.25rem;
-            color: var(--text-medium);
-            margin: 1.5rem 0 2.5rem;
-            max-width: 600px;
-            margin-left: auto;
-            margin-right: auto;
-        }
-
-        .cta-button {
-            background: var(--primary-green);
-            color: white;
-            border: none;
-            padding: 1rem 2.5rem;
-            font-size: 1.125rem;
-            font-weight: 600;
-            border-radius: 8px;
-            cursor: pointer;
-            transition: var(--transition-smooth);
-            box-shadow: var(--shadow-light);
-            position: relative;
-            overflow: hidden;
-        }
-
-        .cta-button::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: -100%;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
-            transition: var(--transition-smooth);
-        }
-
-        .cta-button:hover::before {
-            left: 100%;
-        }
-
-        .cta-button:hover {
-            background: var(--primary-green-light);
-            transform: translateY(-2px);
-            box-shadow: var(--shadow-hover);
-        }
-
-        .cta-button:active {
-            transform: translateY(0);
-        }
-
-        /* Filters Section */
-        .filters-section {
-            background: white;
-            border-radius: 16px;
-            padding: 2rem;
-            margin-bottom: 3rem;
-            box-shadow: var(--shadow-light);
-            border: 1px solid var(--border-light);
-        }
-
-        .filters-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 1.5rem;
-        }
-
-        .filters-title {
-            font-size: 1.25rem;
-            font-weight: 600;
-            color: var(--text-dark);
-        }
-
-        .filter-buttons {
-            display: flex;
-            gap: 0.75rem;
-            flex-wrap: wrap;
-        }
-
-        .filter-button {
-            background: var(--accent-cream);
-            border: 1px solid var(--border-light);
-            padding: 0.5rem 1.25rem;
-            border-radius: 24px;
-            cursor: pointer;
-            font-size: 0.875rem;
-            font-weight: 500;
-            color: var(--text-medium);
-            transition: var(--transition-smooth);
-        }
-
-        .filter-button:hover {
-            background: var(--primary-green);
-            color: white;
-            border-color: var(--primary-green);
-            transform: translateY(-1px);
-        }
-
-        .filter-button.active {
-            background: var(--primary-green);
-            color: white;
-            border-color: var(--primary-green);
-        }
-
-        /* Meal Grid */
-        .meals-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
-            gap: 2rem;
-            margin-bottom: 3rem;
-        }
-
-        .meal-card {
-            background: var(--gradient-card);
-            border-radius: 16px;
-            overflow: hidden;
-            box-shadow: var(--shadow-light);
-            border: 1px solid var(--border-light);
-            transition: var(--transition-smooth);
-            position: relative;
-        }
-
-        .meal-card:hover {
-            transform: translateY(-4px);
-            box-shadow: var(--shadow-hover);
-        }
-
-        .meal-image {
-            width: 100%;
-            height: 200px;
-            object-fit: cover;
-            background: linear-gradient(135deg, var(--primary-green-light), var(--primary-green-dark));
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: white;
-            font-size: 2rem;
-            font-weight: 600;
-        }
-
-        .meal-content {
-            padding: 1.5rem;
-        }
-
-        .meal-category {
-            display: inline-block;
-            background: rgba(46, 125, 50, 0.1);
-            color: var(--primary-green);
-            padding: 0.25rem 0.75rem;
-            border-radius: 20px;
-            font-size: 0.75rem;
-            font-weight: 600;
-            text-transform: uppercase;
-            letter-spacing: 0.05em;
-            margin-bottom: 0.75rem;
-        }
-
-        .meal-title {
-            margin-bottom: 0.5rem;
-            line-height: 1.3;
-        }
-
-        .meal-description {
-            margin-bottom: 1.5rem;
-            line-height: 1.6;
-        }
-
-        .meal-ingredients {
-            margin-bottom: 1.5rem;
-        }
-
-        .ingredients-title {
-            font-size: 0.875rem;
-            font-weight: 600;
-            color: var(--text-dark);
-            margin-bottom: 0.75rem;
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-        }
-
-        .ingredients-list {
-            list-style: none;
-            display: flex;
-            flex-wrap: wrap;
-            gap: 0.5rem;
-        }
-
-        .ingredient-item {
-            background: white;
-            border: 1px solid var(--border-light);
-            padding: 0.25rem 0.75rem;
-            border-radius: 16px;
-            font-size: 0.75rem;
-            color: var(--text-medium);
-            cursor: pointer;
-            transition: var(--transition-smooth);
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-        }
-
-        .ingredient-item:hover {
-            background: var(--primary-green);
-            color: white;
-            border-color: var(--primary-green);
-        }
-
-        .ingredient-item.checked {
-            background: var(--primary-green);
-            color: white;
-            border-color: var(--primary-green);
-            text-decoration: line-through;
-            opacity: 0.7;
-        }
-
-        .ingredient-checkbox {
-            width: 16px;
-            height: 16px;
-            border: 2px solid var(--border-light);
-            border-radius: 3px;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: var(--transition-smooth);
-        }
-
-        .ingredient-item.checked .ingredient-checkbox {
-            background: white;
-            border-color: white;
-        }
-
-        .ingredient-item.checked .ingredient-checkbox::after {
-            content: '✓';
-            color: var(--primary-green);
-            font-size: 0.75rem;
-            font-weight: 600;
-        }
-
-        .meal-actions {
-            display: flex;
-            gap: 0.75rem;
-        }
-
-        .action-button {
-            flex: 1;
-            background: white;
-            border: 1px solid var(--border-light);
-            padding: 0.75rem;
-            border-radius: 8px;
-            cursor: pointer;
-            font-size: 0.875rem;
-            font-weight: 500;
-            color: var(--text-medium);
-            transition: var(--transition-smooth);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 0.5rem;
-        }
-
-        .action-button:hover {
-            background: var(--primary-green);
-            color: white;
-            border-color: var(--primary-green);
-        }
-
-        .action-button.completed {
-            background: var(--primary-green);
-            color: white;
-            border-color: var(--primary-green);
-        }
-
-        /* Empty State */
-        .empty-state {
-            text-align: center;
-            padding: 4rem 2rem;
-            background: white;
-            border-radius: 16px;
-            box-shadow: var(--shadow-light);
-            border: 1px solid var(--border-light);
-        }
-
-        .empty-icon {
-            font-size: 4rem;
-            margin-bottom: 1.5rem;
-            opacity: 0.5;
-        }
-
-        .empty-title {
-            font-size: 1.5rem;
-            margin-bottom: 1rem;
-            color: var(--text-dark);
-        }
-
-        .empty-description {
-            color: var(--text-medium);
-            max-width: 400px;
-            margin: 0 auto 2rem;
-        }
-
-        /* Ingredient Checklist */
-        .ingredient-checklist {
-            background: white;
-            border-radius: 16px;
-            padding: 2rem;
-            box-shadow: var(--shadow-light);
-            border: 1px solid var(--border-light);
-            margin-top: 2rem;
-        }
-
-        .checklist-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 1.5rem;
-        }
-
-        .checklist-title {
-            font-size: 1.25rem;
-            font-weight: 600;
-            color: var(--text-dark);
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-        }
-
-        .clear-all-button {
-            background: var(--accent-cream);
-            border: 1px solid var(--border-light);
-            padding: 0.5rem 1rem;
-            border-radius: 8px;
-            cursor: pointer;
-            font-size: 0.875rem;
-            color: var(--text-medium);
-            transition: var(--transition-smooth);
-        }
-
-        .clear-all-button:hover {
-            background: #ffebee;
-            border-color: #ffcdd2;
-            color: #c62828;
-        }
-
-        .checklist-items {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-            gap: 0.75rem;
-        }
-
-        .checklist-item {
-            background: var(--accent-cream);
-            border: 1px solid var(--border-light);
-            padding: 0.75rem;
-            border-radius: 8px;
-            font-size: 0.875rem;
-            color: var(--text-medium);
-            cursor: pointer;
-            transition: var(--transition-smooth);
-            display: flex;
-            align-items: center;
-            gap: 0.75rem;
-        }
-
-        .checklist-item:hover {
-            background: var(--primary-green);
-            color: white;
-            border-color: var(--primary-green);
-            transform: translateX(4px);
-        }
-
-        .checklist-item.checked {
-            background: var(--primary-green);
-            color: white;
-            border-color: var(--primary-green);
-            text-decoration: line-through;
-            opacity: 0.7;
-        }
-
-        .checklist-checkbox {
-            width: 18px;
-            height: 18px;
-            border: 2px solid var(--border-light);
-            border-radius: 4px;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: var(--transition-smooth);
-            flex-shrink: 0;
-        }
-
-        .checklist-item.checked .checklist-checkbox {
-            background: white;
-            border-color: white;
-        }
-
-        .checklist-item.checked .checklist-checkbox::after {
-            content: '✓';
-            color: var(--primary-green);
-            font-size: 0.875rem;
-            font-weight: 600;
-        }
-
-        /* Footer */
-        footer {
-            background: white;
-            border-top: 1px solid var(--border-light);
-            padding: 3rem 0 2rem;
-            margin-top: 4rem;
-        }
-
-        .footer-content {
-            display: grid;
-            grid-template-columns: 2fr 1fr 1fr 1fr;
-            gap: 3rem;
-            margin-bottom: 2rem;
-        }
-
-        .footer-brand {
-            max-width: 300px;
-        }
-
-        .footer-logo {
-            font-size: 1.5rem;
-            font-weight: 700;
-            color: var(--primary-green);
-            text-decoration: none;
-            display: inline-block;
-            margin-bottom: 1rem;
-        }
-
-        .footer-description {
-            color: var(--text-medium);
-            line-height: 1.6;
-            margin-bottom: 1.5rem;
-        }
-
-        .footer-social {
-            display: flex;
-            gap: 1rem;
-        }
-
-        .social-link {
-            width: 36px;
-            height: 36px;
-            background: var(--accent-cream);
-            border-radius: 8px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: var(--primary-green);
-            text-decoration: none;
-            transition: var(--transition-smooth);
-        }
-
-        .social-link:hover {
-            background: var(--primary-green);
-            color: white;
-            transform: translateY(-2px);
-        }
-
-        .footer-title {
-            font-size: 1rem;
-            font-weight: 600;
-            color: var(--text-dark);
-            margin-bottom: 1rem;
-        }
-
-        .footer-links {
-            list-style: none;
-            display: flex;
-            flex-direction: column;
-            gap: 0.75rem;
-        }
-
-        .footer-links a {
-            color: var(--text-medium);
-            text-decoration: none;
-            transition: var(--transition-smooth);
-        }
-
-        .footer-links a:hover {
-            color: var(--primary-green);
-            padding-left: 4px;
-        }
-
-        .footer-bottom {
-            border-top: 1px solid var(--border-light);
-            padding-top: 2rem;
-            text-align: center;
-            color: var(--text-light);
-            font-size: 0.875rem;
-        }
-
-        /* Animations */
-        @keyframes fadeIn {
-            from {
-                opacity: 0;
-                transform: translateY(20px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
-        .meal-card {
-            animation: fadeIn 0.5s ease-out;
-        }
-
-        /* Focus States */
-        *:focus {
-            outline: 2px solid var(--primary-green);
-            outline-offset: 2px;
-        }
-
-        /* Reduced Motion */
-        @media (prefers-reduced-motion: reduce) {
-            * {
-                animation-duration: 0.01ms !important;
-                animation-iteration-count: 1 !important;
-                transition-duration: 0.01ms !important;
-            }
-        }
-
-        /* Responsive Design */
-        @media (max-width: 968px) {
-            .footer-content {
-                grid-template-columns: 1fr 1fr;
-                gap: 2rem;
-            }
-        }
-
-        @media (max-width: 768px) {
-            .nav-links {
-                display: none;
-                position: absolute;
-                top: 100%;
-                left: 0;
-                right: 0;
-                background: white;
-                border-bottom: 1px solid var(--border-light);
-                padding: 1rem;
-                box-shadow: var(--shadow-medium);
-            }
-
-            .nav-links.active {
-                display: flex;
-                flex-direction: column;
-                gap: 1rem;
-            }
-
-            .mobile-menu-toggle {
-                display: block;
-            }
-
-            .hero {
-                padding: 4rem 0;
-            }
-
-            .filters-section {
-                padding: 1.5rem;
-            }
-
-            .filter-buttons {
-                justify-content: center;
-            }
-
-            .meals-grid {
-                grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-                gap: 1.5rem;
-            }
-
-            .footer-content {
-                grid-template-columns: 1fr;
-                text-align: center;
-                gap: 2rem;
-            }
-
-            .footer-brand {
-                max-width: 100%;
-            }
-
-            .footer-social {
-                justify-content: center;
-            }
-        }
-
-        @media (max-width: 480px) {
-            .container {
-                padding: 0 1rem;
-            }
-
-            .section {
-                padding: 3rem 0;
-            }
-
-            .hero-title {
-                font-size: 2rem;
-            }
-
-            .hero-description {
-                font-size: 1.125rem;
-            }
-
-            .cta-button {
-                width: 100%;
-                padding: 0.875rem 2rem;
-            }
-
-            .meals-grid {
-                grid-template-columns: 1fr;
-                gap: 1.5rem;
-            }
-
-            .meal-actions {
-                flex-direction: column;
-            }
-
-            .checklist-items {
-                grid-template-columns: 1fr;
-            }
-        }
-
-        /* Utility Classes */
-        .hidden {
-            display: none !important;
-        }
-
-        .visually-hidden {
-            position: absolute;
-            width: 1px;
-            height: 1px;
-            padding: 0;
-            margin: -1px;
-            overflow: hidden;
-            clip: rect(0, 0, 0, 0);
-            white-space: nowrap;
-            border: 0;
-        }
-
-        /* Toast Notification */
-        .toast {
-            position: fixed;
-            bottom: 2rem;
-            right: 2rem;
-            background: white;
-            border-radius: 8px;
-            padding: 1rem 1.5rem;
-            box-shadow: var(--shadow-medium);
-            border: 1px solid var(--border-light);
-            display: flex;
-            align-items: center;
-            gap: 0.75rem;
-            transform: translateX(400px);
-            transition: var(--transition-smooth);
-            z-index: 1000;
-        }
-
-        .toast.show {
-            transform: translateX(0);
-        }
-
-        .toast-success {
-            border-left: 4px solid var(--primary-green);
-        }
-
-        .toast-icon {
-            color: var(--primary-green);
-            font-size: 1.25rem;
-        }
-
-        /* Loading State */
-        .loading {
-            display: inline-block;
-            width: 16px;
-            height: 16px;
-            border: 2px solid rgba(255, 255, 255, 0.3);
-            border-radius: 50%;
-            border-top-color: white;
-            animation: spin 0.8s linear infinite;
-        }
-
-        @keyframes spin {
-            to {
-                transform: rotate(360deg);
-            }
-        }
-
-        /* Error Message */
-        .error-message {
-            background: #ffebee;
-            border: 1px solid #ffcdd2;
-            color: #c62828;
-            padding: 1rem;
-            border-radius: 8px;
-            margin: 1rem 0;
-            display: flex;
-            align-items: center;
-            gap: 0.75rem;
-        }
-
-        .error-icon {
-            font-size: 1.25rem;
-        }
-    </style>
-    <script type="text/babel">
-        const { useState, useEffect } = React;
-
-        // Sample meal data
-        const sampleMeals = [
-            {
-                id: 1,
-                title: "Mediterranean Quinoa Bowl",
-                category: "Lunch",
-                description: "A vibrant and nutritious bowl packed with quinoa, cherry tomatoes, cucumber, olives, and feta cheese.",
-                ingredients: ["Quinoa", "Cherry tomatoes", "Cucumber", "Kalamata olives", "Feta cheese", "Fresh herbs", "Lemon juice"],
-                image: "🍽️"
-            },
-            {
-                id: 2,
-                title: "Classic Avocado Toast",
-                category: "Breakfast",
-                description: "Toasted whole grain bread topped with mashed avocado, sprinkle of sea salt, and red pepper flakes.",
-                ingredients: ["Whole grain bread", "Avocado", "Sea salt", "Red pepper flakes", "Lemon wedges"],
-                image: "🥑"
-            },
-            {
-                id: 3,
-                title: "Grilled Salmon with Asparagus",
-                category: "Dinner",
-                description: "Perfectly grilled salmon fillet served with roasted asparagus spears and a squeeze of dill.",
-                ingredients: ["Salmon fillet", "Fresh asparagus", "Dill", "Olive oil", "Lemon", "Salt", "Black pepper"],
-                image: "🐟"
-            },
-            {
-                id: 4,
-                title: "Chocolate Chip Cookies",
-                category: "Snacks",
-                description: "Warm, chewy cookies packed with chocolate chips, perfect for an afternoon pick-me-up.",
-                ingredients: ["Butter", "Brown sugar", "White sugar", "Eggs", "Vanilla extract", "Flour", "Chocolate chips"],
-                image: "🍪"
-            },
-            {
-                id: 5,
-                title: "Greek Yogurt Parfait",
-                category: "Breakfast",
-                description: "Layered Greek yogurt with fresh berries, granola, and a drizzle of honey.",
-                ingredients: ["Greek yogurt", "Mixed berries", "Granola", "Honey", "Fresh mint"],
-                image: "🍓"
-            },
-            {
-                id: 6,
-                title: "Vegetable Stir-Fry",
-                category: "Lunch",
-                description: "Quick and healthy stir-fry with bell peppers, broccoli, carrots, and snap peas in a soy-ginger sauce.",
-                ingredients: ["Bell peppers", "Broccoli", "Carrots", "Snap peas", "Soy sauce", "Ginger", "Garlic", "Olive oil"],
-                image: "🥦"
-            },
-            {
-                id: 7,
-                title: "Beef and Broccoli",
-                category: "Dinner",
-                description: "Tender beef strips cooked with fresh broccoli in a rich brown sauce.",
-                ingredients: ["Beef strips", "Fresh broccoli", "Soy sauce", "Garlic", "Cornstarch", "Vegetable oil"],
-                image: "🥩"
-            },
-            {
-                id: 8,
-                title: "Apple Cinnamon Oatmeal",
-                category: "Breakfast",
-                description: "Warm oatmeal cooked with apples, cinnamon, and a hint of maple syrup.",
-                ingredients: ["Oats", "Apples", "Cinnamon", "Maple syrup", "Walnuts", "Milk"],
-                image: "🍎"
-            }
-        ];
-
-        // Main App Component
-        function MealPlannerApp() {
-            const [meals, setMeals] = useState(sampleMeals);
-            const [filteredMeals, setFilteredMeals] = useState(sampleMeals);
-            const [selectedCategory, setSelectedCategory] = useState('All');
-            const [ingredientChecklist, setIngredientChecklist] = useState([]);
-            const [completedIngredients, setCompletedIngredients] = useState([]);
-            const [completedMeals, setCompletedMeals] = useState([]);
-            const [toastMessage, setToastMessage] = useState('');
-            const [isLoading, setIsLoading] = useState(false);
-            const [error, setError] = useState(null);
-
-            // Get all unique categories
-            const categories = ['All', ...Array.from(new Set(meals.map(meal => meal.category)))];
-
-            // Filter meals based on selected category
-            useEffect(() => {
-                if (selectedCategory === 'All') {
-                    setFilteredMeals(meals);
-                } else {
-                    setFilteredMeals(meals.filter(meal => meal.category === selectedCategory));
-                }
-            }, [selectedCategory, meals]);
-
-            // Collect all ingredients from all meals
-            useEffect(() => {
-                const allIngredients = meals.flatMap(meal => meal.ingredients);
-                const uniqueIngredients = [...new Set(allIngredients)];
-                setIngredientChecklist(uniqueIngredients);
-            }, [meals]);
-
-            // Toast notification function
-            const showToast = (message) => {
-                setToastMessage(message);
-                setTimeout(() => {
-                    setToastMessage('');
-                }, 3000);
-            };
-
-            // Filter button click handler
-            const handleFilterClick = (category) => {
-                setSelectedCategory(category);
-                showToast(`Showing ${category} meals`);
-            };
-
-            // Ingredient checkbox click handler
-            const handleIngredientClick = (ingredient) => {
-                if (completedIngredients.includes(ingredient)) {
-                    setCompletedIngredients(completedIngredients.filter(item => item !== ingredient));
-                    showToast(`Removed ${ingredient} from checklist`);
-                } else {
-                    setCompletedIngredients([...completedIngredients, ingredient]);
-                    showToast(`Added ${ingredient} to checklist`);
-                }
-            };
-
-            // Meal action button click handler
-            const handleMealAction = (mealId, action) => {
-                if (action === 'complete') {
-                    if (completedMeals.includes(mealId)) {
-                        setCompletedMeals(completedMeals.filter(id => id !== mealId));
-                        showToast(`Marked ${meals.find(m => m.id === mealId).title} as incomplete`);
-                    } else {
-                        setCompletedMeals([...completedMeals, mealId]);
-                        showToast(`Completed ${meals.find(m => m.id === mealId).title}`);
-                    }
-                } else if (action === 'ingredients') {
-                    // Toggle all ingredients of this meal
-                    const meal = meals.find(m => m.id === mealId);
-                    const mealIngredients = meal.ingredients;
-                    const newCompletedIngredients = [...completedIngredients];
-                    
-                    mealIngredients.forEach(ingredient => {
-                        if (!newCompletedIngredients.includes(ingredient)) {
-                            newCompletedIngredients.push(ingredient);
-                        }
-                    });
-                    
-                    setCompletedIngredients(newCompletedIngredients);
-                    showToast(`Added all ingredients for ${meal.title} to checklist`);
-                }
-            };
-
-            // Clear all ingredients handler
-            const handleClearAllIngredients = () => {
-                if (completedIngredients.length > 0) {
-                    setCompletedIngredients([]);
-                    showToast('Cleared all ingredients from checklist');
-                }
-            };
-
-            // Simulate loading state
-            const simulateLoading = () => {
-                setIsLoading(true);
-                setTimeout(() => {
-                    setIsLoading(false);
-                }, 1000);
-            };
-
-            return (
-                <div>
-                    {/* Header */}
-                    <header>
-                        <div className="container">
-                            <nav>
-                                <a href="#" className="logo">
-                                    <span>🍽️</span>
-                                    <span>Daily Meal Planner</span>
-                                </a>
-                                <ul className="nav-links" id="navLinks">
-                                    <li><a href="#hero">Home</a></li>
-                                    <li><a href="#meals">Meals</a></li>
-                                    <li><a href="#ingredients">Ingredients</a></li>
-                                    <li><a href="#about">About</a></li>
-                                </ul>
-                                <button 
-                                    className="mobile-menu-toggle" 
-                                    id="mobileMenuToggle"
-                                    aria-label="Toggle navigation menu"
-                                >
-                                    <div className="hamburger"></div>
-                                </button>
-                            </nav>
-                        </div>
-                    </header>
-
-                    {/* Hero Section */}
-                    <section className="hero" id="hero">
-                        <div className="container">
-                            <div className="hero-content">
-                                <h1 className="hero-title">Plan Your Perfect Day</h1>
-                                <p className="hero-description">
-                                    Discover delicious meals, manage your ingredients, and track your progress with our friendly meal planner. 
-                                    Make every day healthier and more enjoyable!
-                                </p>
-                                <button 
-                                    className="cta-button" 
-                                    onClick={() => {
-                                        document.getElementById('meals').scrollIntoView({ behavior: 'smooth' });
-                                        simulateLoading();
-                                    }}
-                                >
-                                    {isLoading ? <span className="loading"></span> : 'Explore Meals'}
-                                </button>
-                            </div>
-                        </div>
-                    </section>
-
-                    {/* Main Content */}
-                    <main className="section" id="meals">
-                        <div className="container">
-                            {/* Filters Section */}
-                            <div className="filters-section">
-                                <div className="filters-header">
-                                    <h2 className="filters-title">Browse Meals</h2>
-                                    <div className="filter-buttons">
-                                        {categories.map(category => (
-                                            <button
-                                                key={category}
-                                                className={`filter-button ${selectedCategory === category ? 'active' : ''}`}
-                                                onClick={() => handleFilterClick(category)}
-                                                aria-label={`Filter by ${category}`}
-                                            >
-                                                {category}
-                                            </button>
-                                        ))}
-                                    </div>
-                                </div>
-                            </div>
-
-                            {/* Error Message */}
-                            {error && (
-                                <div className="error-message">
-                                    <span className="error-icon">⚠️</span>
-                                    <span>{error}</span>
-                                </div>
-                            )}
-
-                            {/* Meals Grid */}
-                            {filteredMeals.length > 0 ? (
-                                <div className="meals-grid">
-                                    {filteredMeals.map(meal => (
-                                        <article key={meal.id} className="meal-card">
-                                            <div className="meal-image">{meal.image}</div>
-                                            <div className="meal-content">
-                                                <span className="meal-category">{meal.category}</span>
-                                                <h3 className="card-title meal-title">{meal.title}</h3>
-                                                <p className="body-text meal-description">{meal.description}</p>
-                                                
-                                                <div className="meal-ingredients">
-                                                    <h4 className="ingredients-title">
-                                                        <span>📝</span>
-                                                        Key Ingredients
-                                                    </h4>
-                                                    <ul className="ingredients-list">
-                                                        {meal.ingredients.slice(0, 4).map((ingredient, index) => (
-                                                            <li 
-                                                                key={index}
-                                                                className={`ingredient-item ${completedIngredients.includes(ingredient) ? 'checked' : ''}`}
-                                                                onClick={() => handleIngredientClick(ingredient)}
-                                                                title="Click to toggle"
-                                                            >
-                                                                <div className="ingredient-checkbox"></div>
-                                                                <span>{ingredient}</span>
-                                                            </li>
-                                                        ))}
-                                                        {meal.ingredients.length > 4 && (
-                                                            <li className="small-text" style={{ alignSelf: 'center', padding: '0.25rem 0.75rem' }}>
-                                                                +{meal.ingredients.length - 4} more
-                                                            </li>
-                                                        )}
-                                                    </ul>
-                                                </div>
-
-                                                <div className="meal-actions">
-                                                    <button 
-                                                        className={`action-button ${completedMeals.includes(meal.id) ? 'completed' : ''}`}
-                                                        onClick={() => handleMealAction(meal.id, 'complete')}
-                                                        aria-label={`${completedMeals.includes(meal.id) ? 'Mark as incomplete' : 'Mark as complete'} ${meal.title}`}
-                                                    >
-                                                        <span>{completedMeals.includes(meal.id) ? '✓ Completed' : '○ Complete'}</span>
-                                                    </button>
-                                                    <button 
-                                                        className="action-button"
-                                                        onClick={() => handleMealAction(meal.id, 'ingredients')}
-                                                        aria-label={`Add all ingredients for ${meal.title}`}
-                                                    >
-                                                        <span>➕ Add All Ingredients</span>
-                                                    </button>
-                                                </div>
-                                            </div>
-                                        </article>
-                                    ))}
-                                </div>
-                            ) : (
-                                <div className="empty-state">
-                                    <div className="empty-icon">🔍</div>
-                                    <h3 className="empty-title">No meals found</h3>
-                                    <p className="empty-description">
-                                        We couldn't find any meals in the "{selectedCategory}" category. 
-                                        Try selecting a different category or check back later for new additions.
-                                    </p>
-                                    <button 
-                                        className="cta-button"
-                                        onClick={() => handleFilterClick('All')}
-                                    >
-                                        View All Meals
-                                    </button>
-                                </div>
-                            )}
-
-                            {/* Ingredient Checklist */}
-                            <section className="ingredient-checklist" id="ingredients">
-                                <div className="checklist-header">
-                                    <h2 className="checklist-title">
-                                        <span>🛒</span>
-                                        Shopping Checklist ({completedIngredients.length}/{ingredientChecklist.length})
-                                    </h2>
-                                    {completedIngredients.length > 0 && (
-                                        <button 
-                                            className="clear-all-button"
-                                            onClick={handleClearAllIngredients}
-                                            aria-label="Clear all ingredients from checklist"
-                                        >
-                                            Clear All
-                                        </button>
-                                    )}
-                                </div>
-                                
-                                {ingredientChecklist.length > 0 ? (
-                                    <div className="checklist-items">
-                                        {ingredientChecklist.map((ingredient, index) => (
-                                            <div 
-                                                key={index}
-                                                className={`checklist-item ${completedIngredients.includes(ingredient) ? 'checked' : ''}`}
-                                                onClick={() => handleIngredientClick(ingredient)}
-                                                title="Click to toggle"
-                                            >
-                                                <div className="checklist-checkbox"></div>
-                                                <span>{ingredient}</span>
-                                            </div>
-                                        ))}
-                                    </div>
-                                ) : (
-                                    <div className="empty-state" style={{ padding: '2rem', marginTop: '0' }}>
-                                        <div className="empty-icon">📋</div>
-                                        <p className="empty-description">
-                                            Your shopping checklist is empty. Start adding ingredients from the meals above!
-                                        </p>
-                                    </div>
-                                )}
-                            </section>
-                        </div>
-                    </main>
-
-                    {/* About Section */}
-                    <section className="section" id="about">
-                        <div className="container">
-                            <div style={{ maxWidth: '800px', margin: '0 auto', textAlign: 'center' }}>
-                                <h2 className="section-title">Why Choose Daily Meal Planner?</h2>
-                                <p className="body-text" style={{ margin: '1.5rem 0' }}>
-                                    Our meal planner is designed to make healthy eating effortless and enjoyable. 
-                                    With carefully curated meal cards, easy ingredient tracking, and simple filtering options, 
-                                    you'll never wonder what's for dinner again.
-                                </p>
-                                
-                                <div style={{ 
-                                    display: 'grid', 
-                                    gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', 
-                                    gap: '2rem', 
-                                    marginTop: '3rem' 
-                                }}>
-                                    <div>
-                                        <div style={{ fontSize: '2.5rem', marginBottom: '1rem' }}>🍽️</div>
-                                        <h3 className="card-title" style={{ fontSize: '1.25rem', marginBottom: '0.5rem' }}>Delicious Recipes</h3>
-                                        <p className="small-text" style={{ color: 'var(--text-medium)' }}>
-                                            Curated meals from breakfast to dinner, including snacks and desserts.
-                                        </p>
-                                    </div>
-                                    <div>
-                                        <div style={{ fontSize: '2.5rem', marginBottom: '1rem' }}>✅</div>
-                                        <h3 className="card-title" style={{ fontSize: '1.25rem', marginBottom: '0.5rem' }}>Track Progress</h3>
-                                        <p className="small-text" style={{ color: 'var(--text-medium)' }}>
-                                            Mark meals as completed and track your ingredient shopping list.
-                                        </p>
-                                    </div>
-                                    <div>
-                                        <div style={{ fontSize: '2.5rem', marginBottom: '1rem' }}>🔍</div>
-                                        <h3 className="card-title" style={{ fontSize: '1.25rem', marginBottom: '0.5rem' }}>Easy Filtering</h3>
-                                        <p className="small-text" style={{ color: 'var(--text-medium)' }}>
-                                            Browse meals by category with simple, intuitive filters.
-                                        </p>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </section>
-
-                    {/* Footer */}
-                    <footer>
-                        <div className="container">
-                            <div className="footer-content">
-                                <div className="footer-brand">
-                                    <a href="#" className="footer-logo">
-                                        🍽️ Daily Meal Planner
-                                    </a>
-                                    <p className="footer-description">
-                                        Your friendly companion for planning healthy meals, managing ingredients, 
-                                        and making every day more delicious and nutritious.
-                                    </p>
-                                    <div className="footer-social">
-                                        <a href="#" className="social-link" aria-label="Facebook">
-                                            <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
-                                                <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.187 2.686.187v2.953H15.83c-1.491 0-1.956 0.925-1.956 1.914v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 22.927 24 17.992 24 12.073z"/>
-                                            </svg>
-                                        </a>
-                                        <a href="#" className="social-link" aria-label="Instagram">
-                                            <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
-                                                <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.689-.073-4.948-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44 1.44-.645 1.44-1.44-.644-1.44-1.44-1.44z"/>
-                                            </svg>
-                                        </a>
-                                        <a href="#" className="social-link" aria-label="Twitter">
-                                            <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
-                                                <path d="M23.953 4.57a10 10 0 01-2.825.775 4.958 4.958 0 002.163-2.723c-.951.555-2.005.959-3.127 1.184a4.92 4.92 0 00-8.384 4.482C7.69 8.095 4.067 6.13 1.64 3.162a4.822 4.822 0 00-.666 2.475c0 1.71.87 3.213 2.188 4.096a4.904 4.904 0 01-2.228-.616v.06a4.923 4.923 0 003.946 4.827 4.996 4.996 0 01-2.212.085 4.936 4.936 0 004.604 3.417 9.867 9.867 0 01-6.102 2.105c-.39 0-.779-.023-1.17-.067a13.995 13.995 0 007.557-4.208z"/>
-                                            </svg>
-                                        </a>
-                                    </div>
-                                </div>
-                                
-                                <div>
-                                    <h3 className="footer-title">Quick Links</h3>
-                                    <ul className="footer-links">
-                                        <li><a href="#hero">Home</a></li>
-                                        <li><a href="#meals">Browse Meals</a></li>
-                                        <li><a href="#ingredients">Shopping List</a></li>
-                                        <li><a href="#about">About Us</a></li>
-                                    </ul>
-                                </div>
-                                
-                                <div>
-                                    <h3 className="footer-title">Categories</h3>
-                                    <ul className="footer-links">
-                                        <li><a href="#" onClick={() => handleFilterClick('Breakfast')}>Breakfast</a></li>
-                                        <li><a href="#" onClick={() => handleFilterClick('Lunch')}>Lunch</a></li>
-                                        <li><a href="#" onClick={() => handleFilterClick('Dinner')}>Dinner</a></li>
-                                        <li><a href="#" onClick={() => handleFilterClick('Snacks')}>Snacks</a></li>
-                                    </ul>
-                                </div>
-                                
-                                <div>
-                                    <h3 className="footer-title">Support</h3>
-                                    <ul className="footer-links">
-                                        <li><a href="#">Help Center</a></li>
-                                        <li><a href="#">Privacy Policy</a></li>
-                                        <li><a href="#">Terms of Service</a></li>
-                                        <li><a href="#">Contact Us</a></li>
-                                    </ul>
-                                </div>
-                            </div>
-                            
-                            <div className="footer-bottom">
-                                <p>© 2026 Daily Meal Planner. Made with Daily AI Website Factory.</p>
-                            </div>
-                        </div>
-                    </footer>
-
-                    {/* Toast Notification */}
-                    {toastMessage && (
-                        <div className="toast show">
-                            <span className="toast-icon">✓</span>
-                            <span>{toastMessage}</span>
-                        </div>
-                    )}
-
-                    <script type="text/babel">
-                        // Mobile menu functionality
-                        document.addEventListener('DOMContentLoaded', () => {
-                            const mobileMenuToggle = document.getElementById('mobileMenuToggle');
-                            const navLinks = document.getElementById('navLinks');
-                            
-                            mobileMenuToggle.addEventListener('click', () => {
-                                mobileMenuToggle.classList.toggle('active');
-                                navLinks.classList.toggle('active');
-                            });
-                            
-                            // Close mobile menu when clicking on a link
-                            navLinks.querySelectorAll('a').forEach(link => {
-                                link.addEventListener('click', () => {
-                                    mobileMenuToggle.classList.remove('active');
-                                    navLinks.classList.remove('active');
-                                });
-                            });
-                            
-                            // Smooth scrolling for anchor links
-                            document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-                                anchor.addEventListener('click', function (e) {
-                                    e.preventDefault();
-                                    const target = document.querySelector(this.getAttribute('href'));
-                                    if (target) {
-                                        target.scrollIntoView({
-                                            behavior: 'smooth',
-                                            block: 'start'
-                                        });
-                                    }
-                                });
-                            });
-                            
-                            // Add keyboard navigation support
-                            document.addEventListener('keydown', (e) => {
-                                if (e.key === 'Escape') {
-                                    mobileMenuToggle.classList.remove('active');
-                                    navLinks.classList.remove('active');
-                                }
-                            });
-                        });
-                    </script>
-                </div>
-            );
-        }
-
-        // Render the app
-        ReactDOM.render(<MealPlannerApp />, document.body);
-    </script>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Daily Meal Planner — a calmer way to plan the week</title>
+<meta name="description" content="Pick meals from a friendly sample library, set your servings, and turn your plan into a tidy ingredient checklist. Filters for diet and cooking time included." />
+<style>
+  :root{
+    --primary:#1f5c3d;
+    --primary-dark:#123c27;
+    --primary-soft:#2f7d55;
+    --secondary:#b96a3c;
+    --accent:#e0a33e;
+    --bg:#fbf8f2;
+    --surface:#ffffff;
+    --text:#1b2a21;
+    --muted:#5b6a60;
+    --success:#2f7d4f;
+    --error:#a83a2a;
+    --tint-primary:#e9f1ea;
+    --tint-accent:#fdf2df;
+    --tint-secondary:#f8ece3;
+    --line:#e4dfd3;
+    --radius:16px;
+    --shadow:0 14px 34px -18px rgba(18,60,39,.45);
+    --shadow-soft:0 6px 18px -12px rgba(18,60,39,.4);
+    --max:1120px;
+    --font-display:"Iowan Old Style","Palatino Linotype",Palatino,Georgia,"Times New Roman",serif;
+    --font-body:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
+  }
+
+  *,*::before,*::after{box-sizing:border-box}
+  html{scroll-behavior:smooth;scroll-padding-top:88px;-webkit-text-size-adjust:100%}
+  body{margin:0;background:var(--bg);color:var(--text);font-family:var(--font-body);font-size:17px;line-height:1.6}
+  h1,h2,h3,h4{font-family:var(--font-display);line-height:1.15;letter-spacing:-.01em;margin:0 0 .5em;color:var(--primary-dark);font-weight:600}
+  h1{font-size:clamp(2.1rem,5.2vw,3.4rem)}
+  h2{font-size:clamp(1.6rem,3.4vw,2.3rem)}
+  h3{font-size:1.15rem}
+  p{margin:0 0 1em}
+  a{color:var(--primary)}
+  svg{max-width:100%}
+  :focus-visible{outline:3px solid var(--secondary);outline-offset:3px;border-radius:6px}
+  .wrap{width:100%;max-width:var(--max);margin-inline:auto;padding-inline:clamp(16px,4vw,32px)}
+  .skip{position:absolute;left:-9999px;top:0;background:var(--primary);color:#fff;padding:12px 18px;border-radius:0 0 12px 0;z-index:200;font-weight:600}
+  .skip:focus{left:0}
+
+  /* Buttons */
+  .btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:48px;padding:12px 22px;border-radius:999px;border:1px solid transparent;font:inherit;font-weight:600;font-size:.98rem;text-decoration:none;cursor:pointer;transition:transform .15s ease,box-shadow .15s ease,background .15s ease,color .15s ease,border-color .15s ease}
+  .btn--primary{background:linear-gradient(135deg,var(--primary-soft),var(--primary));color:#fff;box-shadow:0 10px 22px -12px rgba(18,60,39,.8)}
+  .btn--primary:hover{transform:translateY(-2px);box-shadow:0 16px 26px -14px rgba(18,60,39,.85)}
+  .btn--ghost{background:transparent;border-color:var(--line);color:var(--primary-dark)}
+  .btn--ghost:hover{background:var(--tint-primary);border-color:var(--primary)}
+  .btn--small{min-height:44px;padding:8px 16px;font-size:.9rem}
+  .btn--added{background:var(--tint-primary);color:var(--primary-dark);border-color:var(--primary)}
+  .btn:disabled{opacity:.45;cursor:not-allowed;transform:none;box-shadow:none}
+
+  /* Header */
+  .site-header{position:sticky;top:0;z-index:60;background:rgba(251,248,242,.88);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border-bottom:1px solid var(--line)}
+  .header-inner{display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap;padding-block:10px}
+  .brand{display:inline-flex;align-items:center;gap:10px;text-decoration:none;color:var(--primary-dark);font-family:var(--font-display);font-weight:600;font-size:1.1rem;min-height:44px}
+  .brand-mark{width:34px;height:34px;flex:none}
+  .nav-toggle{display:inline-flex;align-items:center;justify-content:center;width:44px;height:44px;border-radius:12px;border:1px solid var(--line);background:var(--surface);color:var(--primary-dark);cursor:pointer}
+  .nav-toggle:hover{background:var(--tint-primary)}
+  .site-nav{display:none;width:100%;flex-direction:column;gap:2px;padding-bottom:12px}
+  .site-nav.open{display:flex}
+  .site-nav a{display:flex;align-items:center;min-height:44px;padding:8px 12px;border-radius:10px;text-decoration:none;color:var(--text);font-weight:600;font-size:.95rem}
+  .site-nav a:hover,.site-nav a.is-active{background:var(--tint-primary);color:var(--primary-dark)}
+  @media(min-width:860px){
+    .nav-toggle{display:none}
+    .site-nav{display:flex;width:auto;flex-direction:row;gap:4px;padding-bottom:0}
+  }
+
+  /* Hero */
+  .hero{position:relative;overflow:hidden;background:linear-gradient(180deg,var(--tint-primary) 0%,var(--bg) 78%);padding-block:clamp(40px,7vw,80px) clamp(48px,7vw,88px)}
+  .hero::after{content:"";position:absolute;right:-12%;bottom:-45%;width:min(560px,80vw);height:min(560px,80vw);background:radial-gradient(circle at 50% 50%,rgba(224,163,62,.22),transparent 65%);pointer-events:none}
+  .hero-grid{position:relative;display:grid;gap:clamp(28px,5vw,56px);align-items:center}
+  @media(min-width:900px){.hero-grid{grid-template-columns:1.05fr .95fr}}
+  .eyebrow{display:inline-block;margin:0 0 14px;padding:6px 14px;border-radius:999px;background:var(--surface);border:1px solid var(--line);color:var(--primary);font-size:.78rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase}
+  .lede{font-size:clamp(1.02rem,1.6vw,1.18rem);color:var(--muted);max-width:52ch}
+  .hero-actions{display:flex;flex-wrap:wrap;gap:12px;margin:24px 0 28px}
+  .hero-points{list-style:none;margin:0;padding:0;display:grid;gap:10px}
+  .hero-points li{display:flex;gap:10px;align-items:flex-start;color:var(--muted);font-size:.97rem}
+  .hero-points li::before{content:"✓";flex:none;display:grid;place-items:center;width:22px;height:22px;margin-top:2px;border-radius:50%;background:var(--tint-primary);color:var(--primary);font-size:.78rem;font-weight:700}
+  .hero-art{position:relative}
+  .hero-svg{width:100%;height:auto;display:block;filter:drop-shadow(0 24px 40px rgba(18,60,39,.14))}
+
+  /* Sections */
+  .section{padding-block:clamp(56px,8vw,96px)}
+  .section--tint{background:var(--tint-primary)}
+  .section--warm{background:var(--tint-secondary)}
+  .section-head{max-width:64ch;margin-bottom:clamp(24px,4vw,40px)}
+  .section-sub{color:var(--muted);margin:0}
+  .card{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow-soft)}
+
+  /* Filters */
+  .filters{padding:clamp(16px,3vw,24px);margin-bottom:clamp(20px,3vw,28px)}
+  .filter-row{display:grid;gap:16px}
+  @media(min-width:900px){.filter-row{grid-template-columns:1fr auto;align-items:end}}
+  .chips{display:flex;flex-wrap:wrap;gap:8px}
+  .chip{min-height:44px;padding:8px 16px;border-radius:999px;border:1px solid var(--line);background:var(--surface);color:var(--text);font:inherit;font-size:.9rem;font-weight:600;cursor:pointer;transition:background .15s,color .15s,border-color .15s}
+  .chip:hover{border-color:var(--primary);color:var(--primary-dark)}
+  .chip.is-active{background:var(--primary);border-color:var(--primary);color:#fff}
+  .filter-fields{display:grid;gap:12px}
+  @media(min-width:640px){.filter-fields{grid-template-columns:210px minmax(0,1fr)}}
+  .field{display:grid;gap:6px}
+  .field label{font-size:.78rem;font-weight:700;letter-spacing:.05em;text-transform:uppercase;color:var(--muted)}
+  .field select,.field input{min-height:44px;padding:10px 14px;border-radius:12px;border:1px solid var(--line);background:var(--surface);font:inherit;font-size:.95rem;color:var(--text);width:100%}
+  .field select:focus,.field input:focus{outline:3px solid var(--secondary);outline-offset:2px;border-color:var(--primary)}
+  .result-count{margin:14px 0 0;font-size:.9rem;color:var(--muted)}
+
+  /* Planner grid */
+  .planner-grid{display:grid;gap:clamp(20px,3vw,28px)}
+  @media(min-width:980px){.planner-grid{grid-template-columns:minmax(0,1.55fr) minmax(0,1fr);align-items:start}}
+  .meal-grid{display:grid;gap:16px}
+  @media(min-width:640px){.meal-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+
+  /* Meal cards */
+  .meal-card{display:flex;flex-direction:column;gap:12px;padding:20px;background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow-soft);transition:transform .18s ease,box-shadow .18s ease,border-color .18s ease}
+  .meal-card:hover{transform:translateY(-4px);box-shadow:var(--shadow);border-color:#d6d0c1}
+  .meal-card.is-added{border-color:var(--primary);box-shadow:0 0 0 2px var(--tint-primary),var(--shadow-soft)}
+  .meal-top{display:flex;gap:12px;align-items:flex-start}
+  .badge{flex:none;display:grid;place-items:center;width:44px;height:44px;border-radius:14px}
+  .badge svg{width:22px;height:22px;stroke:currentColor;fill:none;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round}
+  .badge--breakfast{background:var(--tint-accent);color:#8a5a12}
+  .badge--lunch{background:var(--tint-primary);color:var(--primary)}
+  .badge--dinner{background:var(--tint-secondary);color:#8f4a22}
+  .meal-title h3{margin:0 0 2px;font-size:1.05rem}
+  .meal-meta{margin:0;font-size:.84rem;color:var(--muted)}
+  .meal-desc{margin:0;font-size:.93rem;color:var(--muted)}
+  .tags{list-style:none;display:flex;flex-wrap:wrap;gap:6px;margin:0;padding:0}
+  .tags li{font-size:.72rem;font-weight:700;letter-spacing:.04em;text-transform:uppercase;padding:4px 10px;border-radius:999px;background:var(--tint-primary);color:var(--primary-dark)}
+  .meal-foot{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-top:auto;padding-top:4px}
+  .ing-count{font-size:.84rem;color:var(--muted)}
+
+  /* Plan panel */
+  .plan-panel{padding:20px}
+  @media(min-width:980px){.plan-panel{position:sticky;top:88px}}
+  .panel-head{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-bottom:14px}
+  .panel-head h3{margin:0}
+  .pill{font-size:.78rem;font-weight:700;padding:4px 12px;border-radius:999px;background:var(--tint-primary);color:var(--primary-dark)}
+  .plan-list{list-style:none;margin:0;padding:0;display:grid;gap:10px}
+  .plan-item{display:flex;flex-wrap:wrap;align-items:center;gap:10px;padding:10px;border-radius:12px;background:var(--bg);border:1px solid var(--line)}
+  .plan-item-main{flex:1 1 130px;min-width:0}
+  .plan-name{margin:0;font-weight:600;font-size:.94rem;line-height:1.3}
+  .plan-meta{margin:2px 0 0;font-size:.76rem;color:var(--muted);text-transform:capitalize}
+  .stepper{display:flex;align-items:center;gap:2px;border:1px solid var(--line);border-radius:999px;background:var(--surface);padding:2px}
+  .stepper button{width:44px;height:44px;border:0;background:transparent;border-radius:50%;font-size:1.05rem;font-weight:700;color:var(--primary-dark);cursor:pointer;line-height:1}
+  .stepper button:hover{background:var(--tint-primary)}
+  .stepper span{min-width:24px;text-align:center;font-weight:700;font-size:.9rem}
+  .icon-btn{width:44px;height:44px;border:0;background:transparent;border-radius:50%;color:var(--muted);font-size:1.25rem;line-height:1;cursor:pointer}
+  .icon-btn:hover{background:#f7e4de;color:var(--error)}
+  .panel-foot{margin-top:16px;padding-top:14px;border-top:1px solid var(--line);display:flex;justify-content:flex-end}
+
+  /* Checklist */
+  .checklist{margin-top:clamp(20px,3vw,28px);padding:clamp(18px,3vw,26px)}
+  .checklist-actions{display:flex;gap:8px;flex-wrap:wrap}
+  .hint{margin:2px 0 0;font-size:.88rem;color:var(--muted)}
+  .progress{height:10px;border-radius:999px;background:var(--tint-primary);overflow:hidden;margin:6px 0 8px}
+  .progress-bar{display:block;height:100%;width:0;border-radius:999px;background:linear-gradient(90deg,var(--primary-soft),var(--primary));transition:width .3s ease}
+  .progress-label{margin:0 0 16px;font-size:.87rem;color:var(--muted)}
+  .checklist-list{list-style:none;margin:0;padding:0;display:grid;gap:4px}
+  @media(min-width:760px){.checklist-list{grid-template-columns:1fr 1fr;gap:4px 24px}}
+  .check-label{display:flex;align-items:center;gap:12px;min-height:44px;padding:8px 10px;border-radius:10px;cursor:pointer;font-size:.95rem}
+  .check-label:hover{background:var(--bg)}
+  .check-label input{width:20px;height:20px;flex:none;accent-color:var(--primary);cursor:pointer}
+  .check-item.is-checked .check-label span{color:var(--muted);text-decoration:line-through}
+  .check-qty{font-weight:700;color:var(--primary-dark)}
+  .check-item.is-checked .check-qty{color:var(--muted)}
+  .check-empty{grid-column:1/-1;padding:18px;text-align:center;color:var(--muted);font-size:.94rem;border:1px dashed var(--line);border-radius:12px}
+
+  /* Empty states */
+  .empty{padding:32px 24px;text-align:center;border:1px dashed var(--line);border-radius:var(--radius);background:var(--surface)}
+  .empty h3{margin-bottom:6px}
+  .empty p{color:var(--muted);margin-bottom:16px}
+  .empty--sm{padding:20px;border-style:dashed}
+  .empty-title{font-weight:700;color:var(--primary-dark);margin:0 0 4px}
+  .empty-text{margin:0;color:var(--muted);font-size:.9rem}
+
+  /* Steps */
+  .steps{display:grid;gap:16px}
+  @media(min-width:760px){.steps{grid-template-columns:repeat(3,1fr)}}
+  .step{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);padding:24px;box-shadow:var(--shadow-soft)}
+  .step-num{display:grid;place-items:center;width:40px;height:40px;border-radius:12px;background:var(--primary);color:#fff;font-weight:700;font-family:var(--font-display);margin-bottom:14px}
+  .step h3{margin-bottom:6px}
+  .step p{margin:0;color:var(--muted);font-size:.94rem}
+
+  /* Notes */
+  .notes{display:grid;gap:16px}
+  @media(min-width:760px){.notes{grid-template-columns:repeat(3,1fr)}}
+  .note{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);padding:24px;box-shadow:var(--shadow-soft)}
+  .note-mark{display:grid;place-items:center;width:40px;height:40px;border-radius:12px;background:var(--tint-accent);color:#8a5a12;margin-bottom:14px}
+  .note-mark svg{width:20px;height:20px;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+  .note h3{margin-bottom:6px}
+  .note p{margin:0;color:var(--muted);font-size:.94rem}
+
+  /* FAQ */
+  .faq-list{display:grid;gap:10px;max-width:820px}
+  details{background:var(--surface);border:1px solid var(--line);border-radius:14px;box-shadow:var(--shadow-soft)}
+  summary{display:flex;justify-content:space-between;align-items:center;gap:12px;min-height:56px;padding:14px 20px;cursor:pointer;font-weight:600;font-family:var(--font-display);font-size:1.02rem;color:var(--primary-dark);list-style:none}
+  summary::-webkit-details-marker{display:none}
+  summary::after{content:"+";font-size:1.35rem;line-height:1;color:var(--primary);transition:transform .2s ease}
+  details[open] summary::after{transform:rotate(45deg)}
+  details p{margin:0;padding:0 20px 18px;color:var(--muted);font-size:.94rem}
+
+  /* Footer */
+  .site-footer{background:var(--primary-dark);color:#e8f0e9;padding-block:clamp(36px,5vw,56px) 24px}
+  .site-footer .brand{color:#fff}
+  .footer-grid{display:grid;gap:24px}
+  @media(min-width:760px){.footer-grid{grid-template-columns:1.4fr 1fr;align-items:start}}
+  .footer-note{color:#b9cdbe;font-size:.92rem;max-width:40ch;margin:12px 0 0}
+  .site-footer nav{display:flex;flex-wrap:wrap;gap:4px 20px}
+  .site-footer nav a{color:#dbe8dd;text-decoration:none;min-height:44px;display:inline-flex;align-items:center;font-size:.95rem}
+  .site-footer nav a:hover{color:#fff;text-decoration:underline}
+  .footer-bottom{display:flex;flex-wrap:wrap;gap:8px 24px;justify-content:space-between;border-top:1px solid rgba(255,255,255,.16);margin-top:28px;padding-top:18px;font-size:.84rem;color:#a9c0af}
+  .footer-bottom p{margin:0}
+
+  /* Toast */
+  .toast{position:fixed;left:50%;bottom:24px;transform:translate(-50%,20px);background:var(--primary-dark);color:#fff;padding:12px 20px;border-radius:999px;font-size:.9rem;font-weight:600;box-shadow:0 12px 30px -12px rgba(0,0,0,.6);opacity:0;pointer-events:none;transition:opacity .2s ease,transform .2s ease;z-index:100;max-width:calc(100% - 32px);text-align:center}
+  .toast.is-visible{opacity:1;transform:translate(-50%,0)}
+
+  @media(prefers-reduced-motion:reduce){
+    html{scroll-behavior:auto}
+    *,*::before,*::after{animation-duration:.001ms!important;transition-duration:.001ms!important}
+    .meal-card:hover,.btn--primary:hover{transform:none}
+  }
+</style>
+</head>
+<body>
+<a class="skip" href="#planner">Skip to the planner</a>
+
+<header class="site-header">
+  <div class="wrap header-inner">
+    <a class="brand" href="#top">
+      <svg class="brand-mark" viewBox="0 0 40 40" aria-hidden="true" focusable="false">
+        <rect width="40" height="40" rx="12" fill="#1f5c3d"/>
+        <path d="M12 26c0-7 5-12 12-12 0 7-5 12-12 12Z" fill="#e0a33e"/>
+        <path d="M12 28c4-4 8-6 12-7" stroke="#fdf2df" stroke-width="2" stroke-linecap="round" fill="none"/>
+      </svg>
+      <span>Daily Meal Planner</span>
+    </a>
+    <button class="nav-toggle" type="button" aria-expanded="false" aria-controls="site-nav" aria-label="Open menu">
+      <svg width="22" height="22" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+        <path d="M4 7h16M4 12h16M4 17h16" stroke="currentColor" stroke-width="2" stroke-linecap="round" fill="none"/>
+      </svg>
+    </button>
+    <nav class="site-nav" id="site-nav" aria-label="Main">
+      <a href="#planner">Planner</a>
+      <a href="#how">How it works</a>
+      <a href="#kitchen">Kitchen notes</a>
+      <a href="#faq">FAQ</a>
+    </nav>
+  </div>
+</header>
+
+<main id="top">
+  <section class="hero">
+    <div class="wrap hero-grid">
+      <div class="hero-copy">
+        <p class="eyebrow">Weekly planning, without the spreadsheet</p>
+        <h1>Plan a week of good meals in five calm minutes.</h1>
+        <p class="lede">Choose from a friendly sample library, set how many people you are feeding, and your shopping list builds itself as you go.</p>
+        <div class="hero-actions">
+          <a class="btn btn--primary" href="#planner">Start my plan</a>
+          <a class="btn btn--ghost" href="#how">See how it works</a>
+        </div>
+        <ul class="hero-points">
+          <li>Filter by diet and cooking time</li>
+          <li>Servings scale every ingredient automatically</li>
+          <li>A checklist you can tick off in the shop</li>
+        </ul>
+      </div>
+      <div class="hero-art">
+        <svg class="hero-svg" viewBox="0 0 460 420" role="img" aria-label="Illustration of a meal plan card next to a bowl of vegetables">
+          <defs>
+            <linearGradient id="bowlGrad" x1="0" y1="0" x2="1" y2="1">
+              <stop offset="0" stop-color="#2f7d55"/>
+              <stop offset="1" stop-color="#1a4d33"/>
+            </linearGradient>
+          </defs>
+          <circle cx="352" cy="86" r="62" fill="#fdf2df"/>
+          <circle cx="352" cy="86" r="36" fill="#e0a33e" opacity=".5"/>
+          <path d="M28 250c46-64 128-84 196-52" fill="none" stroke="#cfe0d3" stroke-width="12" stroke-linecap="round"/>
+          <rect x="34" y="58" width="238" height="186" rx="22" fill="#ffffff" stroke="#e4dfd3" stroke-width="2"/>
+          <rect x="58" y="84" width="96" height="12" rx="6" fill="#1f5c3d" opacity=".8"/>
+          <rect x="58" y="110" width="160" height="8" rx="4" fill="#e6ece6"/>
+          <rect x="58" y="128" width="124" height="8" rx="4" fill="#e6ece6"/>
+          <circle cx="68" cy="164" r="10" fill="#e9f1ea" stroke="#1f5c3d" stroke-width="2"/>
+          <path d="M63.5 164l3.2 3.2 6-6.4" fill="none" stroke="#1f5c3d" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          <rect x="88" y="158" width="112" height="8" rx="4" fill="#e6ece6"/>
+          <circle cx="68" cy="196" r="10" fill="#e9f1ea" stroke="#1f5c3d" stroke-width="2"/>
+          <rect x="88" y="190" width="84" height="8" rx="4" fill="#e6ece6"/>
+          <circle cx="68" cy="228" r="10" fill="#e9f1ea" stroke="#1f5c3d" stroke-width="2"/>
+          <rect x="88" y="222" width="96" height="8" rx="4" fill="#e6ece6"/>
+          <path d="M148 300h184a92 92 0 0 1-184 0Z" fill="url(#bowlGrad)"/>
+          <ellipse cx="240" cy="300" rx="92" ry="17" fill="#2f7d55"/>
+          <circle cx="206" cy="292" r="17" fill="#e0a33e"/>
+          <circle cx="248" cy="286" r="14" fill="#b96a3c"/>
+          <circle cx="282" cy="294" r="12" fill="#fdf2df"/>
+          <path d="M188 262c6-18 24-26 36-22-2 16-18 28-36 22Z" fill="#2f7d55"/>
+          <path d="M300 258c-4-16-20-24-32-21 1 15 15 26 32 21Z" fill="#7fb08c"/>
+          <rect x="150" y="332" width="180" height="10" rx="5" fill="#e4dfd3"/>
+        </svg>
+      </div>
+    </div>
+  </section>
+
+  <section class="section" id="planner">
+    <div class="wrap">
+      <div class="section-head">
+        <p class="eyebrow">The planner</p>
+        <h2>Build your plan, one meal at a time</h2>
+        <p class="section-sub">Filter the sample library, add what looks good, then adjust servings. Your ingredient checklist updates as you go. The twelve meals here are illustrative examples written for this demo.</p>
+      </div>
+
+      <div class="filters card">
+        <div class="filter-row">
+          <div class="chips" role="group" aria-label="Filter by diet">
+            <button class="chip is-active" type="button" data-diet="all" aria-pressed="true">All meals</button>
+            <button class="chip" type="button" data-diet="vegetarian" aria-pressed="false">Vegetarian</button>
+            <button class="chip" type="button" data-diet="vegan" aria-pressed="false">Vegan</button>
+            <button class="chip" type="button" data-diet="high-protein" aria-pressed="false">High protein</button>
+            <button class="chip" type="button" data-diet="gluten-free" aria-pressed="false">Gluten-free</button>
+          </div>
+          <div class="filter-fields">
+            <div class="field">
+              <label for="time-filter">Cooking time</label>
+              <select id="time-filter">
+                <option value="0">Any time</option>
+                <option value="20">20 minutes or less</option>
+                <option value="30">30 minutes or less</option>
+                <option value="45">45 minutes or less</option>
+              </select>
+            </div>
+            <div class="field">
+              <label for="search">Search meals or ingredients</label>
+              <input id="search" type="search" placeholder="e.g. chickpea, salmon, oats" autocomplete="off" />
+            </div>
+          </div>
+        </div>
+        <p class="result-count" id="result-count" role="status" aria-live="polite">Showing 12 meals</p>
+      </div>
+
+      <div class="planner-grid">
+        <div>
+          <div class="meal-grid" id="meal-grid"></div>
+          <noscript>
+            <p class="empty">This planner needs JavaScript to filter meals and build your list. Please enable it and reload the page.</p>
+          </noscript>
+        </div>
+
+        <aside class="plan-panel card" aria-labelledby="plan-title">
+          <div class="panel-head">
+            <h3 id="plan-title">Your plan</h3>
+            <span class="pill" id="plan-count" aria-live="polite">0 meals</span>
+          </div>
+          <div id="plan-body"></div>
+          <div class="panel-foot">
+            <button class="btn btn--ghost btn--small" id="reset-plan" type="button">Reset plan</button>
+          </div>
+        </aside>
+      </div>
+
+      <section class="checklist card" aria-labelledby="list-title">
+        <div class="panel-head">
+          <div>
+            <h3 id="list-title">Ingredient checklist</h3>
+            <p class="hint">Tick items off as you shop. Quantities scale with the servings in your plan.</p>
+          </div>
+          <div class="checklist-actions">
+            <button class="btn btn--ghost btn--small" id="clear-checked" type="button">Clear ticks</button>
+            <button class="btn btn--ghost btn--small" id="copy-list" type="button">Copy list</button>
+          </div>
+        </div>
+        <div class="progress" id="progress" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" aria-label="Checklist progress">
+          <span class="progress-bar" id="progress-bar"></span>
+        </div>
+        <p class="progress-label" id="progress-label">No ingredients yet</p>
+        <ul class="checklist-list" id="checklist-list"></ul>
+      </section>
+    </div>
+  </section>
+
+  <section class="section section--tint" id="how">
+    <div class="wrap">
+      <div class="section-head">
+        <p class="eyebrow">How it works</p>
+        <h2>Three steps, then you are done</h2>
+        <p class="section-sub">No accounts, no setup. The whole plan lives on this page.</p>
+      </div>
+      <div class="steps">
+        <article class="step">
+          <div class="step-num" aria-hidden="true">1</div>
+          <h3>Filter the library</h3>
+          <p>Narrow the twelve sample meals by diet, cooking time, or a single ingredient you already have in the fridge.</p>
+        </article>
+        <article class="step">
+          <div class="step-num" aria-hidden="true">2</div>
+          <h3>Add and adjust</h3>
+          <p>Add meals to your plan, then use the plus and minus buttons to set servings. Every quantity recalculates for you.</p>
+        </article>
+        <article class="step">
+          <div class="step-num" aria-hidden="true">3</div>
+          <h3>Shop the list</h3>
+          <p>Your ingredients are merged into one checklist. Tick each item as it lands in the basket, or copy the list to your notes.</p>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <section class="section section--warm" id="kitchen">
+    <div class="wrap">
+      <div class="section-head">
+        <p class="eyebrow">Kitchen notes</p>
+        <h2>Small habits that make planning stick</h2>
+        <p class="section-sub">Practical ideas you can use with any recipe, not just the ones on this page.</p>
+      </div>
+      <div class="notes">
+        <article class="note">
+          <div class="note-mark" aria-hidden="true">
+            <svg viewBox="0 0 24 24"><path d="M4 10h16v4a6 6 0 0 1-6 6H10a6 6 0 0 1-6-6v-4Z"/><path d="M2 10h20"/><path d="M9 6c0-1 1-1.4 1-2.4"/></svg>
+          </div>
+          <h3>Cook once, eat twice</h3>
+          <p>Double the rice, grains or roasted vegetables when you cook. Tomorrow's lunch then takes five minutes instead of thirty.</p>
+        </article>
+        <article class="note">
+          <div class="note-mark" aria-hidden="true">
+            <svg viewBox="0 0 24 24"><path d="M4 6h16l-1.5 13.5a2 2 0 0 1-2 1.5H7.5a2 2 0 0 1-2-1.5L4 6Z"/><path d="M9 6V4.5A1.5 1.5 0 0 1 10.5 3h3A1.5 1.5 0 0 1 15 4.5V6"/></svg>
+          </div>
+          <h3>Shop the list, not the shop</h3>
+          <p>Walk the aisles in the order your shop is laid out. The checklist groups everything by name, so nothing gets bought twice.</p>
+        </article>
+        <article class="note">
+          <div class="note-mark" aria-hidden="true">
+            <svg viewBox="0 0 24 24"><path d="M12 3v18"/><path d="M5 8h14"/><path d="M7 8c0 4 2 6 5 6s5-2 5-6"/></svg>
+          </div>
+          <h3>Keep a flexible shelf</h3>
+          <p>Stock tinned beans, rice, pasta and a good stock. When a plan changes, those staples turn any vegetable into dinner.</p>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <section class="section" id="faq">
+    <div class="wrap">
+      <div class="section-head">
+        <p class="eyebrow">Questions</p>
+        <h2>Good to know</h2>
+      </div>
+      <div class="faq-list">
+        <details>
+          <summary>Is the meal library real?</summary>
+          <p>It is a sample set of twelve everyday meals written for this demo. The planner behaves exactly the same way with your own recipes, so you can swap the data for your household favourites.</p>
+        </details>
+        <details>
+          <summary>How do servings work?</summary>
+          <p>Each meal has a base serving count. When you change servings in your plan, every ingredient quantity scales to match, and the checklist updates straight away.</p>
+        </details>
+        <details>
+          <summary>Can I use this on my phone in the shop?</summary>
+          <p>Yes. The checklist is built for one-handed tapping, with large targets and a progress bar so you can see how much is left.</p>
+        </details>
+        <details>
+          <summary>Does it save my plan?</summary>
+          <p>Your plan is stored in this browser only, so it is waiting when you come back on the same device. Reset plan clears it completely.</p>
+        </details>
+        <details>
+          <summary>What if I am missing an ingredient?</summary>
+          <p>Tick what you have and leave the rest. The checklist is a shopping aid, not a rulebook — most of these meals work with a sensible swap.</p>
+        </details>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer class="site-footer">
+  <div class="wrap footer-grid">
+    <div>
+      <a class="brand" href="#top">
+        <svg class="brand-mark" viewBox="0 0 40 40" aria-hidden="true" focusable="false">
+          <rect width="40" height="40" rx="12" fill="#2f7d55"/>
+          <path d="M12 26c0-7 5-12 12-12 0 7-5 12-12 12Z" fill="#e0a33e"/>
+          <path d="M12 28c4-4 8-6 12-7" stroke="#fdf2df" stroke-width="2" stroke-linecap="round" fill="none"/>
+        </svg>
+        <span>Daily Meal Planner</span>
+      </a>
+      <p class="footer-note">A calm weekly meal planner. Sample recipes, real planning, one tidy shopping list.</p>
+    </div>
+    <nav aria-label="Footer">
+      <a href="#planner">Planner</a>
+      <a href="#how">How it works</a>
+      <a href="#kitchen">Kitchen notes</a>
+      <a href="#faq">FAQ</a>
+    </nav>
+  </div>
+  <div class="wrap footer-bottom">
+    <p>© 2026 Daily Meal Planner</p>
+    <p>Made with Daily AI Website Factory</p>
+  </div>
+</footer>
+
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+<script>
+(function () {
+  'use strict';
+
+  var MEALS = [
+    {
+      id: 'chicken-bowl', name: 'Lemon Herb Chicken Bowl', category: 'dinner',
+      tags: ['high-protein', 'gluten-free'], minutes: 30, servings: 2,
+      desc: 'Pan-seared chicken over brown rice with cucumber, parsley and a bright lemon dressing.',
+      ingredients: [
+        { n: 'chicken breast', q: 400, u: 'g' }, { n: 'brown rice', q: 150, u: 'g' },
+        { n: 'lemon', q: 1, u: '' }, { n: 'cucumber', q: 1, u: '' },
+        { n: 'olive oil', q: 2, u: 'tbsp' }, { n: 'flat-leaf parsley', q: 1, u: 'bunch' }
+      ]
+    },
+    {
+      id: 'chickpea-curry', name: 'Chickpea & Spinach Curry', category: 'dinner',
+      tags: ['vegan', 'gluten-free'], minutes: 35, servings: 4,
+      desc: 'A gentle coconut curry with chickpeas and spinach. Freezes well in single portions.',
+      ingredients: [
+        { n: 'chickpeas', q: 2, u: 'cans' }, { n: 'baby spinach', q: 200, u: 'g' },
+        { n: 'coconut milk', q: 1, u: 'can' }, { n: 'curry powder', q: 2, u: 'tsp' },
+        { n: 'onion', q: 1, u: '' }, { n: 'garlic', q: 3, u: 'cloves' }
+      ]
+    },
+    {
+      id: 'overnight-oats', name: 'Overnight Oats with Berries', category: 'breakfast',
+      tags: ['vegetarian'], minutes: 10, servings: 2,
+      desc: 'Stir it together the night before and breakfast is already waiting in the fridge.',
+      ingredients: [
+        { n: 'rolled oats', q: 100, u: 'g' }, { n: 'milk', q: 300, u: 'ml' },
+        { n: 'chia seeds', q: 2, u: 'tbsp' }, { n: 'mixed berries', q: 150, u: 'g' },
+        { n: 'honey', q: 1, u: 'tbsp' }
+      ]
+    },
+    {
+      id: 'black-bean-tacos', name: 'Smoky Black Bean Tacos', category: 'dinner',
+      tags: ['vegan'], minutes: 25, servings: 3,
+      desc: 'Warm tortillas, spiced beans and a sharp lime slaw. A weeknight favourite.',
+      ingredients: [
+        { n: 'black beans', q: 2, u: 'cans' }, { n: 'corn tortillas', q: 6, u: '' },
+        { n: 'red onion', q: 1, u: '' }, { n: 'lime', q: 1, u: '' },
+        { n: 'smoked paprika', q: 1, u: 'tsp' }, { n: 'coriander', q: 1, u: 'bunch' }
+      ]
+    },
+    {
+      id: 'greek-salad', name: 'Greek Salad with Feta', category: 'lunch',
+      tags: ['vegetarian', 'gluten-free'], minutes: 15, servings: 2,
+      desc: 'Chunky cucumber, tomatoes and olives with a generous slab of feta and dried oregano.',
+      ingredients: [
+        { n: 'cucumber', q: 1, u: '' }, { n: 'tomatoes', q: 300, u: 'g' },
+        { n: 'feta', q: 150, u: 'g' }, { n: 'black olives', q: 100, u: 'g' },
+        { n: 'olive oil', q: 3, u: 'tbsp' }, { n: 'dried oregano', q: 1, u: 'tsp' }
+      ]
+    },
+    {
+      id: 'miso-salmon', name: 'Miso Salmon & Greens', category: 'dinner',
+      tags: ['high-protein', 'gluten-free'], minutes: 25, servings: 2,
+      desc: 'Salmon glazed with miso and ginger, served with pak choi and steamed rice.',
+      ingredients: [
+        { n: 'salmon fillets', q: 2, u: '' }, { n: 'white miso paste', q: 2, u: 'tbsp' },
+        { n: 'pak choi', q: 300, u: 'g' }, { n: 'fresh ginger', q: 20, u: 'g' },
+        { n: 'sesame oil', q: 1, u: 'tbsp' }, { n: 'jasmine rice', q: 150, u: 'g' }
+      ]
+    },
+    {
+      id: 'barley-soup', name: 'Mushroom Barley Soup', category: 'lunch',
+      tags: ['vegetarian'], minutes: 45, servings: 4,
+      desc: 'Deep, savoury and filling. Make a big pot on Sunday and reheat through the week.',
+      ingredients: [
+        { n: 'chestnut mushrooms', q: 400, u: 'g' }, { n: 'pearl barley', q: 150, u: 'g' },
+        { n: 'vegetable stock', q: 1.5, u: 'litres' }, { n: 'carrots', q: 2, u: '' },
+        { n: 'celery sticks', q: 2, u: '' }, { n: 'dried thyme', q: 1, u: 'tsp' }
+      ]
+    },
+    {
+      id: 'shakshuka', name: 'Shakshuka with Peppers', category: 'breakfast',
+      tags: ['vegetarian', 'gluten-free'], minutes: 30, servings: 2,
+      desc: 'Eggs poached in a spiced tomato and pepper sauce. Serve with bread for dipping.',
+      ingredients: [
+        { n: 'eggs', q: 4, u: '' }, { n: 'chopped tomatoes', q: 400, u: 'g' },
+        { n: 'red pepper', q: 1, u: '' }, { n: 'ground cumin', q: 1, u: 'tsp' },
+        { n: 'onion', q: 1, u: '' }, { n: 'parsley', q: 1, u: 'bunch' }
+      ]
+    },
+    {
+      id: 'lentil-stew', name: 'Lentil & Sweet Potato Stew', category: 'dinner',
+      tags: ['vegan', 'gluten-free'], minutes: 40, servings: 4,
+      desc: 'Red lentils and sweet potato simmered until soft, finished with a handful of spinach.',
+      ingredients: [
+        { n: 'red lentils', q: 200, u: 'g' }, { n: 'sweet potatoes', q: 2, u: '' },
+        { n: 'vegetable stock', q: 1, u: 'litre' }, { n: 'tomato paste', q: 2, u: 'tbsp' },
+        { n: 'ground cumin', q: 1, u: 'tsp' }, { n: 'baby spinach', q: 150, u: 'g' }
+      ]
+    },
+    {
+      id: 'tuna-bean-salad', name: 'Tuna & White Bean Salad', category: 'lunch',
+      tags: ['high-protein', 'gluten-free'], minutes: 12, servings: 2,
+      desc: 'A no-cook lunch from the cupboard: tuna, cannellini beans, red onion and rocket.',
+      ingredients: [
+        { n: 'tinned tuna', q: 2, u: 'cans' }, { n: 'cannellini beans', q: 1, u: 'can' },
+        { n: 'red onion', q: 1, u: '' }, { n: 'lemon', q: 1, u: '' },
+        { n: 'olive oil', q: 2, u: 'tbsp' }, { n: 'rocket', q: 80, u: 'g' }
+      ]
+    },
+    {
+      id: 'oat-pancakes', name: 'Banana Oat Pancakes', category: 'breakfast',
+      tags: ['vegetarian'], minutes: 20, servings: 2,
+      desc: 'Three everyday ingredients blitzed into a batter. Good with yoghurt and fruit.',
+      ingredients: [
+        { n: 'bananas', q: 2, u: '' }, { n: 'rolled oats', q: 120, u: 'g' },
+        { n: 'eggs', q: 2, u: '' }, { n: 'milk', q: 100, u: 'ml' },
+        { n: 'baking powder', q: 1, u: 'tsp' }, { n: 'butter', q: 1, u: 'tbsp' }
+      ]
+    },
+    {
+      id: 'tofu-stirfry', name: 'Tofu & Broccoli Stir-fry', category: 'dinner',
+      tags: ['vegan', 'high-protein'], minutes: 20, servings: 2,
+      desc: 'Crisp tofu, bright broccoli and a quick soy and garlic sauce. Faster than a takeaway.',
+      ingredients: [
+        { n: 'firm tofu', q: 300, u: 'g' }, { n: 'broccoli', q: 300, u: 'g' },
+        { n: 'soy sauce', q: 3, u: 'tbsp' }, { n: 'garlic', q: 2, u: 'cloves' },
+        { n: 'sesame oil', q: 1, u: 'tbsp' }, { n: 'jasmine rice', q: 150, u: 'g' }
+      ]
+    }
+  ];
+
+  var TAG_LABEL = {
+    'vegetarian': 'Vegetarian',
+    'vegan': 'Vegan',
+    'high-protein': 'High protein',
+    'gluten-free': 'Gluten-free'
+  };
+
+  var ICONS = {
+    breakfast: '<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="4.2"/><path d="M12 2.5v2.2M12 19.3v2.2M2.5 12h2.2M19.3 12h2.2M5.2 5.2l1.6 1.6M17.2 17.2l1.6 1.6M18.8 5.2l-1.6 1.6M6.8 17.2l-1.6 1.6"/></svg>',
+    lunch: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3.2 11.5h17.6a8.8 8.8 0 0 1-17.6 0Z"/><path d="M8.4 7.6c0-1.4 1-1.9 1-3.1M12.4 7.6c0-1.4 1-1.9 1-3.1M16.4 7.6c0-1.4 1-1.9 1-3.1"/></svg>',
+    dinner: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4.5 10.5h15v4.2a5.3 5.3 0 0 1-5.3 5.3H9.8a5.3 5.3 0 0 1-5.3-5.3v-4.2Z"/><path d="M2.5 10.5h19"/><path d="M9.5 6.6c0-1.1 1-1.5 1-2.6"/></svg>'
+  };
+
+  var STORAGE_KEY = 'dmp-plan-v1';
+  var state = { diet: 'all', maxTime: 0, query: '', plan: [], checked: {} };
+
+  function $(sel, root) { return (root || document).querySelector(sel); }
+  function $$(sel, root) { return Array.prototype.slice.call((root || document).querySelectorAll(sel)); }
+  function esc(s) {
+    return String(s).replace(/[&<>"]/g, function (c) {
+      return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c];
+    });
+  }
+  function keyOf(item) { return item.n + '|' + item.u; }
+
+  function load() {
+    try {
+      var raw = localStorage.getItem(STORAGE_KEY);
+      if (!raw) return;
+      var saved = JSON.parse(raw);
+      if (saved && Array.isArray(saved.plan)) {
+        state.plan = saved.plan.filter(function (p) {
+          return p && MEALS.some(function (m) { return m.id === p.id; }) && isFinite(p.servings);
+        }).map(function (p) {
+          return { id: p.id, servings: Math.min(12, Math.max(1, Math.round(p.servings))) };
+        });
+      }
+      if (saved && saved.checked && typeof saved.checked === 'object') {
+        state.checked = saved.checked;
+      }
+    } catch (e) { /* storage unavailable — start fresh */ }
+  }
+
+  function save() {
+    try {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify({ plan: state.plan, checked: state.checked }));
+    } catch (e) { /* ignore */ }
+  }
+
+  function filteredMeals() {
+    var q = state.query.trim().toLowerCase();
+    return MEALS.filter(function (m) {
+      if (state.diet !== 'all') {
+        if (state.diet === 'vegetarian') {
+          if (m.tags.indexOf('vegetarian') === -1 && m.tags.indexOf('vegan') === -1) return false;
+        } else if (m.tags.indexOf(state.diet) === -1) {
+          return false;
+        }
+      }
+      if (state.maxTime && m.minutes > state.maxTime) return false;
+      if (q) {
+        var hay = (m.name + ' ' + m.desc + ' ' + m.ingredients.map(function (i) { return i.n; }).join(' ')).toLowerCase();
+        if (hay.indexOf(q) === -1) return false;
+      }
+      return true;
+    });
+  }
+
+  function aggregate() {
+    var map = {};
+    state.plan.forEach(function (item) {
+      var meal = MEALS.filter(function (m) { return m.id === item.id; })[0];
+      if (!meal) return;
+      var factor = item.servings / meal.servings;
+      meal.ingredients.forEach(function (ing) {
+        var k = keyOf(ing);
+        if (!map[k]) map[k] = { n: ing.n, u: ing.u, q: 0 };
+        map[k].q += ing.q * factor;
+      });
+    });
+    return Object.keys(map).map(function (k) { return map[k]; }).sort(function (a, b) {
+      return a.n.localeCompare(b.n);
+    });
+  }
+
+  function fmtQty(q) {
+    var r = Math.round(q * 100) / 100;
+    if (Number.isInteger(r)) return String(r);
+    return String(r).replace(/(\.\d*?)0+$/, '$1').replace(/\.$/, '');
+  }
+
+  var toastTimer;
+  function toast(msg) {
+    var el = $('#toast');
+    el.textContent = msg;
+    el.classList.add('is-visible');
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(function () { el.classList.remove('is-visible'); }, 3200);
+  }
+
+  /* ---------- Rendering ---------- */
+
+  function mealCard(m) {
+    var inPlan = state.plan.some(function (p) { return p.id === m.id; });
+    var tags = m.tags.map(function (t) { return '<li>' + TAG_LABEL[t] + '</li>'; }).join('');
+    return '<article class="meal-card' + (inPlan ? ' is-added' : '') + '">' +
+      '<div class="meal-top">' +
+        '<span class="badge badge--' + m.category + '" aria-hidden="true">' + ICONS[m.category] + '</span>' +
+        '<div class="meal-title">' +
+          '<h3>' + esc(m.name) + '</h3>' +
+          '<p class="meal-meta">' + m.minutes + ' min · ' + m.servings + ' servings</p>' +
+        '</div>' +
+      '</div>' +
+      '<p class="meal-desc">' + esc(m.desc) + '</p>' +
+      '<ul class="tags">' + tags + '</ul>' +
+      '<div class="meal-foot">' +
+        '<span class="ing-count">' + m.ingredients.length + ' ingredients</span>' +
+        '<button class="btn btn--small ' + (inPlan ? 'btn--added' : 'btn--primary') + '" type="button" ' +
+          'data-add="' + m.id + '" aria-pressed="' + inPlan + '">' +
+          (inPlan ? 'In plan' : 'Add to plan') +
+        '</button>' +
+      '</div>' +
+    '</article>';
+  }
+
+  function renderMeals() {
+    var list = filteredMeals();
+    var grid = $('#meal-grid');
+    var count = $('#result-count');
+    count.textContent = list.length === 1 ? 'Showing 1 meal' : 'Showing ' + list.length + ' meals';
+
+    if (!list.length) {
+      grid.innerHTML = '<div class="empty">' +
+        '<h3>No meals match those filters</h3>' +
+        '<p>Try a shorter search, a longer cooking time, or a different diet.</p>' +
+        '<button class="btn btn--primary btn--small" type="button" data-clear-filters>Clear filters</button>' +
+      '</div>';
+      return;
+    }
+    grid.innerHTML = list.map(mealCard).join('');
+  }
+
+  function syncCard(id) {
+    var btn = document.querySelector('[data-add="' + id + '"]');
+    if (!btn) return;
+    var inPlan = state.plan.some(function (p) { return p.id === id; });
+    btn.setAttribute('aria-pressed', String(inPlan));
+    btn.textContent = inPlan ? 'In plan' : 'Add to plan';
+    btn.classList.toggle('btn--added', inPlan);
+    btn.classList.toggle('btn--primary', !inPlan);
+    var card = btn.closest('.meal-card');
+    if (card) card.classList.toggle('is-added', inPlan);
+  }
+
+  function renderPlan(focusSel) {
+    var body = $('#plan-body');
+    $('#plan-count').textContent = state.plan.length === 1 ? '1 meal' : state.plan.length + ' meals';
+
+    if (!state.plan.length) {
+      body.innerHTML = '<div class="empty empty--sm">' +
+        '<p class="empty-title">Your plan is empty</p>' +
+        '<p class="empty-text">Add a meal card and it will show up here, with servings you can adjust.</p>' +
+      '</div>';
+    } else {
+      body.innerHTML = '<ul class="plan-list">' + state.plan.map(function (item) {
+        var m = MEALS.filter(function (x) { return x.id === item.id; })[0];
+        return '<li class="plan-item">' +
+          '<div class="plan-item-main">' +
+            '<p class="plan-name">' + esc(m.name) + '</p>' +
+            '<p class="plan-meta">' + m.minutes + ' min · ' + m.category + '</p>' +
+          '</div>' +
+          '<div class="stepper" role="group" aria-label="Servings for ' + esc(m.name) + '">' +
+            '<button type="button" data-step="-1" data-id="' + m.id + '" aria-label="One fewer serving of ' + esc(m.name) + '">−</button>' +
+            '<span>' + item.servings + '</span>' +
+            '<button type="button" data-step="1" data-id="' + m.id + '" aria-label="One more serving of ' + esc(m.name) + '">+</button>' +
+          '</div>' +
+          '<button class="icon-btn" type="button" data-remove="' + m.id + '" aria-label="Remove ' + esc(m.name) + ' from plan">×</button>' +
+        '</li>';
+      }).join('') + '</ul>';
+    }
+
+    if (focusSel) {
+      var el = document.querySelector(focusSel);
+      if (el) el.focus();
+    }
+  }
+
+  function updateProgress(items) {
+    var list = items || aggregate();
+    var total = list.length;
+    var done = list.filter(function (i) { return state.checked[keyOf(i)]; }).length;
+    var pct = total ? Math.round((done / total) * 100) : 0;
+
+    $('#progress-bar').style.width = pct + '%';
+    $('#progress').setAttribute('aria-valuenow', String(pct));
+    $('#progress-label').textContent = total
+      ? done + ' of ' + total + ' items ticked'
+      : 'No ingredients yet';
+    $('#clear-checked').disabled = done === 0;
+  }
+
+  function renderChecklist() {
+    var items = aggregate();
+    var list = $('#checklist-list');
+    var valid = {};
+    items.forEach(function (i) { valid[keyOf(i)] = true; });
+
+    Object.keys(state.checked).forEach(function (k) {
+      if (!valid[k]) delete state.checked[k];
+    });
+
+    if (!items.length) {
+      list.innerHTML = '<li class="check-empty">Add a meal to your plan and its ingredients will appear here.</li>';
+    } else {
+      list.innerHTML = items.map(function (it) {
+        var k = keyOf(it);
+        var on = !!state.checked[k];
+        var qty = fmtQty(it.q) + (it.u ? ' ' + it.u : '');
+        return '<li class="check-item' + (on ? ' is-checked' : '') + '">' +
+          '<label class="check-label">' +
+            '<input type="checkbox" data-key="' + esc(k) + '"' + (on ? ' checked' : '') + '>' +
+            '<span><span class="check-qty">' + esc(qty) + '</span> ' + esc(it.n) + '</span>' +
+          '</label>' +
+        '</li>';
+      }).join('');
+    }
+    updateProgress(items);
+  }
+
+  /* ---------- Actions ---------- */
+
+  function toggleMeal(id) {
+    var meal = MEALS.filter(function (m) { return m.id === id; })[0];
+    if (!meal) return;
+    var idx = -1;
+    state.plan.forEach(function (p, i) { if (p.id === id) idx = i; });
+
+    if (idx > -1) {
+      state.plan.splice(idx, 1);
+      toast(meal.name + ' removed from your plan.');
+    } else {
+      state.plan.push({ id: id, servings: meal.servings });
+      toast(meal.name + ' added — ' + meal.servings + ' servings.');
+    }
+    save();
+    syncCard(id);
+    renderPlan();
+    renderChecklist();
+  }
+
+  function changeServings(id, delta) {
+    var item = null;
+    state.plan.forEach(function (p) { if (p.id === id) item = p; });
+    if (!item) return;
+
+    var next = Math.min(12, Math.max(1, item.servings + delta));
+    if (next === item.servings) {
+      toast('Servings stay between 1 and 12.');
+      return;
+    }
+    item.servings = next;
+    save();
+    renderPlan('[data-step="' + delta + '"][data-id="' + id + '"]');
+    renderChecklist();
+  }
+
+  function removeMeal(id) {
+    var meal = MEALS.filter(function (m) { return m.id === id; })[0];
+    state.plan = state.plan.filter(function (p) { return p.id !== id; });
+    save();
+    syncCard(id);
+    renderPlan();
+    renderChecklist();
+    if (meal) toast(meal.name + ' removed from your plan.');
+  }
+
+  function clearFilters() {
+    state.diet = 'all';
+    state.maxTime = 0;
+    state.query = '';
+    $('#time-filter').value = '0';
+    $('#search').value = '';
+    $$('.chip').forEach(function (c) {
+      var on = c.dataset.diet === 'all';
+      c.classList.toggle('is-active', on);
+      c.setAttribute('aria-pressed', String(on));
+    });
+    renderMeals();
+    toast('Filters cleared.');
+  }
+
+  function copyList() {
+    var items = aggregate();
+    if (!items.length) {
+      toast('Add a meal first — the list is empty.');
+      return;
+    }
+    var text = 'Shopping list — Daily Meal Planner\n\n' + items.map(function (i) {
+      return '- ' + fmtQty(i.q) + (i.u ? ' ' + i.u : '') + ' ' + i.n;
+    }).join('\n');
+
+    function fallback() {
+      var ta = document.createElement('textarea');
+      ta.value = text;
+      ta.setAttribute('readonly', '');
+      ta.style.position = 'fixed';
+      ta.style.top = '-1000px';
+      ta.style.opacity = '0';
+      document.body.appendChild(ta);
+      ta.select();
+      var ok = false;
+      try { ok = document.execCommand('copy'); } catch (e) { ok = false; }
+      document.body.removeChild(ta);
+      toast(ok ? 'Shopping list copied to your clipboard.' : 'Copying is blocked here — select the list and copy it manually.');
+    }
+
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(text).then(function () {
+        toast('Shopping list copied to your clipboard.');
+      }, fallback);
+    } else {
+      fallback();
+    }
+  }
+
+  /* ---------- Wiring ---------- */
+
+  $('#meal-grid').addEventListener('click', function (e) {
+    var addBtn = e.target.closest('[data-add]');
+    if (addBtn) { toggleMeal(addBtn.dataset.add); return; }
+    if (e.target.closest('[data-clear-filters]')) clearFilters();
+  });
+
+  $('#plan-body').addEventListener('click', function (e) {
+    var step = e.target.closest('[data-step]');
+    if (step) { changeServings(step.dataset.id, Number(step.dataset.step)); return; }
+    var rm = e.target.closest('[data-remove]');
+    if (rm) removeMeal(rm.dataset.remove);
+  });
+
+  $('#checklist-list').addEventListener('change', function (e) {
+    var cb = e.target.closest('input[type="checkbox"]');
+    if (!cb) return;
+    var key = cb.dataset.key;
+    if (cb.checked) state.checked[key] = true;
+    else delete state.checked[key];
+    var li = cb.closest('.check-item');
+    if (li) li.classList.toggle('is-checked', cb.checked);
+    save();
+    updateProgress();
+  });
+
+  $$('.chip').forEach(function (chip) {
+    chip.addEventListener('click', function () {
+      state.diet = chip.dataset.diet;
+      $$('.chip').forEach(function (c) {
+        var on = c === chip;
+        c.classList.toggle('is-active', on);
+        c.setAttribute('aria-pressed', String(on));
+      });
+      renderMeals();
+    });
+  });
+
+  $('#time-filter').addEventListener('change', function (e) {
+    state.maxTime = Number(e.target.value);
+    renderMeals();
+  });
+
+  $('#search').addEventListener('input', function (e) {
+    state.query = e.target.value;
+    renderMeals();
+  });
+
+  $('#reset-plan').addEventListener('click', function () {
+    if (!state.plan.length && !Object.keys(state.checked).length) {
+      toast('Your plan is already empty.');
+      return;
+    }
+    state.plan = [];
+    state.checked = {};
+    save();
+    renderMeals();
+    renderPlan();
+    renderChecklist();
+    toast('Plan reset. A fresh start.');
+  });
+
+  $('#clear-checked').addEventListener('click', function () {
+    state.checked = {};
+    save();
+    renderChecklist();
+    toast('All ticks cleared.');
+  });
+
+  $('#copy-list').addEventListener('click', copyList);
+
+  var navToggle = $('.nav-toggle');
+  var nav = $('#site-nav');
+  navToggle.addEventListener('click', function () {
+    var open = nav.classList.toggle('open');
+    navToggle.setAttribute('aria-expanded', String(open));
+    navToggle.setAttribute('aria-label', open ? 'Close menu' : 'Open menu');
+  });
+  nav.addEventListener('click', function (e) {
+    if (e.target.tagName === 'A' && nav.classList.contains('open')) {
+      nav.classList.remove('open');
+      navToggle.setAttribute('aria-expanded', 'false');
+      navToggle.setAttribute('aria-label', 'Open menu');
+    }
+  });
+
+  var navLinks = $$('#site-nav a');
+  var sections = ['planner', 'how', 'kitchen', 'faq'].map(function (id) {
+    return document.getElementById(id);
+  }).filter(Boolean);
+
+  if ('IntersectionObserver' in window) {
+    var io = new IntersectionObserver(function (entries) {
+      entries.forEach(function (entry) {
+        if (!entry.isIntersecting) return;
+        navLinks.forEach(function (a) {
+          a.classList.toggle('is-active', a.getAttribute('href') === '#' + entry.target.id);
+        });
+      });
+    }, { rootMargin: '-45% 0px -50% 0px', threshold: 0 });
+    sections.forEach(function (s) { io.observe(s); });
+  }
+
+  /* ---------- Start ---------- */
+  load();
+  renderMeals();
+  renderPlan();
+  renderChecklist();
+})();
+</script>
 </body>
 </html>
+```
+### Core Interaction & Design
+
+The page works as a self-contained meal planning tool, with all interactions handled in vanilla JavaScript.
+
+- **Filtering & search** – Diet chips, a cooking-time dropdown, and a text search narrow the twelve sample meals instantly. The result count updates live, and an empty state offers a one-click reset.
+- **Plan builder** – Each meal card has an “Add to plan” button that toggles its state. The plan panel shows selected meals with plus/minus serving controls, and every ingredient quantity recalculates automatically.
+- **Ingredient checklist** – All ingredients from the plan are merged into a single list. Checkboxes let you tick items off, a progress bar tracks completion, and “Copy list” copies the shopping list to your clipboard.
+- **Persistence & feedback** – Your plan and checked items are saved to localStorage, so they survive a page reload. A toast notification confirms every action, and the reset button clears everything.
+- **Accessibility & responsiveness** – The layout is mobile-first, with a hamburger menu, visible focus states, reduced-motion support, and semantic HTML throughout.
+---
+
+**Optimization Tip:** You can replace the sample meals in the `MEALS` array with your own recipes. Each meal needs an `id`, `name`, `category`, `tags`, `minutes`, `servings`, `desc`, and an `ingredients` list with `n`, `q`, and `u` fields.
