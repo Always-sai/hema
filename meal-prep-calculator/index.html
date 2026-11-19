@@ -1,0 +1,351 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#173f32">
+<meta name="description" content="Plan a week of balanced meals in minutes. Set your goals, choose your prep time, and get a meal schedule, ingredient quantities, and a shopping list.">
+<title>Meal Prep Calculator — A calmer way to eat well</title>
+<style>
+:root{--paper:#f7f5ee;--paper-2:#efeee4;--white:#fffef9;--ink:#203b31;--muted:#647168;--green:#245b43;--green-dark:#173f32;--green-soft:#e4ecdf;--lime:#d9e8b7;--line:#dce1d4;--orange:#b96b3d;--orange-soft:#f5e7d8;--red:#a33d32;--shadow:0 12px 40px rgba(35,57,40,.07);--radius:20px}
+*{box-sizing:border-box}html{scroll-behavior:smooth;scroll-padding-top:90px}body{margin:0;background:var(--paper);color:var(--ink);font-family:Inter,ui-sans-serif,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;font-size:15px;line-height:1.6;-webkit-font-smoothing:antialiased}button,input,select{font:inherit}button,a,input,select{-webkit-tap-highlight-color:transparent}button{cursor:pointer}a{color:inherit}button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,summary:focus-visible{outline:3px solid var(--orange);outline-offset:4px}button:disabled{cursor:not-allowed;opacity:.55}svg{display:block}img{max-width:100%}h1,h2,h3,p{margin:0}h1,h2,h3{line-height:1.15;letter-spacing:-.035em}h2{font-size:clamp(1.7rem,3vw,2.4rem)}h3{font-size:1.1rem}p{color:var(--muted)}.wrap{width:min(1180px,calc(100% - 40px));margin-inline:auto}.eyebrow{font-size:.72rem;font-weight:750;letter-spacing:.14em;text-transform:uppercase;color:var(--green)}.skip{position:absolute;top:-60px;left:20px;background:var(--green-dark);color:white;padding:10px 18px;border-radius:8px;z-index:100}.skip:focus{top:12px}.sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
+.site-header{position:sticky;top:0;z-index:30;background:rgba(247,245,238,.94);backdrop-filter:blur(14px);border-bottom:1px solid rgba(220,225,212,.7)}.nav{height:76px;display:flex;align-items:center;justify-content:space-between;gap:20px}.brand{display:flex;align-items:center;gap:10px;text-decoration:none;font-weight:800;font-size:1.15rem;letter-spacing:-.04em}.brand-mark{width:35px;height:35px;background:var(--green-dark);border-radius:11px;display:grid;place-items:center;color:var(--lime)}.brand-mark svg{width:23px;height:23px}.nav-links{display:flex;align-items:center;gap:28px}.nav-links a{font-size:.85rem;font-weight:600;text-decoration:none;color:#4d6055}.nav-links a:hover{color:var(--green)}.nav-cta{background:var(--green-dark);color:white;border:0;border-radius:9px;padding:10px 16px;font-size:.82rem;font-weight:650}.nav-cta:hover{background:var(--green)}
+.hero{padding:64px 0 48px;position:relative;overflow:hidden}.hero:before{content:"";position:absolute;width:500px;height:500px;border-radius:50%;background:radial-gradient(circle,rgba(217,232,183,.45),transparent 68%);right:-150px;top:-100px;pointer-events:none}.hero-grid{display:grid;grid-template-columns:1.05fr .95fr;gap:60px;align-items:center}.hero h1{font-size:clamp(2.8rem,5.5vw,4.7rem);font-weight:750;letter-spacing:-.065em;line-height:1.04;margin:20px 0 24px}.hero h1 span{color:var(--green);position:relative;white-space:nowrap}.hero h1 span:after{content:"";position:absolute;left:0;right:0;bottom:-5px;height:7px;background:var(--lime);border-radius:50%;transform:rotate(-1deg);z-index:-1}.hero-copy{font-size:1.05rem;max-width:470px}.hero-actions{display:flex;gap:12px;align-items:center;margin-top:28px}.btn{display:inline-flex;align-items:center;justify-content:center;gap:9px;border:1px solid transparent;border-radius:10px;padding:13px 20px;font-weight:650;font-size:.9rem;text-decoration:none;transition:background .2s,transform .2s}.btn:hover{transform:translateY(-2px)}.btn-primary{background:var(--green-dark);color:white}.btn-primary:hover{background:var(--green)}.btn-secondary{background:transparent;border-color:#c9d2c3;color:var(--green-dark)}.btn-secondary:hover{background:var(--green-soft)}.btn svg{width:17px;height:17px}.hero-note{display:flex;align-items:center;gap:8px;font-size:.78rem;color:var(--muted);margin-top:20px}.hero-note svg{width:16px;height:16px;color:var(--green)}
+.hero-art{position:relative;min-height:390px;display:flex;align-items:center;justify-content:center}.plate{position:relative;width:330px;height:330px;border-radius:50%;background:#e8e9d9;border:1px solid #d7ddc9;box-shadow:inset 0 0 0 15px #f8f7ed,inset 0 0 0 17px #d9decd,0 25px 60px rgba(35,57,40,.1);transform:rotate(-8deg)}.plate:before{content:"";position:absolute;inset:35px;border-radius:50%;background:linear-gradient(135deg,#f0f0df,#e4e8d4)}.food{position:absolute;border-radius:50%;box-shadow:inset -8px -8px 0 rgba(0,0,0,.06)}.food-grain{width:115px;height:115px;background:#d9c99a;left:65px;top:65px;border-radius:45% 55% 50% 40%;transform:rotate(20deg)}.food-grain:after{content:"";position:absolute;inset:12px;background:repeating-linear-gradient(35deg,transparent 0 7px,rgba(255,255,255,.35) 8px 9px);border-radius:inherit}.food-green{width:125px;height:120px;background:#5b8050;right:55px;top:60px;border-radius:55% 45% 60% 40%;transform:rotate(-20deg)}.food-green:after{content:"";position:absolute;inset:15px;border:2px solid rgba(255,255,255,.2);border-radius:50%;box-shadow:0 0 0 10px rgba(255,255,255,.06)}.food-protein{width:125px;height:100px;background:#c98b5b;left:85px;bottom:55px;border-radius:45% 55% 40% 50%;transform:rotate(15deg)}.food-protein:after{content:"";position:absolute;inset:12px;border-radius:inherit;background:repeating-linear-gradient(0deg,transparent 0 8px,rgba(255,255,255,.15) 9px 10px)}.food-tomato{width:45px;height:45px;background:#c96b4b;right:65px;bottom:75px}.food-tomato:after{content:"";position:absolute;width:12px;height:12px;background:#4c7044;left:17px;top:-4px;border-radius:50%}.floating-card{position:absolute;background:var(--white);border:1px solid var(--line);border-radius:14px;box-shadow:var(--shadow);padding:15px 18px}.floating-card.top{right:-5px;top:20px;transform:rotate(4deg)}.floating-card.bottom{left:-10px;bottom:20px;transform:rotate(-3deg)}.floating-card .small{font-size:.68rem;color:var(--muted);margin-bottom:3px}.floating-card strong{font-size:1.05rem;letter-spacing:-.03em}.floating-card .mini-bar{height:5px;background:var(--green-soft);border-radius:5px;margin-top:8px;overflow:hidden}.floating-card .mini-bar span{display:block;width:78%;height:100%;background:var(--green)}.floating-card .check{display:inline-grid;place-items:center;width:24px;height:24px;background:var(--green-soft);color:var(--green);border-radius:50%;margin-right:7px}.floating-card .check svg{width:13px;height:13px}.floating-card.bottom strong{font-size:.85rem}.hero-art .leaf{position:absolute;width:50px;height:50px;color:#8ca16e;right:0;bottom:70px;transform:rotate(25deg)}
+.section{padding:70px 0}.section-head{display:flex;justify-content:space-between;align-items:end;gap:30px;margin-bottom:30px}.section-head p{max-width:440px;margin-top:12px}.section-head .eyebrow{margin-bottom:10px}.section-head .step-label{font-size:.8rem;color:var(--muted);white-space:nowrap}.planner-section{padding-top:30px}.planner-shell{display:grid;grid-template-columns:340px 1fr;gap:0;border:1px solid var(--line);border-radius:24px;background:var(--white);box-shadow:var(--shadow);overflow:hidden}.settings{padding:30px;background:#f0f1e7;border-right:1px solid var(--line)}.settings h2{font-size:1.5rem;margin-bottom:6px}.settings>p{font-size:.82rem;margin-bottom:24px}.field{margin-bottom:20px}.field label,.field-label{display:block;font-size:.8rem;font-weight:700;margin-bottom:8px}.field input,.field select{width:100%;border:1px solid #cdd5c6;border-radius:9px;background:var(--white);padding:11px 12px;color:var(--ink);min-height:44px}.field input:hover,.field select:hover{border-color:#9eaf98}.field input:focus,.field select:focus{border-color:var(--green);outline:2px solid var(--lime);outline-offset:1px}.field-row{display:grid;grid-template-columns:1fr 1fr;gap:12px}.field-hint{font-size:.7rem;color:var(--muted);margin-top:5px}.segmented{display:flex;gap:5px;background:#e4e8dc;padding:4px;border-radius:10px}.segmented label{flex:1;position:relative;margin:0}.segmented input{position:absolute;opacity:0;width:1px;height:1px}.segmented span{display:block;text-align:center;padding:8px 4px;border-radius:7px;font-size:.75rem;font-weight:600;cursor:pointer}.segmented input:checked+span{background:var(--white);color:var(--green-dark);box-shadow:0 2px 5px rgba(0,0,0,.06)}.segmented input:focus-visible+span{outline:3px solid var(--orange);outline-offset:2px}.diet-options{display:flex;flex-wrap:wrap;gap:7px}.diet-option{position:relative}.diet-option input{position:absolute;opacity:0;width:1px;height:1px}.diet-option span{display:block;border:1px solid #cdd5c6;border-radius:7px;padding:7px 10px;font-size:.72rem;cursor:pointer;background:var(--white)}.diet-option input:checked+span{background:var(--green-dark);color:white;border-color:var(--green-dark)}.diet-option input:focus-visible+span{outline:3px solid var(--orange);outline-offset:2px}.generate-btn{width:100%;margin-top:4px}.form-error{font-size:.78rem;color:var(--red);margin:0 0 12px;display:none}.form-error.visible{display:block}.results{padding:30px;min-width:0}.results-top{display:flex;justify-content:space-between;gap:15px;align-items:start;margin-bottom:22px}.results-top h3{font-size:1.35rem}.results-top p{font-size:.8rem;margin-top:5px}.status-pill{display:inline-flex;align-items:center;gap:6px;background:var(--green-soft);color:var(--green);font-size:.68rem;font-weight:700;padding:5px 9px;border-radius:20px;white-space:nowrap}.status-pill:before{content:"";width:5px;height:5px;border-radius:50%;background:var(--green)}.macro-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:24px}.macro-card{background:#f5f5ed;border:1px solid #e5e8dc;border-radius:12px;padding:13px}.macro-card .macro-label{font-size:.68rem;color:var(--muted);font-weight:600}.macro-card strong{display:block;font-size:1.35rem;letter-spacing:-.04em;margin-top:3px}.macro-card strong small{font-size:.65rem;font-weight:500;color:var(--muted);letter-spacing:0}.macro-track{height:4px;background:#e0e5d7;border-radius:4px;margin-top:9px;overflow:hidden}.macro-track span{display:block;height:100%;background:var(--green);border-radius:4px;transition:width .4s}.macro-card:nth-child(2) .macro-track span{background:#b98b4e}.macro-card:nth-child(3) .macro-track span{background:#7b9b5b}.macro-card:nth-child(4) .macro-track span{background:#c07b5b}.result-tabs{display:flex;gap:20px;border-bottom:1px solid var(--line);margin-bottom:18px}.result-tab{border:0;background:none;padding:0 0 10px;font-size:.8rem;font-weight:700;color:var(--muted);border-bottom:2px solid transparent}.result-tab[aria-selected="true"]{color:var(--green-dark);border-bottom-color:var(--green)}.meal-list{display:grid;gap:10px}.meal-row{display:grid;grid-template-columns:42px 1fr auto;gap:12px;align-items:center;padding:12px;border:1px solid var(--line);border-radius:12px;background:var(--white)}.meal-icon{width:40px;height:40px;border-radius:10px;background:var(--orange-soft);display:grid;place-items:center;color:var(--orange)}.meal-icon svg{width:22px;height:22px}.meal-row:nth-child(2) .meal-icon{background:var(--green-soft);color:var(--green)}.meal-row:nth-child(3) .meal-icon{background:#eee9d8;color:#8b7b42}.meal-row h4{font-size:.85rem;margin:0 0 2px;letter-spacing:-.01em}.meal-row p{font-size:.72rem}.meal-meta{text-align:right;font-size:.72rem;color:var(--muted);white-space:nowrap}.meal-meta strong{display:block;color:var(--ink);font-size:.8rem}.result-note{font-size:.72rem;margin-top:16px;display:flex;gap:7px;align-items:start}.result-note svg{width:14px;height:14px;flex-shrink:0;margin-top:3px;color:var(--green)}.empty-state{padding:35px 20px;text-align:center;border:1px dashed #c9d2c3;border-radius:14px;background:#f8f8f1}.empty-state svg{width:38px;height:38px;margin:0 auto 12px;color:#8ca16e}.empty-state h4{margin:0 0 6px;font-size:1rem}.empty-state p{font-size:.8rem;max-width:340px;margin:auto}.shopping-list{display:grid;gap:0}.shopping-item{display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid #e8ebdf;font-size:.8rem}.shopping-item input{width:16px;height:16px;accent-color:var(--green);flex-shrink:0}.shopping-item label{flex:1;cursor:pointer}.shopping-item label strong{font-weight:650}.shopping-item label span{color:var(--muted);font-size:.72rem}.shopping-item input:checked+label{text-decoration:line-through;color:#8a9488}.shopping-actions{display:flex;justify-content:space-between;align-items:center;margin-top:14px;gap:10px}.text-btn{border:0;background:none;color:var(--green);font-size:.75rem;font-weight:650;padding:5px 0;text-decoration:underline;text-underline-offset:3px}.results-actions{display:flex;gap:8px;margin-top:20px;flex-wrap:wrap}.results-actions .btn{padding:9px 13px;font-size:.75rem}.results-actions .btn svg{width:14px;height:14px}
+.how-section{background:var(--green-dark);color:white;border-radius:28px;padding:48px;margin:0 auto;width:min(1180px,calc(100% - 40px));position:relative;overflow:hidden}.how-section:after{content:"";position:absolute;width:350px;height:350px;border:1px solid rgba(217,232,183,.12);border-radius:50%;right:-80px;top:-100px;box-shadow:0 0 0 40px rgba(217,232,183,.03),0 0 0 80px rgba(217,232,183,.02);pointer-events:none}.how-section .eyebrow{color:var(--lime)}.how-section h2{margin:10px 0 30px;max-width:500px}.how-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:30px}.how-step{border-top:1px solid rgba(255,255,255,.2);padding-top:20px}.how-step .number{font-size:.75rem;color:var(--lime);font-weight:700}.how-step h3{margin:12px 0 8px;font-size:1.05rem}.how-step p{color:#c4d0c4;font-size:.85rem;max-width:280px}.tips-section .section-head{margin-bottom:24px}.tips-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:18px}.tip-card{background:var(--white);border:1px solid var(--line);border-radius:16px;padding:24px}.tip-icon{width:38px;height:38px;border-radius:11px;background:var(--green-soft);color:var(--green);display:grid;place-items:center;margin-bottom:18px}.tip-icon svg{width:21px;height:21px}.tip-card h3{font-size:1rem;margin-bottom:8px}.tip-card p{font-size:.83rem}.tip-card .tip-detail{font-size:.72rem;color:var(--green);font-weight:650;margin-top:14px}.faq-section{padding-top:0}.faq-layout{display:grid;grid-template-columns:.8fr 1.2fr;gap:60px}.faq-intro p{margin-top:14px;max-width:300px}.faq-list details{border-bottom:1px solid var(--line);padding:17px 0}.faq-list details:first-child{border-top:1px solid var(--line)}.faq-list summary{cursor:pointer;font-weight:650;font-size:.9rem;list-style:none;display:flex;justify-content:space-between;gap:20px;align-items:center}.faq-list summary::-webkit-details-marker{display:none}.faq-list summary:after{content:"+";font-size:1.3rem;font-weight:400;color:var(--green);line-height:1}.faq-list details[open] summary:after{content:"−"}.faq-list details p{font-size:.83rem;padding-top:12px;max-width:560px}.final-cta{background:var(--green-soft);border:1px solid #d4dfc8;border-radius:20px;padding:30px 36px;display:flex;justify-content:space-between;align-items:center;gap:25px;margin-bottom:60px}.final-cta h2{font-size:1.6rem}.final-cta p{font-size:.85rem;margin-top:7px}.site-footer{border-top:1px solid var(--line);padding:30px 0}.footer-top{display:flex;justify-content:space-between;gap:30px;align-items:start}.footer-brand p{font-size:.78rem;max-width:280px;margin-top:10px}.footer-links{display:flex;gap:24px;font-size:.78rem}.footer-links a{text-decoration:none;color:var(--muted)}.footer-links a:hover{color:var(--green)}.footer-bottom{display:flex;justify-content:space-between;gap:20px;border-top:1px solid var(--line);margin-top:25px;padding-top:18px;font-size:.7rem;color:var(--muted)}.toast{position:fixed;bottom:24px;left:50%;transform:translate(-50%,20px);background:var(--green-dark);color:white;padding:12px 20px;border-radius:10px;box-shadow:var(--shadow);font-size:.82rem;opacity:0;pointer-events:none;transition:opacity .2s,transform .2s;z-index:60;max-width:calc(100% - 40px);text-align:center}.toast.show{opacity:1;transform:translate(-50%,0)}
+@media(min-width:1400px){.hero{padding-top:80px;padding-bottom:65px}}
+@media(max-width:1000px){.hero-grid{gap:25px}.hero-art{transform:scale(.9)}.planner-shell{grid-template-columns:300px 1fr}.settings,.results{padding:24px}.macro-card{padding:10px}.macro-card strong{font-size:1.15rem}.how-section{padding:36px}.faq-layout{gap:30px}}
+@media(max-width:760px){.wrap{width:calc(100% - 32px)}.nav{height:66px}.nav-links{gap:16px}.nav-links a{display:none}.brand{font-size:1.05rem}.hero{padding:42px 0 30px}.hero-grid{grid-template-columns:1fr;gap:20px}.hero h1{font-size:clamp(2.8rem,10vw,4rem)}.hero-copy{max-width:100%}.hero-art{min-height:340px;transform:scale(.9);margin-top:0}.hero-art .plate{width:300px;height:300px}.floating-card.top{right:5px}.floating-card.bottom{left:5px}.section{padding:48px 0}.section-head{display:block;margin-bottom:24px}.section-head .step-label{display:none}.planner-section{padding-top:20px}.planner-shell{grid-template-columns:1fr}.settings{border-right:0;border-bottom:1px solid var(--line);padding:24px}.results{padding:24px}.settings>p{margin-bottom:20px}.field{margin-bottom:16px}.how-section{width:calc(100% - 32px);padding:30px 24px;border-radius:20px}.how-grid{grid-template-columns:1fr;gap:22px}.how-step p{max-width:100%}.tips-grid{grid-template-columns:1fr;gap:12px}.tip-card{padding:20px}.tip-icon{margin-bottom:12px}.faq-layout{grid-template-columns:1fr;gap:20px}.faq-intro p{max-width:100%}.final-cta{padding:25px;display:block;margin-bottom:40px}.final-cta .btn{margin-top:18px}.footer-top{display:block}.footer-links{margin-top:20px;flex-wrap:wrap;gap:18px}.footer-bottom{display:block}.footer-bottom span{display:block;margin-top:6px}.hero-actions{flex-wrap:wrap}.hero-note{font-size:.72rem}.macro-grid{gap:7px}.macro-card{padding:10px 8px}.macro-card strong{font-size:1.1rem}.macro-card .macro-label{font-size:.62rem}.results-top h3{font-size:1.2rem}.meal-row{grid-template-columns:36px 1fr auto;gap:9px;padding:10px}.meal-icon{width:34px;height:34px}.meal-row h4{font-size:.8rem}.meal-meta{font-size:.65rem}.meal-meta strong{font-size:.72rem}}
+@media(max-width:380px){.hero h1{font-size:2.6rem}.hero-art{transform:scale(.8);margin-left:-15px;margin-right:-15px}.macro-grid{grid-template-columns:repeat(2,1fr)}.meal-meta{white-space:normal;max-width:70px}.nav-cta{padding:9px 12px;font-size:.75rem}.brand{font-size:.95rem}}
+@media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}*,*:before,*:after{animation:none!important;transition:none!important}.btn:hover{transform:none}}
+@media print{.site-header,.hero,.how-section,.tips-section,.faq-section,.final-cta,.site-footer,.settings,.results-actions,.result-tabs,.toast{display:none!important}.planner-shell{display:block;border:0;box-shadow:none}.results{padding:0}.section{padding:0}.macro-card{break-inside:avoid}.meal-row{break-inside:avoid}body{background:white}}
+</style>
+</head>
+<body>
+<a class="skip" href="#planner">Skip to meal planner</a>
+<header class="site-header">
+  <nav class="nav wrap" aria-label="Main navigation">
+    <a class="brand" href="#" aria-label="Meal Prep Calculator home">
+      <span class="brand-mark" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none"><path d="M5 3v6a3 3 0 0 0 6 0V3M8 3v18M19 3c-3 2-4 5-4 9h4M19 3v18" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+      mealprep<span style="color:var(--green);margin-left:-8px">.</span>
+    </a>
+    <div class="nav-links">
+      <a href="#planner">Calculator</a>
+      <a href="#how-it-works">How it works</a>
+      <a href="#tips">Prep tips</a>
+      <a class="nav-cta" href="#planner">Plan my week <span aria-hidden="true">↗</span></a>
+    </div>
+  </nav>
+</header>
+<main>
+  <section class="hero wrap" aria-labelledby="hero-title">
+    <div class="hero-grid">
+      <div>
+        <div class="eyebrow">Less guesswork. More good food.</div>
+        <h1 id="hero-title">Eat well.<br>Plan <span>less.</span></h1>
+        <p class="hero-copy">Turn your goals and your schedule into a week of balanced meals. We’ll do the ingredient math, so you can get on with your day.</p>
+        <div class="hero-actions">
+          <a class="btn btn-primary" href="#planner">Build my meal plan <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M5 12h14m-5-5 5 5-5 5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></a>
+          <a class="btn btn-secondary" href="#how-it-works">See how it works</a>
+        </div>
+        <div class="hero-note"><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="m12 3 8 4v5c0 5-8 9-8 9s-8-4-8-9V7l8-4Z" stroke="currentColor" stroke-width="1.6"/><path d="m8.5 12 2.5 2.5 4.5-5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>No account needed. Your plan stays in your browser.</div>
+      </div>
+      <div class="hero-art" aria-hidden="true">
+        <div class="plate">
+          <div class="food food-grain"></div><div class="food food-green"></div><div class="food food-protein"></div><div class="food food-tomato"></div>
+        </div>
+        <div class="floating-card top"><div class="small">Your daily balance</div><strong>Right on target</strong><div class="mini-bar"><span></span></div></div>
+        <div class="floating-card bottom"><span class="check"><svg viewBox="0 0 24 24" fill="none"><path d="m5 12 4 4L19 6" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg></span><strong>Sunday prep, sorted.</strong></div>
+        <svg class="leaf" viewBox="0 0 60 60" fill="none"><path d="M12 48C8 20 28 8 50 10c0 24-14 40-38 38Z" fill="currentColor" opacity=".5"/><path d="M12 48 42 18" stroke="#f7f5ee" stroke-width="2" stroke-linecap="round"/></svg>
+      </div>
+    </div>
+  </section>
+
+  <section class="section planner-section wrap" id="planner" aria-labelledby="planner-title">
+    <div class="section-head">
+      <div><div class="eyebrow">Your week, made simple</div><h2 id="planner-title">The meal prep calculator</h2><p>A few details are all it takes. Adjust your plan anytime.</p></div>
+      <span class="step-label">01 &nbsp;—&nbsp; Make it yours</span>
+    </div>
+    <div class="planner-shell">
+      <form class="settings" id="planner-form">
+        <h2>Let’s set the table.</h2>
+        <p>Tell us what works for your body and your week.</p>
+        <div class="field-row">
+          <div class="field"><label for="days">Prep days</label><select id="days" name="days"><option value="3">3 days</option><option value="4">4 days</option><option value="5" selected>5 days</option><option value="7">7 days</option></select></div>
+          <div class="field"><label for="people">People</label><select id="people" name="people"><option value="1" selected>1 person</option><option value="2">2 people</option><option value="3">3 people</option><option value="4">4 people</option></select></div>
+        </div>
+        <div class="field"><label for="calories">Daily calorie goal</label><input id="calories" name="calories" type="number" min="1200" max="4000" step="50" value="2000" inputmode="numeric" required><div class="field-hint">A planning estimate, not medical advice.</div></div>
+        <div class="field"><span class="field-label" id="goal-label">Your focus</span><div class="segmented" role="group" aria-labelledby="goal-label"><label><input type="radio" name="goal" value="balanced" checked><span>Balanced</span></label><label><input type="radio" name="goal" value="protein"><span>High protein</span></label><label><input type="radio" name="goal" value="light"><span>Light &amp; fresh</span></label></div></div>
+        <div class="field"><span class="field-label" id="time-label">Time to cook each day</span><div class="segmented" role="group" aria-labelledby="time-label"><label><input type="radio" name="time" value="15"><span>15 min</span></label><label><input type="radio" name="time" value="30" checked><span>30 min</span></label><label><input type="radio" name="time" value="45"><span>45 min</span></label></div></div>
+        <div class="field"><span class="field-label" id="diet-label">Food preferences <span style="font-weight:400;color:var(--muted)">(optional)</span></span><div class="diet-options" role="group" aria-labelledby="diet-label"><label class="diet-option"><input type="checkbox" name="diet" value="vegetarian"><span>Vegetarian</span></label><label class="diet-option"><input type="checkbox" name="diet" value="vegan"><span>Plant-based</span></label><label class="diet-option"><input type="checkbox" name="diet" value="gluten-free"><span>Gluten-free</span></label><label class="diet-option"><input type="checkbox" name="diet" value="dairy-free"><span>Dairy-free</span></label></div></div>
+        <p class="form-error" id="form-error" role="alert"></p>
+        <button class="btn btn-primary generate-btn" type="submit"><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="m12 3 1.8 5.2L19 10l-5.2 1.8L12 17l-1.8-5.2L5 10l5.2-1.8L12 3ZM19 16l.8 2.2L22 19l-2.2.8L19 22l-.8-2.2L16 19l2.2-.8L19 16Z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/></svg>Calculate my plan</button>
+      </form>
+      <div class="results" id="results" aria-live="polite" aria-atomic="false">
+        <div class="results-top"><div><h3 id="plan-title">Your week at a glance</h3><p id="plan-subtitle">A balanced starting point for 1 person.</p></div><span class="status-pill" id="plan-status">Ready to plan</span></div>
+        <div class="macro-grid" aria-label="Daily nutrition targets">
+          <div class="macro-card"><div class="macro-label">Calories</div><strong id="macro-cal">2,000 <small>kcal</small></strong><div class="macro-track"><span id="bar-cal" style="width:100%"></span></div></div>
+          <div class="macro-card"><div class="macro-label">Protein</div><strong id="macro-protein">120 <small>g</small></strong><div class="macro-track"><span id="bar-protein" style="width:60%"></span></div></div>
+          <div class="macro-card"><div class="macro-label">Carbs</div><strong id="macro-carbs">225 <small>g</small></strong><div class="macro-track"><span id="bar-carbs" style="width:60%"></span></div></div>
+          <div class="macro-card"><div class="macro-label">Fats</div><strong id="macro-fat">67 <small>g</small></strong><div class="macro-track"><span id="bar-fat" style="width:60%"></span></div></div>
+        </div>
+        <div class="result-tabs" role="tablist" aria-label="Plan details">
+          <button class="result-tab" id="tab-meals" role="tab" aria-selected="true" aria-controls="panel-meals" tabindex="0" type="button">Meal schedule</button>
+          <button class="result-tab" id="tab-shopping" role="tab" aria-selected="false" aria-controls="panel-shopping" tabindex="-1" type="button">Shopping list</button>
+        </div>
+        <div id="panel-meals" role="tabpanel" aria-labelledby="tab-meals" tabindex="0">
+          <div class="meal-list" id="meal-list">
+            <div class="meal-row"><span class="meal-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none"><path d="M4 9h16M6 9a6 6 0 0 1 12 0M5 14h14M7 18h10" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg></span><div><h4>Breakfast · Overnight oats &amp; berries</h4><p>Make-ahead jars with chia and yogurt</p></div><div class="meal-meta"><strong>400 kcal</strong>10 min</div></div>
+            <div class="meal-row"><span class="meal-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none"><path d="M4 3v6a3 3 0 0 0 6 0V3M7 3v18M19 3c-3 2-4 5-4 9h4M19 3v18" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg></span><div><h4>Lunch · Lemon chicken grain bowl</h4><p>Roast chicken, quinoa, greens &amp; tahini</p></div><div class="meal-meta"><strong>600 kcal</strong>25 min</div></div>
+            <div class="meal-row"><span class="meal-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none"><path d="M3 12h18M5 12a7 7 0 0 1 14 0M4 16h16M7 20h10" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg></span><div><h4>Dinner · Roasted salmon &amp; greens</h4><p>Salmon, sweet potato and seasonal greens</p></div><div class="meal-meta"><strong>700 kcal</strong>30 min</div></div>
+          </div>
+          <p class="result-note"><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="1.6"/><path d="M12 11v5m0-9v1" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg><span id="result-note-text">This is a sample preview. Calculate your plan to get quantities tailored to your goals.</span></p>
+        </div>
+        <div id="panel-shopping" role="tabpanel" aria-labelledby="tab-shopping" tabindex="0" hidden>
+          <div id="shopping-content"><div class="empty-state"><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M5 8h14l-1 12H6L5 8Zm3 0V6a4 4 0 0 1 8 0v2" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg><h4>Your list is waiting</h4><p>Calculate a plan first. We’ll combine ingredients across your week and calculate exactly how much to buy.</p></div></div>
+        </div>
+        <div class="results-actions"><button class="btn btn-secondary" id="copy-plan" type="button"><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><rect x="8" y="8" width="12" height="12" rx="2" stroke="currentColor" stroke-width="1.6"/><path d="M16 8V4H4v12h4" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/></svg>Copy plan</button><button class="btn btn-secondary" id="print-plan" type="button"><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M7 8V3h10v5M7 17H4V9h16v8h-3M7 14h10v7H7v-7Z" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/></svg>Print / save PDF</button></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="how-section" id="how-it-works" aria-labelledby="how-title">
+    <div class="eyebrow">From “what’s for dinner?” to done</div>
+    <h2 id="how-title">A little planning goes a long way.</h2>
+    <div class="how-grid">
+      <article class="how-step"><span class="number">01 / YOUR GOALS</span><h3>Start with your real life.</h3><p>Set your calorie target, food preferences, and the time you actually have. No perfect routines required.</p></article>
+      <article class="how-step"><span class="number">02 / THE MATH</span><h3>Get a plan that adds up.</h3><p>Your meals are portioned to your daily targets, with ingredient quantities scaled for everyone at your table.</p></article>
+      <article class="how-step"><span class="number">03 / THE SHORTCUT</span><h3>Shop once. Prep with a plan.</h3><p>Take your combined shopping list to the store, then follow a simple schedule that fits your cooking time.</p></article>
+    </div>
+  </section>
+
+  <section class="section tips-section wrap" id="tips" aria-labelledby="tips-title">
+    <div class="section-head"><div><div class="eyebrow">Small habits, better weeks</div><h2 id="tips-title">Make your prep work harder.</h2></div><p>Practical ways to keep meals fresh, interesting, and genuinely easy.</p></div>
+    <div class="tips-grid">
+      <article class="tip-card"><div class="tip-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none"><path d="M5 3v6a3 3 0 0 0 6 0V3M8 3v18M19 3c-3 2-4 5-4 9h4M19 3v18" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></div><h3>Mix components, not just meals.</h3><p>Cook a batch of grains and a tray of vegetables. Combine them in different ways so lunch never feels like a repeat.</p><div class="tip-detail">Try two sauces. Get four lunches.</div></article>
+      <article class="tip-card"><div class="tip-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none"><path d="M12 3v9m0 0 6 6M12 12l-6 6M4 4l16 16" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/><circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="1.6"/></svg></div><h3>Give your fridge a little respect.</h3><p>Cool cooked food promptly, use airtight containers, and refrigerate within two hours. Most cooked meals keep for 3–4 days.</p><div class="tip-detail">Freeze later-day portions if needed.</div></article>
+      <article class="tip-card"><div class="tip-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none"><path d="M5 8h14l-1 12H6L5 8Zm3 0V6a4 4 0 0 1 8 0v2M9 12v4m6-4v4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></div><h3>Shop your kitchen first.</h3><p>Check your pantry before you head out. Grains, spices, and oils often cover more of your list than you think.</p><div class="tip-detail">Less waste. A lighter receipt.</div></article>
+    </div>
+  </section>
+
+  <section class="section faq-section wrap" id="faq" aria-labelledby="faq-title">
+    <div class="faq-layout">
+      <div class="faq-intro"><div class="eyebrow">Good questions</div><h2 id="faq-title">A few things<br>to know.</h2><p>Meal prep should make life simpler. Here’s how this calculator fits in.</p></div>
+      <div class="faq-list">
+        <details><summary>How are the nutrition targets calculated?</summary><p>We split your daily calorie goal across breakfast, lunch, and dinner, then estimate protein, carbohydrate, and fat using a balanced ratio. “High protein” shifts the ratio toward protein; “Light &amp; fresh” favors produce and lighter meals. Values are estimates and can vary with ingredients and portions.</p></details>
+        <details><summary>Can I use this with allergies or a medical condition?</summary><p>Use the food preference filters to avoid gluten or dairy, but always check ingredient labels for allergens and cross-contact. This tool is for general meal planning, not medical advice. If you have a medical condition, pregnancy, or specific nutrient needs, work with a qualified clinician or dietitian.</p></details>
+        <details><summary>How long will the meals actually keep?</summary><p>Most cooked meals keep in the refrigerator for 3–4 days when cooled promptly and stored in sealed containers. For a 5- or 7-day plan, freeze portions for later in the week and thaw them safely in the refrigerator. Check food regularly and follow local food-safety guidance.</p></details>
+        <details><summary>Does my information leave this page?</summary><p>No. Your inputs and generated plan are processed in your browser. There are no accounts, analytics, or external services. Copying or printing a plan only happens when you choose to do it.</p></details>
+      </div>
+    </div>
+  </section>
+
+  <section class="final-cta wrap" aria-labelledby="cta-title"><div><h2 id="cta-title">Your next good week starts here.</h2><p>One small plan. A lot less “what’s for dinner?”</p></div><a class="btn btn-primary" href="#planner">Plan my meals <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M5 12h14m-5-5 5 5-5 5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></a></section>
+</main>
+<footer class="site-footer">
+  <div class="wrap">
+    <div class="footer-top"><div class="footer-brand"><a class="brand" href="#" aria-label="Meal Prep Calculator home"><span class="brand-mark" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none"><path d="M5 3v6a3 3 0 0 0 6 0V3M8 3v18M19 3c-3 2-4 5-4 9h4M19 3v18" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg></span>mealprep.</a><p>A calmer way to plan nutritious meals.<br>Built for real schedules and real appetites.</p></div><div class="footer-links"><a href="#planner">Calculator</a><a href="#how-it-works">How it works</a><a href="#tips">Prep tips</a><a href="#faq">FAQs</a></div></div>
+    <div class="footer-bottom"><span>© 2026 Meal Prep Calculator. Plan thoughtfully, eat well.</span><span>Made with Daily AI Website Factory</span></div>
+  </div>
+</footer>
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+<script>
+(() => {
+  'use strict';
+  const $ = id => document.getElementById(id);
+  const form = $('planner-form');
+  const state = { plan: null, tab: 'meals', checked: new Set() };
+  const mealIcons = {
+    breakfast: '<svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M4 9h16M6 9a6 6 0 0 1 12 0M5 14h14M7 18h10" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg>',
+    lunch: '<svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M4 3v6a3 3 0 0 0 6 0V3M7 3v18M19 3c-3 2-4 5-4 9h4M19 3v18" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg>',
+    dinner: '<svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M3 12h18M5 12a7 7 0 0 1 14 0M4 16h16M7 20h10" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg>'
+  };
+  const recipes = {
+    standard: {
+      breakfast: { name: 'Berry overnight oats', desc: 'Rolled oats, chia, yogurt & berries', time: 10, ingredients: [{n:'Rolled oats',q:50,u:'g',cat:'Grains & bread'},{n:'Greek yogurt',q:120,u:'g',cat:'Chilled'},{n:'Mixed berries',q:80,u:'g',cat:'Produce'},{n:'Chia seeds',q:10,u:'g',cat:'Pantry'}] },
+      lunch: { name: 'Lemon chicken grain bowl', desc: 'Chicken, quinoa, greens & tahini', time: 25, ingredients: [{n:'Chicken breast',q:150,u:'g',cat:'Protein'},{n:'Quinoa',q:60,u:'g',cat:'Grains & bread'},{n:'Baby spinach',q:50,u:'g',cat:'Produce'},{n:'Cherry tomatoes',q:80,u:'g',cat:'Produce'},{n:'Tahini',q:15,u:'g',cat:'Pantry'}] },
+      dinner: { name: 'Salmon & roasted vegetables', desc: 'Salmon, sweet potato & broccoli', time: 30, ingredients: [{n:'Salmon fillet',q:170,u:'g',cat:'Protein'},{n:'Sweet potato',q:200,u:'g',cat:'Produce'},{n:'Broccoli',q:150,u:'g',cat:'Produce'},{n:'Olive oil',q:10,u:'ml',cat:'Pantry'}] }
+    },
+    vegetarian: {
+      breakfast: { name: 'Berry protein oats', desc: 'Oats, chia, yogurt & berries', time: 10, ingredients: [{n:'Rolled oats',q:50,u:'g',cat:'Grains & bread'},{n:'Greek yogurt',q:150,u:'g',cat:'Chilled'},{n:'Mixed berries',q:80,u:'g',cat:'Produce'},{n:'Chia seeds',q:10,u:'g',cat:'Pantry'}] },
+      lunch: { name: 'Chickpea & quinoa bowl', desc: 'Chickpeas, quinoa, spinach & tahini', time: 20, ingredients: [{n:'Chickpeas, cooked',q:180,u:'g',cat:'Protein'},{n:'Quinoa',q:60,u:'g',cat:'Grains & bread'},{n:'Baby spinach',q:50,u:'g',cat:'Produce'},{n:'Cherry tomatoes',q:80,u:'g',cat:'Produce'},{n:'Tahini',q:15,u:'g',cat:'Pantry'}] },
+      dinner: { name: 'Tofu & roasted vegetables', desc: 'Tofu, sweet potato & broccoli', time: 30, ingredients: [{n:'Firm tofu',q:180,u:'g',cat:'Protein'},{n:'Sweet potato',q:200,u:'g',cat:'Produce'},{n:'Broccoli',q:150,u:'g',cat:'Produce'},{n:'Olive oil',q:10,u:'ml',cat:'Pantry'}] }
+    },
+    vegan: {
+      breakfast: { name: 'Berry chia breakfast bowl', desc: 'Oats, soy yogurt, chia & berries', time: 10, ingredients: [{n:'Rolled oats',q:50,u:'g',cat:'Grains & bread'},{n:'Unsweetened soy yogurt',q:150,u:'g',cat:'Chilled'},{n:'Mixed berries',q:80,u:'g',cat:'Produce'},{n:'Chia seeds',q:15,u:'g',cat:'Pantry'}] },
+      lunch: { name: 'Lentil & quinoa bowl', desc: 'Lentils, quinoa, spinach & tahini', time: 20, ingredients: [{n:'Lentils, cooked',q:200,u:'g',cat:'Protein'},{n:'Quinoa',q:60,u:'g',cat:'Grains & bread'},{n:'Baby spinach',q:50,u:'g',cat:'Produce'},{n:'Cherry tomatoes',q:80,u:'g',cat:'Produce'},{n:'Tahini',q:15,u:'g',cat:'Pantry'}] },
+      dinner: { name: 'Tofu & roasted vegetables', desc: 'Tofu, sweet potato & broccoli', time: 30, ingredients: [{n:'Firm tofu',q:200,u:'g',cat:'Protein'},{n:'Sweet potato',q:200,u:'g',cat:'Produce'},{n:'Broccoli',q:150,u:'g',cat:'Produce'},{n:'Olive oil',q:10,u:'ml',cat:'Pantry'}] }
+    },
+    quick: {
+      breakfast: { name: 'Berry yogurt crunch', desc: 'No-cook oats, yogurt & berries', time: 5, ingredients: [{n:'Rolled oats',q:40,u:'g',cat:'Grains & bread'},{n:'Greek yogurt',q:180,u:'g',cat:'Chilled'},{n:'Mixed berries',q:80,u:'g',cat:'Produce'},{n:'Chia seeds',q:10,u:'g',cat:'Pantry'}] },
+      lunch: { name: 'Chicken & avocado wrap', desc: 'Chicken, wholegrain wrap & greens', time: 15, ingredients: [{n:'Chicken breast',q:140,u:'g',cat:'Protein'},{n:'Wholegrain wraps',q:1,u:'wrap',cat:'Grains & bread'},{n:'Baby spinach',q:40,u:'g',cat:'Produce'},{n:'Avocado',q:50,u:'g',cat:'Produce'},{n:'Cherry tomatoes',q:80,u:'g',cat:'Produce'}] },
+      dinner: { name: 'Chickpea & feta salad', desc: 'Chickpeas, feta, cucumber & greens', time: 15, ingredients: [{n:'Chickpeas, cooked',q:200,u:'g',cat:'Protein'},{n:'Feta cheese',q:50,u:'g',cat:'Chilled'},{n:'Cucumber',q:100,u:'g',cat:'Produce'},{n:'Baby spinach',q:50,u:'g',cat:'Produce'},{n:'Cherry tomatoes',q:100,u:'g',cat:'Produce'},{n:'Olive oil',q:10,u:'ml',cat:'Pantry'}] }
+    },
+    quickVeg: {
+      breakfast: { name: 'Berry yogurt crunch', desc: 'No-cook oats, yogurt & berries', time: 5, ingredients: [{n:'Rolled oats',q:40,u:'g',cat:'Grains & bread'},{n:'Greek yogurt',q:180,u:'g',cat:'Chilled'},{n:'Mixed berries',q:80,u:'g',cat:'Produce'},{n:'Chia seeds',q:10,u:'g',cat:'Pantry'}] },
+      lunch: { name: 'Chickpea & avocado wrap', desc: 'Chickpeas, wholegrain wrap & greens', time: 15, ingredients: [{n:'Chickpeas, cooked',q:150,u:'g',cat:'Protein'},{n:'Wholegrain wraps',q:1,u:'wrap',cat:'Grains & bread'},{n:'Baby spinach',q:40,u:'g',cat:'Produce'},{n:'Avocado',q:50,u:'g',cat:'Produce'},{n:'Cherry tomatoes',q:80,u:'g',cat:'Produce'}] },
+      dinner: { name: 'Tofu & crunchy slaw', desc: 'Tofu, cabbage, cucumber & seeds', time: 15, ingredients: [{n:'Firm tofu',q:180,u:'g',cat:'Protein'},{n:'Red cabbage',q:100,u:'g',cat:'Produce'},{n:'Cucumber',q:100,u:'g',cat:'Produce'},{n:'Baby spinach',q:50,u:'g',cat:'Produce'},{n:'Pumpkin seeds',q:15,u:'g',cat:'Pantry'},{n:'Olive oil',q:10,u:'ml',cat:'Pantry'}] }
+    },
+    quickVegan: {
+      breakfast: { name: 'Berry chia breakfast bowl', desc: 'No-cook oats, soy yogurt & berries', time: 5, ingredients: [{n:'Rolled oats',q:40,u:'g',cat:'Grains & bread'},{n:'Unsweetened soy yogurt',q:180,u:'g',cat:'Chilled'},{n:'Mixed berries',q:80,u:'g',cat:'Produce'},{n:'Chia seeds',q:15,u:'g',cat:'Pantry'}] },
+      lunch: { name: 'Lentil & avocado wrap', desc: 'Lentils, wholegrain wrap & greens', time: 15, ingredients: [{n:'Lentils, cooked',q:150,u:'g',cat:'Protein'},{n:'Wholegrain wraps',q:1,u:'wrap',cat:'Grains & bread'},{n:'Baby spinach',q:40,u:'g',cat:'Produce'},{n:'Avocado',q:50,u:'g',cat:'Produce'},{n:'Cherry tomatoes',q:80,u:'g',cat:'Produce'}] },
+      dinner: { name: 'Tofu & crunchy slaw', desc: 'Tofu, cabbage, cucumber & seeds', time: 15, ingredients: [{n:'Firm tofu',q:200,u:'g',cat:'Protein'},{n:'Red cabbage',q:100,u:'g',cat:'Produce'},{n:'Cucumber',q:100,u:'g',cat:'Produce'},{n:'Baby spinach',q:50,u:'g',cat:'Produce'},{n:'Pumpkin seeds',q:15,u:'g',cat:'Pantry'},{n:'Olive oil',q:10,u:'ml',cat:'Pantry'}] }
+    }
+  };
+  const fmt = n => new Intl.NumberFormat(undefined, {maximumFractionDigits:0}).format(n);
+  const escapeHTML = str => String(str).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+  const quantity = n => new Intl.NumberFormat(undefined,{maximumFractionDigits:1}).format(n);
+  let toastTimer;
+  function toast(message){ $('toast').textContent=message; $('toast').classList.add('show'); clearTimeout(toastTimer); toastTimer=setTimeout(()=>$('toast').classList.remove('show'),3200); }
+  function getSettings(){
+    const data=new FormData(form);
+    return {days:Number(data.get('days')),people:Number(data.get('people')),calories:Number(data.get('calories')),goal:data.get('goal'),time:Number(data.get('time')),diets:data.getAll('diet')};
+  }
+  function validate(settings){
+    if(!Number.isFinite(settings.calories)||settings.calories<1200||settings.calories>4000){$('form-error').textContent='Choose a calorie goal between 1,200 and 4,000 kcal.';$('form-error').classList.add('visible');$('calories').focus();return false;}
+    if(!Number.isInteger(settings.calories)||settings.calories%50!==0){$('form-error').textContent='Use a calorie goal in steps of 50, such as 1,950 or 2,000.';$('form-error').classList.add('visible');$('calories').focus();return false;}
+    $('form-error').classList.remove('visible');return true;
+  }
+  function chooseRecipes(settings){
+    const vegan=settings.diets.includes('vegan');
+    const vegetarian=vegan||settings.diets.includes('vegetarian');
+    if(settings.time===15) return vegan?recipes.quickVegan:vegetarian?recipes.quickVeg:recipes.quick;
+    return vegan?recipes.vegan:vegetarian?recipes.vegetarian:recipes.standard;
+  }
+  function applyPreferences(recipe,settings){
+    const copy={};
+    Object.keys(recipe).forEach(slot=>{
+      copy[slot]={...recipe[slot],ingredients:recipe[slot].ingredients.map(i=>({...i}))};
+      if(settings.diets.includes('gluten-free')){
+        copy[slot].ingredients=copy[slot].ingredients.filter(i=>i.n!=='Wholegrain wraps');
+        if(slot==='lunch'){copy[slot].name=copy[slot].name.replace(' wrap',' bowl');copy[slot].desc='A satisfying bowl with extra greens';copy[slot].ingredients.push({n:'Quinoa',q:50,u:'g',cat:'Grains & bread'},{n:'Baby spinach',q:30,u:'g',cat:'Produce'});}
+      }
+      if(settings.diets.includes('dairy-free')) copy[slot].ingredients=copy[slot].ingredients.filter(i=>!['Greek yogurt','Feta cheese'].includes(i.n));
+      if(settings.goal==='light'){
+        copy[slot].ingredients=copy[slot].ingredients.map(i=>i.n==='Olive oil'?{...i,q:Math.max(3,i.q-3)}:i);
+        if(slot==='dinner') copy[slot].ingredients.push({n:'Cherry tomatoes',q:60,u:'g',cat:'Produce'});
+      }
+      if(settings.goal==='protein'&&slot!=='breakfast'){
+        const protein=copy[slot].ingredients.find(i=>i.cat==='Protein');
+        if(protein) protein.q=Math.round(protein.q*1.15);
+      }
+    });
+    return copy;
+  }
+  function calculate(){
+    if(!validate(getSettings())) return;
+    const s=getSettings();
+    const recipesForPlan=chooseRecipes(s);
+    const meals=applyPreferences(recipesForPlan,s);
+    const ratios=s.goal==='protein'?{p:.32,c:.38,f:.30}:s.goal==='light'?{p:.22,c:.48,f:.30}:{p:.25,c:.45,f:.30};
+    const protein=Math.round(s.calories*ratios.p/4),carbs=Math.round(s.calories*ratios.c/4),fat=Math.round(s.calories*ratios.f/9);
+    const shopping=new Map();
+    Object.values(meals).forEach(meal=>meal.ingredients.forEach(i=>{
+      const key=i.n+'|'+i.u;
+      if(!shopping.has(key)) shopping.set(key,{...i,q:0});
+      shopping.get(key).q+=i.q*s.people;
+    }));
+    state.plan={settings:s,meals,protein,carbs,fat,shopping:[...shopping.values()].sort((a,b)=>a.cat.localeCompare(b.cat)||a.n.localeCompare(b.n))};
+    state.checked.clear();
+    render();
+    $('plan-status').textContent='Plan calculated';
+    toast('Your meal plan is ready. Let’s make the week easier.');
+    if(window.innerWidth<761) $('results').scrollIntoView({behavior:window.matchMedia('(prefers-reduced-motion: reduce)').matches?'auto':'smooth',block:'start'});
+  }
+  function render(){
+    const p=state.plan;if(!p)return;
+    const s=p.settings;
+    const goalText=s.goal==='protein'?'high-protein':s.goal==='light'?'light & fresh':'balanced';
+    $('plan-title').textContent='Your '+s.days+'-day plan';
+    $('plan-subtitle').textContent=fmt(s.calories)+' kcal/day · '+s.people+' '+(s.people===1?'person':'people')+' · '+goalText;
+    $('macro-cal').innerHTML=fmt(s.calories)+' <small>kcal</small>';
+    $('macro-protein').innerHTML=p.protein+' <small>g</small>';
+    $('macro-carbs').innerHTML=p.carbs+' <small>g</small>';
+    $('macro-fat').innerHTML=p.fat+' <small>g</small>';
+    $('bar-cal').style.width='100%';$('bar-protein').style.width=Math.min(100,p.protein/2)+'%';$('bar-carbs').style.width=Math.min(100,p.carbs/2.5)+'%';$('bar-fat').style.width=Math.min(100,p.fat/1.5)+'%';
+    const slots=[['breakfast','Breakfast',.2],['lunch','Lunch',.3],['dinner','Dinner',.5]];
+    $('meal-list').innerHTML=slots.map(([key,label,share])=>{
+      const m=p.meals[key];
+      const cookTime=s.time===15?Math.min(m.time,s.time):m.time;
+      return '<div class="meal-row"><span class="meal-icon">'+mealIcons[key]+'</span><div><h4>'+label+' · '+escapeHTML(m.name)+'</h4><p>'+escapeHTML(m.desc)+'</p></div><div class="meal-meta"><strong>'+fmt(s.calories*share)+' kcal</strong>'+cookTime+' min</div></div>';
+    }).join('');
+    const storage=s.days>4?' Prepare the first 3–4 days fresh and freeze later portions. Thaw in the refrigerator.':' Refrigerate promptly in sealed containers. Most meals keep for 3–4 days.';
+    $('result-note-text').textContent='Repeat this daily menu for '+s.days+' days. Ingredient quantities below include all meals and '+s.people+' '+(s.people===1?'person':'people')+'. '+storage;
+    renderShopping();
+  }
+  function renderShopping(){
+    const p=state.plan;if(!p)return;
+    if(!p.shopping.length){$('shopping-content').innerHTML='<div class="empty-state"><h4>No ingredients to list</h4><p>Try changing your preferences to build a shopping list.</p></div>';return;}
+    const categories=[...new Set(p.shopping.map(i=>i.cat))];
+    $('shopping-content').innerHTML='<div class="shopping-list">'+categories.map(cat=>'<div class="eyebrow" style="font-size:.65rem;margin:14px 0 2px">'+escapeHTML(cat)+'</div>'+p.shopping.filter(i=>i.cat===cat).map(i=>{
+      const key=i.n+'|'+i.u;
+      return '<div class="shopping-item"><input type="checkbox" id="shop-'+encodeURIComponent(key)+'" data-shop="'+escapeHTML(key)+'" '+(state.checked.has(key)?'checked':'')+'><label for="shop-'+encodeURIComponent(key)+'"><strong>'+escapeHTML(i.n)+'</strong> <span>— '+quantity(i.q)+' '+escapeHTML(i.u)+'</span></label></div>';
+    }).join('')).join('')+'</div><div class="shopping-actions"><span style="font-size:.72rem;color:var(--muted)">'+p.shopping.length+' items for '+p.settings.days+' days</span><button class="text-btn" id="clear-checks" type="button">Clear checks</button></div>';
+  }
+  function setTab(tab,focus=false){
+    state.tab=tab;
+    ['meals','shopping'].forEach(name=>{
+      const selected=name===tab;
+      $('tab-'+name).setAttribute('aria-selected',String(selected));
+      $('tab-'+name).tabIndex=selected?0:-1;
+      $('panel-'+name).hidden=!selected;
+    });
+    if(focus)$('tab-'+tab).focus();
+  }
+  $('tab-meals').addEventListener('click',()=>setTab('meals'));
+  $('tab-shopping').addEventListener('click',()=>setTab('shopping'));
+  document.querySelector('.result-tabs').addEventListener('keydown',e=>{
+    if(['ArrowLeft','ArrowRight','Home','End'].includes(e.key)){
+      e.preventDefault();
+      const tab=e.key==='Home'?'meals':e.key==='End'?'shopping':state.tab==='meals'?'shopping':'meals';
+      setTab(tab,true);
+    }
+  });
+  form.addEventListener('submit',e=>{e.preventDefault();calculate();});
+  $('calories').addEventListener('input',()=>{$('form-error').classList.remove('visible');});
+  $('shopping-content').addEventListener('change',e=>{
+    if(e.target.matches('[data-shop]')){
+      const key=e.target.dataset.shop;
+      if(e.target.checked)state.checked.add(key);else state.checked.delete(key);
+    }
+  });
+  $('shopping-content').addEventListener('click',e=>{
+    if(e.target.id==='clear-checks'){state.checked.clear();renderShopping();$('clear-checks').focus();}
+  });
+  function planText(){
+    const p=state.plan;if(!p)return '';
+    const s=p.settings;
+    let text='MEAL PREP PLAN\n'+s.days+' days · '+s.people+' '+(s.people===1?'person':'people')+' · '+s.calories+' kcal/day\nDaily targets: '+p.protein+'g protein, '+p.carbs+'g carbs, '+p.fat+'g fat\n\nDAILY MENU\n';
+    [['breakfast','Breakfast'],['lunch','Lunch'],['dinner','Dinner']].forEach(([key,label])=>{text+=label+': '+p.meals[key].name+' — '+p.meals[key].desc+'\n';});
+    text+='\nSHOPPING LIST ('+s.days+' days)\n';
+    p.shopping.forEach(i=>{text+=(state.checked.has(i.n+'|'+i.u)?'[x] ':'[ ] ')+i.n+' — '+quantity(i.q)+' '+i.u+'\n';});
+    text+='\nNutrition values are estimates. Check ingredients for allergens. Refrigerate promptly; freeze portions for later days.\nMade with Meal Prep Calculator.';
+    return text;
+  }
+  $('copy-plan').addEventListener('click',async()=>{
+    if(!state.plan){toast('Calculate your plan first, then copy it here.');$('calories').focus();return;}
+    const text=planText();
+    try{
+      if(navigator.clipboard&&window.isSecureContext){await navigator.clipboard.writeText(text);}
+      else{
+        const area=document.createElement('textarea');area.value=text;area.style.position='fixed';area.style.opacity='0';document.body.appendChild(area);area.select();const copied=document.execCommand('copy');area.remove();if(!copied)throw new Error('copy');
+      }
+      toast('Plan copied. You’re ready for the week.');
+    }catch(err){toast('Copy isn’t available in this browser. Use Print / save PDF instead.');}
+  });
+  $('print-plan').addEventListener('click',()=>{
+    if(!state.plan){toast('Calculate your plan first, then print your plan.');$('calories').focus();return;}
+    window.print();
+  });
+  // A useful, clearly labeled preview is available before the first calculation.
+  // The calculator replaces it with personalized quantities and nutrition targets.
+  calculatePreview();
+  function calculatePreview(){
+    // Keep the initial preview static and honest; no plan is generated until submit.
+    $('copy-plan').setAttribute('aria-disabled','true');
+  }
+})();
+</script>
+</body>
+</html>
