@@ -1,0 +1,1114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Fernwood Memory — a calm matching game</title>
+<meta name="description" content="A calm, polished memory matching game with three difficulty levels, a move counter, a timer and personal bests saved on your device.">
+<style>
+  :root{
+    --cream:#fbf8f3;
+    --cream-2:#f3ede2;
+    --panel:#fffdf9;
+    --ink:#182a21;
+    --ink-soft:#4d5f55;
+    --forest:#1e5138;
+    --forest-2:#2c7a52;
+    --moss:#7d9a80;
+    --gold:#b8862f;
+    --line:rgba(24,42,33,.12);
+    --shadow-sm:0 1px 2px rgba(24,42,33,.06), 0 10px 26px -16px rgba(24,42,33,.35);
+    --shadow-lg:0 2px 4px rgba(24,42,33,.05), 0 34px 64px -34px rgba(24,42,33,.42);
+    --serif:"Iowan Old Style","Palatino Linotype",Palatino,"Book Antiqua",Georgia,serif;
+    --sans:ui-sans-serif,system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
+  }
+
+  *,*::before,*::after{ box-sizing:border-box; }
+
+  html{ scroll-behavior:smooth; -webkit-text-size-adjust:100%; }
+
+  body{
+    margin:0;
+    font-family:var(--sans);
+    color:var(--ink);
+    line-height:1.6;
+    background:
+      radial-gradient(1100px 560px at 8% -12%, #eaf2e6 0%, rgba(234,242,230,0) 62%),
+      radial-gradient(900px 520px at 102% -4%, #f8efdf 0%, rgba(248,239,223,0) 58%),
+      var(--cream);
+    background-attachment:fixed;
+  }
+
+  h1,h2,h3{ font-family:var(--serif); font-weight:600; letter-spacing:-.015em; line-height:1.12; margin:0; }
+  p{ margin:0; }
+  a{ color:var(--forest); }
+
+  :focus-visible{
+    outline:3px solid var(--gold);
+    outline-offset:3px;
+    border-radius:8px;
+  }
+
+  .wrap{
+    width:100%;
+    max-width:1120px;
+    margin-inline:auto;
+    padding-inline:clamp(18px,4vw,32px);
+  }
+
+  .skip-link{
+    position:absolute; left:16px; top:-60px;
+    background:var(--forest); color:#fff;
+    padding:10px 16px; border-radius:0 0 12px 12px;
+    z-index:100; text-decoration:none; font-weight:600;
+    transition:top .2s ease;
+  }
+  .skip-link:focus{ top:0; }
+
+  /* ---------- Header ---------- */
+  .site-header{
+    position:sticky; top:0; z-index:50;
+    background:rgba(251,248,243,.82);
+    backdrop-filter:blur(14px);
+    -webkit-backdrop-filter:blur(14px);
+    border-bottom:1px solid var(--line);
+  }
+  .header-inner{
+    display:flex; align-items:center; gap:18px;
+    min-height:70px;
+  }
+  .brand{
+    display:inline-flex; align-items:center; gap:10px;
+    text-decoration:none; color:var(--ink);
+    font-family:var(--serif); font-size:1.12rem; font-weight:600;
+    letter-spacing:-.01em;
+  }
+  .brand-mark{ width:30px; height:30px; flex:none; }
+  .brand-sub{
+    display:block; font-family:var(--sans); font-size:.62rem;
+    letter-spacing:.18em; text-transform:uppercase;
+    color:var(--ink-soft); font-weight:600; line-height:1;
+    margin-top:2px;
+  }
+  .nav{
+    display:flex; gap:6px; margin-left:auto;
+  }
+  .nav a{
+    text-decoration:none; color:var(--ink-soft);
+    font-size:.9rem; font-weight:500;
+    padding:8px 12px; border-radius:999px;
+    transition:color .18s ease, background .18s ease;
+  }
+  .nav a:hover{ color:var(--forest); background:rgba(30,81,56,.07); }
+
+  /* ---------- Buttons ---------- */
+  .btn{
+    display:inline-flex; align-items:center; justify-content:center; gap:8px;
+    font:inherit; font-weight:600; font-size:.95rem;
+    padding:13px 24px; border-radius:999px;
+    border:1px solid transparent; cursor:pointer;
+    text-decoration:none; white-space:nowrap;
+    transition:transform .18s ease, box-shadow .18s ease, background .18s ease, color .18s ease, border-color .18s ease;
+  }
+  .btn-primary{
+    background:linear-gradient(160deg,#2f7a55,#1e5138 70%);
+    color:#fdfbf6;
+    box-shadow:0 1px 0 rgba(255,255,255,.18) inset, 0 12px 24px -14px rgba(30,81,56,.9);
+  }
+  .btn-primary:hover{ transform:translateY(-1px); box-shadow:0 1px 0 rgba(255,255,255,.22) inset, 0 18px 30px -16px rgba(30,81,56,.95); }
+  .btn-ghost{
+    background:rgba(255,253,249,.7);
+    color:var(--forest);
+    border-color:rgba(30,81,56,.24);
+  }
+  .btn-ghost:hover{ background:#fffdf9; border-color:rgba(30,81,56,.45); transform:translateY(-1px); }
+  .btn-sm{ padding:9px 18px; font-size:.86rem; }
+  .btn:active{ transform:translateY(0); }
+
+  /* ---------- Hero ---------- */
+  .hero{ padding:clamp(44px,7vw,84px) 0 clamp(36px,5vw,60px); }
+  .hero-grid{
+    display:grid; grid-template-columns:1.05fr .95fr;
+    gap:clamp(28px,5vw,64px); align-items:center;
+  }
+  .eyebrow{
+    display:inline-flex; align-items:center; gap:8px;
+    font-size:.72rem; font-weight:700; letter-spacing:.16em;
+    text-transform:uppercase; color:var(--forest-2);
+    background:rgba(44,122,82,.1);
+    border:1px solid rgba(44,122,82,.2);
+    padding:6px 14px; border-radius:999px;
+    margin-bottom:20px;
+  }
+  .eyebrow::before{
+    content:""; width:6px; height:6px; border-radius:50%;
+    background:var(--forest-2);
+  }
+  .hero h1{
+    font-size:clamp(2.3rem,5.6vw,3.9rem);
+    margin-bottom:18px;
+  }
+  .hero h1 em{
+    font-style:italic; color:var(--forest-2);
+  }
+  .lede{
+    font-size:clamp(1rem,1.6vw,1.12rem);
+    color:var(--ink-soft); max-width:46ch;
+    margin-bottom:28px;
+  }
+  .hero-actions{ display:flex; flex-wrap:wrap; gap:12px; margin-bottom:26px; }
+  .hero-facts{
+    list-style:none; margin:0; padding:0;
+    display:flex; flex-wrap:wrap; gap:8px 22px;
+    font-size:.85rem; color:var(--ink-soft);
+  }
+  .hero-facts li{ display:flex; align-items:center; gap:7px; }
+  .hero-facts li::before{
+    content:""; width:5px; height:5px; border-radius:50%;
+    background:var(--moss); flex:none;
+  }
+  .hero-art{ display:flex; justify-content:center; }
+  .hero-art svg{ width:100%; max-width:420px; height:auto; filter:drop-shadow(0 30px 40px rgba(24,42,33,.16)); }
+
+  /* ---------- Sections ---------- */
+  .section{ padding:clamp(48px,7vw,88px) 0; scroll-margin-top:84px; }
+  .section-head{ max-width:60ch; margin-bottom:clamp(24px,3.5vw,38px); }
+  .section-head h2{ font-size:clamp(1.6rem,3.2vw,2.3rem); margin-bottom:10px; }
+  .section-head p{ color:var(--ink-soft); font-size:1rem; }
+
+  /* ---------- Game panel ---------- */
+  .game-panel{
+    background:linear-gradient(180deg,#fffdf9,#faf5ec);
+    border:1px solid var(--line);
+    border-radius:28px;
+    padding:clamp(16px,3vw,28px);
+    box-shadow:var(--shadow-lg);
+  }
+  .game-toolbar{
+    display:flex; flex-wrap:wrap; align-items:center;
+    justify-content:space-between; gap:14px;
+    margin-bottom:18px;
+  }
+  .segmented{
+    display:inline-flex; gap:4px; padding:5px;
+    background:var(--cream-2);
+    border:1px solid var(--line);
+    border-radius:999px;
+  }
+  .seg-btn{
+    display:flex; flex-direction:column; align-items:center; gap:1px;
+    border:0; background:transparent; cursor:pointer;
+    padding:7px 16px; border-radius:999px;
+    font:inherit; font-weight:600; font-size:.9rem; color:var(--ink-soft);
+    transition:background .2s ease, color .2s ease, box-shadow .2s ease;
+  }
+  .seg-btn span{
+    font-size:.62rem; font-weight:600; letter-spacing:.1em;
+    text-transform:uppercase; opacity:.72;
+  }
+  .seg-btn:hover{ color:var(--forest); }
+  .seg-btn.is-active{
+    background:var(--panel); color:var(--forest);
+    box-shadow:0 1px 2px rgba(24,42,33,.1), 0 8px 16px -12px rgba(24,42,33,.6);
+  }
+
+  .stats{
+    display:grid; grid-template-columns:repeat(4,minmax(0,1fr));
+    gap:10px; margin-bottom:18px;
+  }
+  .stat{
+    background:var(--cream-2);
+    border:1px solid var(--line);
+    border-radius:14px;
+    padding:11px 14px;
+  }
+  .stat-label{
+    display:block; font-size:.66rem; font-weight:700;
+    letter-spacing:.12em; text-transform:uppercase; color:var(--ink-soft);
+  }
+  .stat-value{
+    display:block; margin-top:2px;
+    font-family:var(--serif); font-size:1.35rem; font-weight:600;
+    color:var(--forest); font-variant-numeric:tabular-nums;
+    line-height:1.25;
+  }
+  .stat-value.sm{ font-size:.92rem; font-family:var(--sans); font-weight:600; }
+
+  .win-banner{
+    display:flex; align-items:center; gap:14px; flex-wrap:wrap;
+    background:linear-gradient(120deg,#e6f3e9,#f7f1e1);
+    border:1px solid rgba(44,122,82,.3);
+    border-radius:16px;
+    padding:14px 18px;
+    margin-bottom:18px;
+  }
+  .win-banner[hidden]{ display:none; }
+  .win-icon{ font-size:1.4rem; line-height:1; }
+  .win-text{ flex:1 1 220px; font-size:.94rem; color:var(--forest); font-weight:500; }
+
+  .board{
+    display:grid;
+    grid-template-columns:repeat(var(--cols,4),minmax(0,1fr));
+    gap:clamp(7px,1.5vw,13px);
+    max-width:var(--board-max,520px);
+    margin-inline:auto;
+    perspective:1200px;
+  }
+
+  .card{
+    position:relative;
+    aspect-ratio:1/1.14;
+    padding:0; border:0; background:transparent;
+    border-radius:14px; cursor:pointer;
+    font:inherit;
+    -webkit-tap-highlight-color:transparent;
+  }
+  .card-inner{
+    position:absolute; inset:0;
+    transform-style:preserve-3d;
+    transition:transform .45s cubic-bezier(.2,.7,.3,1);
+    border-radius:14px;
+  }
+  .card.is-flipped .card-inner,
+  .card.is-matched .card-inner{ transform:rotateY(180deg); }
+
+  .card-face{
+    position:absolute; inset:0;
+    display:grid; place-items:center;
+    border-radius:14px;
+    backface-visibility:hidden;
+    -webkit-backface-visibility:hidden;
+    overflow:hidden;
+  }
+  .card-back{
+    background:
+      repeating-linear-gradient(135deg, rgba(255,255,255,.05) 0 6px, rgba(255,255,255,0) 6px 12px),
+      linear-gradient(160deg,#2f7a55,#1e5138 62%,#163a29);
+    box-shadow:inset 0 1px 0 rgba(255,255,255,.2), 0 8px 16px -12px rgba(24,42,33,.9);
+  }
+  .card-back::after{
+    content:"";
+    width:32%; aspect-ratio:1;
+    border-radius:5px;
+    border:2px solid rgba(255,255,255,.34);
+    transform:rotate(45deg);
+    transition:transform .3s ease, border-color .3s ease;
+  }
+  .card:hover .card-back::after{ transform:rotate(45deg) scale(1.1); border-color:rgba(255,255,255,.55); }
+
+  .card-front{
+    transform:rotateY(180deg);
+    background:linear-gradient(160deg,#fffdf9,#f1ebdf);
+    border:1px solid var(--line);
+    font-size:clamp(1.3rem,4.4vw,2rem);
+    line-height:1;
+  }
+  .card.is-matched .card-front{
+    background:linear-gradient(160deg,#e9f5ec,#dcefe2);
+    border-color:rgba(44,122,82,.42);
+  }
+  .card.is-matched{ cursor:default; }
+  .card.is-matched .card-inner{ animation:pop .4s ease; }
+  @keyframes pop{
+    0%{ transform:rotateY(180deg) scale(1); }
+    45%{ transform:rotateY(180deg) scale(1.06); }
+    100%{ transform:rotateY(180deg) scale(1); }
+  }
+  .card:focus-visible{ outline:none; }
+  .card:focus-visible .card-inner{
+    box-shadow:0 0 0 3px var(--cream), 0 0 0 6px var(--gold);
+  }
+
+  .status{
+    margin:18px 0 0;
+    text-align:center;
+    font-size:.9rem;
+    color:var(--ink-soft);
+    min-height:1.5em;
+  }
+  .board-hint{
+    margin:10px 0 0;
+    text-align:center;
+    font-size:.78rem;
+    color:var(--ink-soft);
+    opacity:.85;
+  }
+
+  /* ---------- Steps ---------- */
+  .steps{
+    display:grid; grid-template-columns:repeat(3,minmax(0,1fr));
+    gap:18px;
+  }
+  .step{
+    background:var(--panel);
+    border:1px solid var(--line);
+    border-radius:20px;
+    padding:26px 24px;
+    box-shadow:var(--shadow-sm);
+  }
+  .step-num{
+    display:grid; place-items:center;
+    width:38px; height:38px; border-radius:50%;
+    background:rgba(44,122,82,.12);
+    color:var(--forest);
+    font-family:var(--serif); font-weight:600; font-size:1.05rem;
+    margin-bottom:16px;
+  }
+  .step h3{ font-size:1.12rem; margin-bottom:8px; }
+  .step p{ color:var(--ink-soft); font-size:.93rem; }
+
+  /* ---------- Tips ---------- */
+  .tips{
+    display:grid; grid-template-columns:repeat(2,minmax(0,1fr));
+    gap:16px;
+  }
+  .tip{
+    display:flex; gap:14px;
+    background:rgba(255,253,249,.72);
+    border:1px solid var(--line);
+    border-radius:18px;
+    padding:20px 22px;
+  }
+  .tip-icon{
+    flex:none; width:34px; height:34px; border-radius:10px;
+    display:grid; place-items:center;
+    background:rgba(30,81,56,.09);
+    color:var(--forest);
+  }
+  .tip h3{ font-size:1rem; margin-bottom:4px; }
+  .tip p{ font-size:.9rem; color:var(--ink-soft); }
+
+  /* ---------- Footer ---------- */
+  .site-footer{
+    margin-top:clamp(40px,6vw,72px);
+    background:linear-gradient(165deg,#1e5138,#123024 85%);
+    color:#e7efe6;
+    padding:clamp(40px,6vw,64px) 0 28px;
+  }
+  .footer-grid{
+    display:grid; grid-template-columns:1.4fr 1fr 1fr;
+    gap:32px;
+    padding-bottom:32px;
+    border-bottom:1px solid rgba(231,239,230,.16);
+  }
+  .footer-brand{ display:flex; align-items:center; gap:10px; margin-bottom:12px; }
+  .footer-brand .brand-mark{ width:28px; height:28px; }
+  .footer-brand span{ font-family:var(--serif); font-size:1.1rem; font-weight:600; color:#f4f8f2; }
+  .footer-blurb{ font-size:.9rem; color:rgba(231,239,230,.72); max-width:38ch; }
+  .footer-col h4{
+    font-family:var(--sans); font-size:.7rem; font-weight:700;
+    letter-spacing:.14em; text-transform:uppercase;
+    color:rgba(231,239,230,.6); margin:0 0 12px;
+  }
+  .footer-col ul{ list-style:none; margin:0; padding:0; display:grid; gap:8px; }
+  .footer-col a{
+    color:rgba(231,239,230,.86); text-decoration:none; font-size:.9rem;
+    transition:color .18s ease;
+  }
+  .footer-col a:hover{ color:#fff; text-decoration:underline; text-underline-offset:3px; }
+  .footer-bottom{
+    display:flex; flex-wrap:wrap; gap:10px 20px;
+    justify-content:space-between; align-items:center;
+    padding-top:22px;
+    font-size:.8rem; color:rgba(231,239,230,.62);
+  }
+  .footer-bottom a{ color:rgba(231,239,230,.86); text-decoration:none; }
+  .footer-bottom a:hover{ text-decoration:underline; text-underline-offset:3px; }
+
+  /* ---------- Responsive ---------- */
+  @media (max-width:900px){
+    .hero-grid{ grid-template-columns:1fr; }
+    .hero-art{ order:-1; }
+    .hero-art svg{ max-width:300px; }
+    .footer-grid{ grid-template-columns:1fr 1fr; }
+    .footer-blurb{ grid-column:1 / -1; }
+  }
+  @media (max-width:820px){
+    .steps{ grid-template-columns:1fr; }
+    .tips{ grid-template-columns:1fr; }
+  }
+  @media (max-width:640px){
+    .nav{ display:none; }
+    .stats{ grid-template-columns:repeat(2,minmax(0,1fr)); }
+    .game-toolbar{ justify-content:center; }
+    .seg-btn{ padding:7px 12px; font-size:.84rem; }
+    .footer-grid{ grid-template-columns:1fr; gap:24px; }
+  }
+
+  @media (prefers-reduced-motion:reduce){
+    html{ scroll-behavior:auto; }
+    *,*::before,*::after{
+      animation-duration:.001ms !important;
+      animation-iteration-count:1 !important;
+      transition-duration:.001ms !important;
+    }
+  }
+</style>
+</head>
+<body>
+<a class="skip-link" href="#play">Skip to the game</a>
+
+<header class="site-header">
+  <div class="wrap header-inner">
+    <a class="brand" href="#top">
+      <svg class="brand-mark" viewBox="0 0 32 32" aria-hidden="true" focusable="false">
+        <defs>
+          <linearGradient id="leafGrad" x1="0" y1="0" x2="1" y2="1">
+            <stop offset="0" stop-color="#3f9468"/>
+            <stop offset="1" stop-color="#1e5138"/>
+          </linearGradient>
+        </defs>
+        <path d="M16 2.5c7.4 3.2 11.5 8.4 11.5 14.4A11.5 11.5 0 0 1 16 28.4 11.5 11.5 0 0 1 4.5 16.9C4.5 10.9 8.6 5.7 16 2.5Z" fill="url(#leafGrad)"/>
+        <path d="M16 8.5v15M16 14.5l5.2-4.2M16 19.5l-5.2-4.2" stroke="#f6f1e2" stroke-width="1.5" stroke-linecap="round" fill="none"/>
+      </svg>
+      <span>
+        Fernwood
+        <span class="brand-sub">Memory</span>
+      </span>
+    </a>
+    <nav class="nav" aria-label="Primary">
+      <a href="#play">Play</a>
+      <a href="#how">How to play</a>
+      <a href="#tips">Tips</a>
+    </nav>
+    <button class="btn btn-primary btn-sm" type="button" id="navNewGame">New game</button>
+  </div>
+</header>
+
+<main id="top">
+
+  <section class="hero">
+    <div class="wrap hero-grid">
+      <div class="hero-copy">
+        <p class="eyebrow">A quiet little brain game</p>
+        <h1>Match the pairs.<br><em>Clear your mind.</em></h1>
+        <p class="lede">
+          Twelve woodland symbols, three difficulty levels and a timer that only starts
+          when you do. Flip two cards at a time, remember what you saw, and clear the
+          board in as few moves as you can.
+        </p>
+        <div class="hero-actions">
+          <a class="btn btn-primary" href="#play">Start playing</a>
+          <a class="btn btn-ghost" href="#how">How it works</a>
+        </div>
+        <ul class="hero-facts">
+          <li>Three difficulties</li>
+          <li>Move &amp; time tracking</li>
+          <li>No sign-up, no ads</li>
+        </ul>
+      </div>
+
+      <div class="hero-art" aria-hidden="true">
+        <svg viewBox="0 0 420 380" role="presentation" focusable="false">
+          <defs>
+            <linearGradient id="cardBack" x1="0" y1="0" x2="1" y2="1">
+              <stop offset="0" stop-color="#2f7a55"/>
+              <stop offset="1" stop-color="#163a29"/>
+            </linearGradient>
+            <linearGradient id="cardFront" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0" stop-color="#fffdf9"/>
+              <stop offset="1" stop-color="#efe8da"/>
+            </linearGradient>
+          </defs>
+          <ellipse cx="210" cy="330" rx="150" ry="20" fill="#1e5138" opacity=".1"/>
+          <g transform="translate(146 196) rotate(-17)">
+            <rect x="-72" y="-96" width="144" height="192" rx="18" fill="url(#cardBack)"/>
+            <rect x="-16" y="-16" width="32" height="32" rx="6" fill="none" stroke="#ffffff" stroke-opacity=".38" stroke-width="2.5" transform="rotate(45)"/>
+          </g>
+          <g transform="translate(274 196) rotate(17)">
+            <rect x="-72" y="-96" width="144" height="192" rx="18" fill="url(#cardBack)"/>
+            <rect x="-16" y="-16" width="32" height="32" rx="6" fill="none" stroke="#ffffff" stroke-opacity=".38" stroke-width="2.5" transform="rotate(45)"/>
+          </g>
+          <g transform="translate(210 180)">
+            <rect x="-72" y="-96" width="144" height="192" rx="18" fill="url(#cardFront)" stroke="#d9d0bf" stroke-width="1.5"/>
+            <text x="0" y="20" text-anchor="middle" font-size="66" font-family="system-ui, sans-serif">🦊</text>
+          </g>
+          <circle cx="66" cy="86" r="7" fill="#c08a3e" opacity=".55"/>
+          <circle cx="356" cy="120" r="5" fill="#2c7a52" opacity=".5"/>
+          <circle cx="330" cy="300" r="8" fill="#7d9a80" opacity=".45"/>
+        </svg>
+      </div>
+    </div>
+  </section>
+
+  <section class="section" id="play">
+    <div class="wrap">
+      <div class="section-head">
+        <h2>Play the board</h2>
+        <p>Choose a difficulty, then flip two cards at a time to find every pair. Your best result for each level is saved on this device.</p>
+      </div>
+
+      <div class="game-panel">
+        <div class="game-toolbar">
+          <div class="segmented" role="group" aria-label="Difficulty">
+            <button class="seg-btn is-active" type="button" data-level="easy" aria-pressed="true">
+              Easy <span>6 pairs</span>
+            </button>
+            <button class="seg-btn" type="button" data-level="medium" aria-pressed="false">
+              Medium <span>8 pairs</span>
+            </button>
+            <button class="seg-btn" type="button" data-level="hard" aria-pressed="false">
+              Hard <span>12 pairs</span>
+            </button>
+          </div>
+          <button class="btn btn-ghost btn-sm" type="button" id="restartBtn">Restart board</button>
+        </div>
+
+        <div class="stats">
+          <div class="stat">
+            <span class="stat-label">Moves</span>
+            <span class="stat-value" id="movesOut">0</span>
+          </div>
+          <div class="stat">
+            <span class="stat-label">Time</span>
+            <span class="stat-value" id="timeOut">0:00</span>
+          </div>
+          <div class="stat">
+            <span class="stat-label">Pairs</span>
+            <span class="stat-value" id="pairsOut">0 / 6</span>
+          </div>
+          <div class="stat">
+            <span class="stat-label">Best</span>
+            <span class="stat-value sm" id="bestOut">No record yet</span>
+          </div>
+        </div>
+
+        <div class="win-banner" id="winBanner" hidden>
+          <span class="win-icon" aria-hidden="true">🌿</span>
+          <p class="win-text" id="winText"></p>
+          <button class="btn btn-primary btn-sm" type="button" id="winAgain">Play again</button>
+        </div>
+
+        <div class="board" id="board" role="group" aria-label="Memory board"></div>
+
+        <p class="status" id="status" role="status" aria-live="polite">Pick any card to begin — the timer starts on your first flip.</p>
+        <p class="board-hint">Keyboard: Tab to the board, then use the arrow keys to move between cards and Enter or Space to flip.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="section" id="how">
+    <div class="wrap">
+      <div class="section-head">
+        <h2>How to play</h2>
+        <p>Three steps, no rules to memorise. The whole game fits in a single screen.</p>
+      </div>
+      <div class="steps">
+        <article class="step">
+          <div class="step-num" aria-hidden="true">1</div>
+          <h3>Pick a difficulty</h3>
+          <p>Easy uses six pairs, medium eight and hard twelve. Changing the level deals a fresh board and resets the clock.</p>
+        </article>
+        <article class="step">
+          <div class="step-num" aria-hidden="true">2</div>
+          <h3>Flip two cards</h3>
+          <p>Every pair of flips counts as one move. Matching symbols stay face up; a mismatch turns back over after a moment.</p>
+        </article>
+        <article class="step">
+          <div class="step-num" aria-hidden="true">3</div>
+          <h3>Clear the board</h3>
+          <p>Find all the pairs to stop the timer. Fewer moves wins — if you tie your own record, the faster time takes it.</p>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <section class="section" id="tips">
+    <div class="wrap">
+      <div class="section-head">
+        <h2>Play notes</h2>
+        <p>Small habits that make a memory board feel a lot easier.</p>
+      </div>
+      <div class="tips">
+        <article class="tip">
+          <span class="tip-icon" aria-hidden="true">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/>
+            </svg>
+          </span>
+          <div>
+            <h3>Say the position out loud</h3>
+            <p>Naming a card and where it sits — “owl, top right” — anchors it in memory far better than a quick glance.</p>
+          </div>
+        </article>
+        <article class="tip">
+          <span class="tip-icon" aria-hidden="true">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M12 3v3M12 18v3M3 12h3M18 12h3M5.6 5.6l2.1 2.1M16.3 16.3l2.1 2.1M18.4 5.6l-2.1 2.1M7.7 16.3l-2.1 2.1"/>
+            </svg>
+          </span>
+          <div>
+            <h3>Work in a sweep</h3>
+            <p>Read the board left to right, row by row. A consistent order stops you from re-checking the same cards twice.</p>
+          </div>
+        </article>
+        <article class="tip">
+          <span class="tip-icon" aria-hidden="true">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M4 19V5M4 19h16"/><path d="M8 15l3.5-4 3 2.5L20 7"/>
+            </svg>
+          </span>
+          <div>
+            <h3>Chase the move count</h3>
+            <p>Time is a nice number, but moves are the real score. Every pair you already know is a move you can save.</p>
+          </div>
+        </article>
+        <article class="tip">
+          <span class="tip-icon" aria-hidden="true">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.7l-1-1.1a5.5 5.5 0 0 0-7.8 7.8l8.8 8.8 8.8-8.8a5.5 5.5 0 0 0 0-7.8Z"/>
+            </svg>
+          </span>
+          <div>
+            <h3>Take the pause</h3>
+            <p>When a mismatch flips back, use that half second to lock in both positions before you reach for the next card.</p>
+          </div>
+        </article>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<footer class="site-footer">
+  <div class="wrap">
+    <div class="footer-grid">
+      <div>
+        <div class="footer-brand">
+          <svg class="brand-mark" viewBox="0 0 32 32" aria-hidden="true" focusable="false">
+            <path d="M16 2.5c7.4 3.2 11.5 8.4 11.5 14.4A11.5 11.5 0 0 1 16 28.4 11.5 11.5 0 0 1 4.5 16.9C4.5 10.9 8.6 5.7 16 2.5Z" fill="#3f9468"/>
+            <path d="M16 8.5v15M16 14.5l5.2-4.2M16 19.5l-5.2-4.2" stroke="#f6f1e2" stroke-width="1.5" stroke-linecap="round" fill="none"/>
+          </svg>
+          <span>Fernwood Memory</span>
+        </div>
+        <p class="footer-blurb">
+          A small, distraction-free matching game built to be played in a coffee break.
+          Everything runs in your browser — nothing is uploaded anywhere.
+        </p>
+      </div>
+      <div class="footer-col">
+        <h4>Game</h4>
+        <ul>
+          <li><a href="#play">Play the board</a></li>
+          <li><a href="#how">How to play</a></li>
+          <li><a href="#tips">Play notes</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4>Good to know</h4>
+        <ul>
+          <li><a href="#play">Best scores stay on this device</a></li>
+          <li><a href="#how">Three difficulty levels</a></li>
+          <li><a href="#top">Back to top</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <span>© 2026 Fernwood Memory. A free browser game.</span>
+      <span>Made with <a href="#top">Daily AI Website Factory</a></span>
+    </div>
+  </div>
+</footer>
+
+<script>
+(function () {
+  'use strict';
+
+  var SYMBOLS = [
+    { g: '🦊', n: 'fox' },
+    { g: '🐸', n: 'frog' },
+    { g: '🍄', n: 'mushroom' },
+    { g: '🌿', n: 'leaf' },
+    { g: '🦉', n: 'owl' },
+    { g: '🐝', n: 'bee' },
+    { g: '🌻', n: 'sunflower' },
+    { g: '🍋', n: 'lemon' },
+    { g: '🐢', n: 'turtle' },
+    { g: '🦋', n: 'butterfly' },
+    { g: '🍂', n: 'autumn leaf' },
+    { g: '🪵', n: 'log' }
+  ];
+
+  var LEVELS = {
+    easy:   { pairs: 6,  cols: 4, max: 480, name: 'Easy' },
+    medium: { pairs: 8,  cols: 4, max: 560, name: 'Medium' },
+    hard:   { pairs: 12, cols: 6, max: 720, name: 'Hard' }
+  };
+
+  var STORE_KEY = 'fernwood-memory-best-v1';
+
+  var boardEl   = document.getElementById('board');
+  var movesOut  = document.getElementById('movesOut');
+  var timeOut   = document.getElementById('timeOut');
+  var pairsOut  = document.getElementById('pairsOut');
+  var bestOut   = document.getElementById('bestOut');
+  var statusEl  = document.getElementById('status');
+  var winBanner = document.getElementById('winBanner');
+  var winText   = document.getElementById('winText');
+  var winAgain  = document.getElementById('winAgain');
+  var restartBtn = document.getElementById('restartBtn');
+  var navNewGame = document.getElementById('navNewGame');
+  var segBtns = Array.prototype.slice.call(document.querySelectorAll('.seg-btn'));
+
+  var reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
+
+  var level = 'easy';
+  var deck = [];
+  var firstCard = null;
+  var secondCard = null;
+  var lock = false;
+  var moves = 0;
+  var matched = 0;
+  var seconds = 0;
+  var timerId = null;
+  var started = false;
+  var storageOK = true;
+  var bests = {};
+  var pending = [];
+
+  /* ---------- storage ---------- */
+
+  function loadBests() {
+    try {
+      var raw = window.localStorage.getItem(STORE_KEY);
+      var parsed = raw ? JSON.parse(raw) : {};
+      bests = (parsed && typeof parsed === 'object') ? parsed : {};
+    } catch (err) {
+      storageOK = false;
+      bests = {};
+    }
+  }
+
+  function saveBests() {
+    if (!storageOK) { return; }
+    try {
+      window.localStorage.setItem(STORE_KEY, JSON.stringify(bests));
+    } catch (err) {
+      storageOK = false;
+    }
+  }
+
+  /* ---------- helpers ---------- */
+
+  function formatTime(total) {
+    var m = Math.floor(total / 60);
+    var s = total % 60;
+    return m + ':' + (s < 10 ? '0' + s : String(s));
+  }
+
+  function shuffle(list) {
+    for (var i = list.length - 1; i > 0; i--) {
+      var j = Math.floor(Math.random() * (i + 1));
+      var tmp = list[i];
+      list[i] = list[j];
+      list[j] = tmp;
+    }
+    return list;
+  }
+
+  function buildDeck(pairs) {
+    var pool = SYMBOLS.slice(0, pairs);
+    var cards = [];
+    for (var i = 0; i < pool.length; i++) {
+      cards.push(i);
+      cards.push(i);
+    }
+    return shuffle(cards);
+  }
+
+  function setStatus(text) {
+    statusEl.textContent = text;
+  }
+
+  function later(fn, ms) {
+    var id = window.setTimeout(fn, ms);
+    pending.push(id);
+    return id;
+  }
+
+  function clearPending() {
+    for (var i = 0; i < pending.length; i++) {
+      window.clearTimeout(pending[i]);
+    }
+    pending = [];
+  }
+
+  /* ---------- timer ---------- */
+
+  function startTimer() {
+    if (started) { return; }
+    started = true;
+    timerId = window.setInterval(function () {
+      seconds++;
+      timeOut.textContent = formatTime(seconds);
+    }, 1000);
+  }
+
+  function stopTimer() {
+    if (timerId !== null) {
+      window.clearInterval(timerId);
+      timerId = null;
+    }
+  }
+
+  /* ---------- rendering ---------- */
+
+  function renderBoard() {
+    var cfg = LEVELS[level];
+    boardEl.style.setProperty('--cols', String(cfg.cols));
+    boardEl.style.setProperty('--board-max', cfg.max + 'px');
+    boardEl.innerHTML = '';
+
+    for (var i = 0; i < deck.length; i++) {
+      var sym = SYMBOLS[deck[i]];
+      var btn = document.createElement('button');
+      btn.type = 'button';
+      btn.className = 'card';
+      btn.setAttribute('data-index', String(i));
+      btn.setAttribute('aria-label', 'Card ' + (i + 1) + ', face down');
+
+      var inner = document.createElement('span');
+      inner.className = 'card-inner';
+
+      var back = document.createElement('span');
+      back.className = 'card-face card-back';
+      back.setAttribute('aria-hidden', 'true');
+
+      var front = document.createElement('span');
+      front.className = 'card-face card-front';
+      front.setAttribute('aria-hidden', 'true');
+      front.textContent = sym.g;
+
+      inner.appendChild(back);
+      inner.appendChild(front);
+      btn.appendChild(inner);
+      boardEl.appendChild(btn);
+    }
+  }
+
+  function renderBest() {
+    if (!storageOK) {
+      bestOut.textContent = 'Unavailable';
+      bestOut.setAttribute('title', 'This browser is blocking local storage, so best scores cannot be saved.');
+      return;
+    }
+    bestOut.removeAttribute('title');
+    var record = bests[level];
+    if (record && typeof record.moves === 'number' && typeof record.seconds === 'number') {
+      bestOut.textContent = record.moves + ' moves · ' + formatTime(record.seconds);
+    } else {
+      bestOut.textContent = 'No record yet';
+    }
+  }
+
+  function syncSegmented() {
+    for (var i = 0; i < segBtns.length; i++) {
+      var on = segBtns[i].getAttribute('data-level') === level;
+      segBtns[i].classList.toggle('is-active', on);
+      segBtns[i].setAttribute('aria-pressed', on ? 'true' : 'false');
+    }
+  }
+
+  /* ---------- game flow ---------- */
+
+  function newGame(nextLevel) {
+    if (nextLevel && LEVELS[nextLevel]) { level = nextLevel; }
+
+    clearPending();
+    stopTimer();
+
+    deck = buildDeck(LEVELS[level].pairs);
+    firstCard = null;
+    secondCard = null;
+    lock = false;
+    moves = 0;
+    matched = 0;
+    seconds = 0;
+    started = false;
+
+    movesOut.textContent = '0';
+    timeOut.textContent = '0:00';
+    pairsOut.textContent = '0 / ' + LEVELS[level].pairs;
+    winBanner.hidden = true;
+    winText.textContent = '';
+
+    renderBoard();
+    renderBest();
+    syncSegmented();
+    setStatus('Pick any card to begin — the timer starts on your first flip.');
+  }
+
+  function flipUp(card) {
+    card.classList.add('is-flipped');
+    var idx = Number(card.getAttribute('data-index'));
+    var sym = SYMBOLS[deck[idx]];
+    card.setAttribute('aria-label', 'Card ' + (idx + 1) + ', ' + sym.n);
+  }
+
+  function flipDown(card) {
+    card.classList.remove('is-flipped');
+    var idx = Number(card.getAttribute('data-index'));
+    card.setAttribute('aria-label', 'Card ' + (idx + 1) + ', face down');
+  }
+
+  function resetTurn() {
+    firstCard = null;
+    secondCard = null;
+    lock = false;
+  }
+
+  function recordBest(lvl, m, s) {
+    var current = bests[lvl];
+    var better = !current ||
+      typeof current.moves !== 'number' ||
+      m < current.moves ||
+      (m === current.moves && s < current.seconds);
+    if (better) {
+      bests[lvl] = { moves: m, seconds: s };
+      saveBests();
+      return true;
+    }
+    return false;
+  }
+
+  function finishGame() {
+    stopTimer();
+    var isBest = recordBest(level, moves, seconds);
+    var summary = 'Cleared ' + LEVELS[level].name.toLowerCase() + ' in ' + moves +
+      (moves === 1 ? ' move' : ' moves') + ' and ' + formatTime(seconds) + '.';
+    winText.textContent = summary + (isBest ? ' That is a new personal best.' : '');
+    winBanner.hidden = false;
+    setStatus('Board cleared. ' + summary);
+    renderBest();
+  }
+
+  function onBoardClick(event) {
+    var card = event.target.closest ? event.target.closest('.card') : null;
+    if (!card || !boardEl.contains(card)) { return; }
+    if (lock) { return; }
+    if (card.classList.contains('is-flipped') || card.classList.contains('is-matched')) { return; }
+
+    startTimer();
+    flipUp(card);
+
+    if (!firstCard) {
+      firstCard = card;
+      setStatus('First card up. Now find its twin.');
+      return;
+    }
+
+    secondCard = card;
+    moves++;
+    movesOut.textContent = String(moves);
+    lock = true;
+
+    var a = deck[Number(firstCard.getAttribute('data-index'))];
+    var b = deck[Number(secondCard.getAttribute('data-index'))];
+    var delay = reduceMotion.matches ? 140 : 520;
+
+    if (a === b) {
+      var cardA = firstCard;
+      var cardB = secondCard;
+      later(function () {
+        cardA.classList.add('is-matched');
+        cardB.classList.add('is-matched');
+        cardA.setAttribute('aria-label', 'Card ' + (Number(cardA.getAttribute('data-index')) + 1) + ', ' + SYMBOLS[a].n + ', matched');
+        cardB.setAttribute('aria-label', 'Card ' + (Number(cardB.getAttribute('data-index')) + 1) + ', ' + SYMBOLS[a].n + ', matched');
+        matched++;
+        pairsOut.textContent = matched + ' / ' + LEVELS[level].pairs;
+        resetTurn();
+        if (matched === LEVELS[level].pairs) {
+          finishGame();
+        } else {
+          setStatus('Match found — ' + SYMBOLS[a].n + '. ' + matched + ' of ' + LEVELS[level].pairs + ' pairs cleared.');
+        }
+      }, delay);
+    } else {
+      var missA = firstCard;
+      var missB = secondCard;
+      setStatus('No match. Remember both spots.');
+      later(function () {
+        flipDown(missA);
+        flipDown(missB);
+        resetTurn();
+        setStatus('No match — those two turned back over. Try again.');
+      }, delay + 280);
+    }
+  }
+
+  /* ---------- keyboard navigation ---------- */
+
+  function onBoardKeydown(event) {
+    var keys = ['ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown'];
+    if (keys.indexOf(event.key) === -1) { return; }
+
+    var cards = Array.prototype.slice.call(boardEl.querySelectorAll('.card'));
+    var index = cards.indexOf(document.activeElement);
+    if (index === -1) { return; }
+
+    event.preventDefault();
+
+    var cols = LEVELS[level].cols;
+    try {
+      var template = window.getComputedStyle(boardEl).gridTemplateColumns;
+      if (template && template.indexOf(' ') !== -1) {
+        cols = template.split(' ').length;
+      }
+    } catch (err) { /* keep the configured column count */ }
+
+    var next = index;
+    if (event.key === 'ArrowLeft') { next = index - 1; }
+    if (event.key === 'ArrowRight') { next = index + 1; }
+    if (event.key === 'ArrowUp') { next = index - cols; }
+    if (event.key === 'ArrowDown') { next = index + cols; }
+
+    if (next >= 0 && next < cards.length) {
+      cards[next].focus();
+    }
+  }
+
+  /* ---------- wiring ---------- */
+
+  boardEl.addEventListener('click', onBoardClick);
+  boardEl.addEventListener('keydown', onBoardKeydown);
+
+  restartBtn.addEventListener('click', function () {
+    newGame();
+    setStatus('Board reshuffled. Pick any card to begin.');
+  });
+
+  navNewGame.addEventListener('click', function () {
+    newGame();
+    var target = document.getElementById('play');
+    if (target) {
+      target.scrollIntoView({ behavior: reduceMotion.matches ? 'auto' : 'smooth', block: 'start' });
+    }
+    var firstCardEl = boardEl.querySelector('.card');
+    if (firstCardEl) { firstCardEl.focus({ preventScroll: true }); }
+  });
+
+  winAgain.addEventListener('click', function () {
+    newGame();
+    var firstCardEl = boardEl.querySelector('.card');
+    if (firstCardEl) { firstCardEl.focus({ preventScroll: true }); }
+  });
+
+  for (var i = 0; i < segBtns.length; i++) {
+    segBtns[i].addEventListener('click', function (event) {
+      var next = event.currentTarget.getAttribute('data-level');
+      if (next === level) {
+        newGame();
+        setStatus('Board reshuffled. Pick any card to begin.');
+        return;
+      }
+      newGame(next);
+      setStatus(LEVELS[next].name + ' board dealt — ' + LEVELS[next].pairs + ' pairs to find.');
+    });
+  }
+
+  loadBests();
+  newGame('easy');
+})();
+</script>
+</body>
+</html>
