@@ -1,0 +1,1403 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#173f35">
+  <meta name="description" content="Story Prompt Generator — a quiet creative studio for fiction writers. Choose a genre and mood, then receive a story seed with a plot starter and character background.">
+  <title>Story Prompt Generator — A quiet creative studio</title>
+  <style>
+    :root {
+      --ink: #173f35;
+      --ink-deep: #102f28;
+      --forest: #245b49;
+      --forest-soft: #dce8df;
+      --paper: #f7f4ec;
+      --paper-deep: #eee9dc;
+      --surface: #fffdf7;
+      --line: #d8d8c9;
+      --muted: #5d6b60;
+      --coral: #e77b5d;
+      --coral-soft: #f8e1d6;
+      --gold: #d9a441;
+      --gold-soft: #f4e8c8;
+      --lavender: #e8e2f0;
+      --lavender-ink: #5b4b72;
+      --shadow: 0 18px 50px rgba(23, 63, 53, 0.09);
+      --radius: 22px;
+      --serif: Georgia, "Times New Roman", serif;
+      --sans: "Avenir Next", Avenir, "Segoe UI", Helvetica, Arial, sans-serif;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      margin: 0;
+      color: var(--ink);
+      background: var(--paper);
+      font-family: var(--sans);
+      font-size: 16px;
+      line-height: 1.6;
+      -webkit-font-smoothing: antialiased;
+    }
+    body::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: -1;
+      background:
+        radial-gradient(circle at 8% 12%, rgba(217, 164, 65, 0.10), transparent 28rem),
+        radial-gradient(circle at 92% 38%, rgba(231, 123, 93, 0.08), transparent 30rem);
+    }
+    button, select, input { font: inherit; }
+    button, select { cursor: pointer; }
+    button { color: inherit; }
+    a { color: inherit; }
+    svg { display: block; }
+    ::selection { background: var(--gold-soft); color: var(--ink-deep); }
+    :focus-visible { outline: 3px solid var(--coral); outline-offset: 4px; }
+    .skip-link {
+      position: absolute;
+      left: 1rem;
+      top: -5rem;
+      z-index: 100;
+      padding: 0.7rem 1rem;
+      background: var(--ink);
+      color: white;
+      border-radius: 8px;
+    }
+    .skip-link:focus { top: 1rem; }
+    .wrap { width: min(1160px, calc(100% - 40px)); margin-inline: auto; }
+    .eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.55rem;
+      margin: 0 0 1rem;
+      color: var(--forest);
+      font-size: 0.72rem;
+      font-weight: 700;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+    }
+    .eyebrow::before {
+      content: "";
+      width: 22px;
+      height: 1px;
+      background: currentColor;
+    }
+    h1, h2, h3, p { margin-top: 0; }
+    h1, h2, h3 { font-family: var(--serif); font-weight: 400; }
+    h1 { font-size: clamp(2.8rem, 7vw, 5.6rem); line-height: 0.98; letter-spacing: -0.055em; margin-bottom: 1.4rem; }
+    h2 { font-size: clamp(2rem, 4vw, 3.2rem); line-height: 1.08; letter-spacing: -0.035em; }
+    h3 { font-size: 1.35rem; line-height: 1.2; }
+    p { margin-bottom: 1rem; }
+    .muted { color: var(--muted); }
+    .sr-only {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      padding: 0;
+      margin: -1px;
+      overflow: hidden;
+      clip: rect(0, 0, 0, 0);
+      white-space: nowrap;
+      border: 0;
+    }
+
+    /* Navigation */
+    .site-header {
+      position: sticky;
+      top: 0;
+      z-index: 20;
+      background: rgba(247, 244, 236, 0.92);
+      backdrop-filter: blur(14px);
+      border-bottom: 1px solid rgba(23, 63, 53, 0.10);
+    }
+    .nav {
+      min-height: 76px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1rem;
+    }
+    .brand {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.7rem;
+      text-decoration: none;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+    }
+    .brand-mark {
+      width: 38px;
+      height: 38px;
+      display: grid;
+      place-items: center;
+      border-radius: 50%;
+      background: var(--ink);
+      color: var(--paper);
+    }
+    .brand-mark svg { width: 22px; height: 22px; }
+    .nav-links { display: flex; align-items: center; gap: 1.5rem; }
+    .nav-links a {
+      text-decoration: none;
+      font-size: 0.88rem;
+      font-weight: 600;
+      color: var(--muted);
+      padding: 0.4rem 0;
+      border-bottom: 1px solid transparent;
+    }
+    .nav-links a:hover { color: var(--ink); border-bottom-color: var(--coral); }
+    .nav-cta {
+      border: 1px solid var(--ink);
+      background: transparent;
+      border-radius: 999px;
+      padding: 0.65rem 1rem;
+      font-size: 0.82rem;
+      font-weight: 700;
+      text-decoration: none;
+      transition: background 180ms ease, color 180ms ease;
+    }
+    .nav-cta:hover { background: var(--ink); color: var(--paper); }
+
+    /* Hero */
+    .hero {
+      position: relative;
+      overflow: hidden;
+      padding: clamp(4rem, 9vw, 7.5rem) 0 clamp(3.5rem, 7vw, 6rem);
+    }
+    .hero-grid {
+      display: grid;
+      grid-template-columns: minmax(0, 1.05fr) minmax(320px, 0.95fr);
+      gap: clamp(2rem, 6vw, 5rem);
+      align-items: center;
+    }
+    .hero h1 em { font-style: italic; color: var(--forest); }
+    .hero-copy { max-width: 34rem; font-size: 1.08rem; color: var(--muted); }
+    .hero-actions { display: flex; flex-wrap: wrap; gap: 0.8rem; margin-top: 1.8rem; }
+    .button {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.55rem;
+      min-height: 48px;
+      padding: 0.8rem 1.25rem;
+      border: 1px solid transparent;
+      border-radius: 999px;
+      font-weight: 700;
+      text-decoration: none;
+      transition: transform 180ms ease, background 180ms ease, box-shadow 180ms ease;
+    }
+    .button:hover { transform: translateY(-2px); }
+    .button-primary { background: var(--ink); color: var(--surface); box-shadow: 0 8px 20px rgba(23, 63, 53, 0.16); }
+    .button-primary:hover { background: var(--forest); }
+    .button-secondary { background: transparent; border-color: var(--line); color: var(--ink); }
+    .button-secondary:hover { background: var(--surface); border-color: var(--ink); }
+    .button-coral { background: var(--coral); color: var(--ink-deep); }
+    .button-coral:hover { background: #ef8d70; }
+    .button svg { width: 18px; height: 18px; }
+    .hero-note {
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+      margin-top: 1.5rem;
+      font-size: 0.82rem;
+      color: var(--muted);
+    }
+    .hero-note svg { width: 18px; height: 18px; color: var(--forest); flex: 0 0 auto; }
+
+    .hero-art {
+      position: relative;
+      min-height: 470px;
+      display: grid;
+      place-items: center;
+    }
+    .orbit {
+      position: absolute;
+      width: min(100%, 440px);
+      aspect-ratio: 1;
+      border: 1px solid rgba(23, 63, 53, 0.16);
+      border-radius: 50%;
+    }
+    .orbit::before, .orbit::after {
+      content: "";
+      position: absolute;
+      border-radius: 50%;
+      border: 1px solid rgba(23, 63, 53, 0.10);
+    }
+    .orbit::before { inset: 38px; }
+    .orbit::after { inset: 82px; background: rgba(255, 253, 247, 0.45); }
+    .orbit-dot {
+      position: absolute;
+      width: 14px;
+      height: 14px;
+      border-radius: 50%;
+      background: var(--coral);
+      top: 12%;
+      right: 18%;
+      box-shadow: 0 0 0 7px var(--coral-soft);
+    }
+    .orbit-dot.second {
+      width: 10px;
+      height: 10px;
+      background: var(--gold);
+      top: auto;
+      right: auto;
+      bottom: 18%;
+      left: 12%;
+      box-shadow: 0 0 0 6px var(--gold-soft);
+    }
+    .prompt-paper {
+      position: relative;
+      z-index: 1;
+      width: min(100%, 350px);
+      padding: 1.6rem;
+      background: var(--surface);
+      border: 1px solid var(--line);
+      border-radius: 18px 18px 18px 4px;
+      box-shadow: var(--shadow);
+      transform: rotate(-3deg);
+    }
+    .paper-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.2rem; }
+    .paper-label { font-size: 0.68rem; font-weight: 800; letter-spacing: 0.14em; text-transform: uppercase; color: var(--forest); }
+    .paper-icon { width: 30px; height: 30px; border-radius: 50%; background: var(--gold-soft); display: grid; place-items: center; }
+    .paper-icon svg { width: 16px; height: 16px; }
+    .prompt-paper h2 { font-size: 1.65rem; line-height: 1.15; margin-bottom: 0.8rem; }
+    .prompt-paper p { font-size: 0.9rem; color: var(--muted); margin-bottom: 1rem; }
+    .paper-rule { height: 1px; background: var(--line); margin: 1rem 0; }
+    .paper-tags { display: flex; flex-wrap: wrap; gap: 0.4rem; }
+    .paper-tag { padding: 0.25rem 0.55rem; border-radius: 999px; background: var(--forest-soft); color: var(--forest); font-size: 0.68rem; font-weight: 700; }
+    .floating-note {
+      position: absolute;
+      z-index: 2;
+      right: 0;
+      bottom: 2.5rem;
+      width: 190px;
+      padding: 1rem;
+      background: var(--ink);
+      color: var(--paper);
+      border-radius: 14px 14px 4px 14px;
+      transform: rotate(4deg);
+      box-shadow: 0 12px 30px rgba(23, 63, 53, 0.18);
+    }
+    .floating-note span { display: block; font-size: 0.65rem; letter-spacing: 0.12em; text-transform: uppercase; color: #c9d9cf; margin-bottom: 0.35rem; }
+    .floating-note strong { font-family: var(--serif); font-size: 1.05rem; font-weight: 400; }
+
+    /* Studio */
+    .studio { padding: 1rem 0 clamp(4rem, 8vw, 7rem); scroll-margin-top: 90px; }
+    .section-heading { display: flex; justify-content: space-between; align-items: end; gap: 2rem; margin-bottom: 2rem; }
+    .section-heading p { max-width: 30rem; margin-bottom: 0; color: var(--muted); }
+    .studio-shell {
+      display: grid;
+      grid-template-columns: 340px minmax(0, 1fr);
+      gap: 1.25rem;
+      align-items: start;
+    }
+    .control-panel, .result-panel {
+      background: var(--surface);
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+    }
+    .control-panel { padding: 1.5rem; }
+    .panel-title { display: flex; align-items: center; gap: 0.65rem; margin-bottom: 1.5rem; }
+    .panel-title svg { width: 22px; height: 22px; color: var(--forest); }
+    .panel-title h3 { margin: 0; font-family: var(--sans); font-size: 1rem; font-weight: 700; letter-spacing: -0.01em; }
+    .field { margin-bottom: 1.35rem; }
+    .field label, .field-label { display: block; margin-bottom: 0.55rem; font-size: 0.78rem; font-weight: 800; letter-spacing: 0.08em; text-transform: uppercase; color: var(--forest); }
+    .select-wrap { position: relative; }
+    .select-wrap::after {
+      content: "";
+      position: absolute;
+      right: 1rem;
+      top: 50%;
+      width: 7px;
+      height: 7px;
+      border-right: 2px solid var(--ink);
+      border-bottom: 2px solid var(--ink);
+      transform: translateY(-70%) rotate(45deg);
+      pointer-events: none;
+    }
+    select {
+      width: 100%;
+      min-height: 48px;
+      appearance: none;
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      background: var(--paper);
+      color: var(--ink);
+      padding: 0.7rem 2.4rem 0.7rem 0.9rem;
+      font-size: 0.92rem;
+    }
+    select:hover { border-color: var(--forest); }
+    .mood-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0.55rem; }
+    .mood-button {
+      min-height: 44px;
+      padding: 0.55rem 0.5rem;
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      background: transparent;
+      font-size: 0.8rem;
+      font-weight: 600;
+      transition: background 160ms ease, border-color 160ms ease, color 160ms ease;
+    }
+    .mood-button:hover { background: var(--paper-deep); border-color: var(--forest); }
+    .mood-button[aria-pressed="true"] { background: var(--ink); border-color: var(--ink); color: var(--surface); }
+    .length-row { display: flex; gap: 0.5rem; }
+    .length-button {
+      flex: 1;
+      min-height: 40px;
+      border: 1px solid var(--line);
+      border-radius: 9px;
+      background: transparent;
+      font-size: 0.78rem;
+      font-weight: 700;
+    }
+    .length-button:hover { background: var(--paper-deep); }
+    .length-button[aria-pressed="true"] { background: var(--gold-soft); border-color: var(--gold); color: var(--ink-deep); }
+    .generate-button { width: 100%; margin-top: 0.25rem; }
+    .control-footnote { margin: 0.8rem 0 0; font-size: 0.75rem; color: var(--muted); text-align: center; }
+    .result-panel { min-height: 560px; padding: clamp(1.25rem, 3vw, 2rem); position: relative; overflow: hidden; }
+    .result-panel::before {
+      content: "";
+      position: absolute;
+      width: 220px;
+      height: 220px;
+      right: -100px;
+      top: -100px;
+      border-radius: 50%;
+      background: var(--gold-soft);
+      opacity: 0.55;
+    }
+    .result-top { position: relative; display: flex; justify-content: space-between; align-items: start; gap: 1rem; margin-bottom: 1.5rem; }
+    .result-kicker { margin: 0 0 0.35rem; font-size: 0.68rem; font-weight: 800; letter-spacing: 0.14em; text-transform: uppercase; color: var(--forest); }
+    .result-title { margin: 0; font-size: clamp(1.8rem, 3.5vw, 2.6rem); line-height: 1.05; }
+    .save-button {
+      flex: 0 0 auto;
+      width: 42px;
+      height: 42px;
+      display: grid;
+      place-items: center;
+      border: 1px solid var(--line);
+      border-radius: 50%;
+      background: var(--surface);
+      transition: background 160ms ease, color 160ms ease;
+    }
+    .save-button:hover { background: var(--ink); color: var(--surface); }
+    .save-button[aria-pressed="true"] { background: var(--coral-soft); border-color: var(--coral); color: var(--ink); }
+    .save-button svg { width: 19px; height: 19px; }
+    .result-tags { display: flex; flex-wrap: wrap; gap: 0.45rem; margin-bottom: 1.5rem; }
+    .tag { padding: 0.28rem 0.65rem; border-radius: 999px; font-size: 0.7rem; font-weight: 700; }
+    .tag-genre { background: var(--forest-soft); color: var(--forest); }
+    .tag-mood { background: var(--coral-soft); color: #7b3524; }
+    .tag-length { background: var(--gold-soft); color: #6b4b0d; }
+    .prompt-block { padding: 1.1rem 0; border-top: 1px solid var(--line); }
+    .prompt-block h3 { display: flex; align-items: center; gap: 0.55rem; margin-bottom: 0.55rem; font-family: var(--sans); font-size: 0.72rem; font-weight: 800; letter-spacing: 0.1em; text-transform: uppercase; color: var(--forest); }
+    .prompt-block h3 svg { width: 17px; height: 17px; }
+    .prompt-block p { margin: 0; font-family: var(--serif); font-size: 1.08rem; line-height: 1.65; }
+    .twist-box {
+      margin-top: 0.5rem;
+      padding: 1rem 1.1rem;
+      border-left: 3px solid var(--coral);
+      border-radius: 0 10px 10px 0;
+      background: var(--coral-soft);
+    }
+    .twist-box h3 { color: #7b3524; }
+    .twist-box p { font-family: var(--sans); font-size: 0.92rem; line-height: 1.6; }
+    .result-actions { display: flex; flex-wrap: wrap; gap: 0.6rem; margin-top: 1.25rem; }
+    .result-actions .button { min-height: 42px; padding: 0.6rem 1rem; font-size: 0.82rem; }
+    .result-status { min-height: 1.4rem; margin: 0.8rem 0 0; font-size: 0.78rem; color: var(--forest); }
+    .empty-state { min-height: 430px; display: grid; place-items: center; text-align: center; }
+    .empty-inner { max-width: 24rem; }
+    .empty-icon { width: 76px; height: 76px; margin: 0 auto 1.2rem; display: grid; place-items: center; border-radius: 50%; background: var(--forest-soft); color: var(--forest); }
+    .empty-icon svg { width: 34px; height: 34px; }
+    .empty-state h3 { font-size: 1.7rem; margin-bottom: 0.6rem; }
+    .empty-state p { color: var(--muted); font-size: 0.92rem; }
+    .error-box { padding: 1rem; border: 1px solid #b84b35; border-radius: 12px; background: #fbe9e3; color: #6f2618; font-size: 0.9rem; }
+    .error-box strong { display: block; margin-bottom: 0.25rem; }
+    [hidden] { display: none !important; }
+
+    /* How it works */
+    .how { padding: clamp(3.5rem, 7vw, 6rem) 0; background: var(--ink); color: var(--paper); }
+    .how .eyebrow { color: #d9c58f; }
+    .how .section-heading p { color: #c9d9cf; }
+    .steps { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; }
+    .step { padding: 1.5rem; border: 1px solid rgba(247, 244, 236, 0.18); border-radius: 16px; background: rgba(255, 255, 255, 0.035); }
+    .step-number { display: grid; place-items: center; width: 38px; height: 38px; margin-bottom: 1.2rem; border-radius: 50%; background: var(--coral); color: var(--ink-deep); font-family: var(--serif); font-size: 1.1rem; }
+    .step:nth-child(2) .step-number { background: var(--gold); }
+    .step:nth-child(3) .step-number { background: var(--lavender); }
+    .step h3 { margin-bottom: 0.5rem; font-size: 1.25rem; }
+    .step p { margin: 0; color: #c9d9cf; font-size: 0.9rem; }
+
+    /* Library */
+    .library { padding: clamp(4rem, 8vw, 7rem) 0; scroll-margin-top: 90px; }
+    .library-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; }
+    .library-card {
+      display: flex;
+      flex-direction: column;
+      min-height: 250px;
+      padding: 1.4rem;
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      background: var(--surface);
+      transition: transform 180ms ease, box-shadow 180ms ease;
+    }
+    .library-card:hover { transform: translateY(-4px); box-shadow: var(--shadow); }
+    .library-card:nth-child(2) { background: var(--gold-soft); border-color: #e2cf9d; }
+    .library-card:nth-child(3) { background: var(--lavender); border-color: #d4c9e2; }
+    .library-card:nth-child(4) { background: var(--coral-soft); border-color: #edc4b5; }
+    .library-card:nth-child(5) { background: var(--forest-soft); }
+    .library-card:nth-child(6) { background: var(--paper-deep); }
+    .library-card .card-index { font-size: 0.68rem; font-weight: 800; letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted); }
+    .library-card h3 { margin: 1.2rem 0 0.6rem; font-size: 1.45rem; }
+    .library-card p { margin: 0 0 1.2rem; color: var(--muted); font-size: 0.88rem; }
+    .library-card button {
+      align-self: start;
+      margin-top: auto;
+      padding: 0;
+      border: 0;
+      border-bottom: 1px solid currentColor;
+      background: transparent;
+      font-size: 0.8rem;
+      font-weight: 800;
+      color: var(--ink);
+    }
+    .library-card button:hover { color: var(--forest); }
+    .library-empty { padding: 2rem; border: 1px dashed var(--line); border-radius: 16px; text-align: center; color: var(--muted); }
+    .library-empty p { margin: 0 0 1rem; }
+
+    /* About / closing */
+    .closing { padding: 0 0 clamp(4rem, 8vw, 7rem); }
+    .closing-card {
+      position: relative;
+      overflow: hidden;
+      display: grid;
+      grid-template-columns: 1.2fr 0.8fr;
+      gap: 2rem;
+      align-items: center;
+      padding: clamp(1.5rem, 5vw, 3.5rem);
+      border-radius: 26px;
+      background: var(--gold-soft);
+      border: 1px solid #e2cf9d;
+    }
+    .closing-card h2 { max-width: 34rem; margin-bottom: 1rem; }
+    .closing-card p { max-width: 34rem; color: #5f5438; }
+    .closing-art { position: relative; min-height: 220px; display: grid; place-items: center; }
+    .closing-art svg { width: min(100%, 280px); height: auto; }
+    .closing-card .button { margin-top: 0.5rem; }
+
+    /* Footer */
+    .site-footer { padding: 2rem 0 1.5rem; border-top: 1px solid var(--line); }
+    .footer-top { display: flex; justify-content: space-between; gap: 1.5rem; align-items: start; }
+    .footer-brand { display: flex; align-items: center; gap: 0.7rem; font-weight: 700; }
+    .footer-brand .brand-mark { width: 32px; height: 32px; }
+    .footer-brand .brand-mark svg { width: 18px; height: 18px; }
+    .footer-links { display: flex; flex-wrap: wrap; gap: 1rem; }
+    .footer-links a { font-size: 0.82rem; color: var(--muted); text-decoration: none; }
+    .footer-links a:hover { color: var(--ink); text-decoration: underline; }
+    .footer-bottom { display: flex; justify-content: space-between; gap: 1rem; margin-top: 1.5rem; padding-top: 1rem; border-top: 1px solid var(--line); font-size: 0.75rem; color: var(--muted); }
+    .footer-bottom p { margin: 0; }
+
+    /* Toast */
+    .toast {
+      position: fixed;
+      left: 50%;
+      bottom: 1.25rem;
+      z-index: 50;
+      max-width: calc(100% - 2rem);
+      padding: 0.8rem 1.1rem;
+      border-radius: 999px;
+      background: var(--ink);
+      color: var(--surface);
+      box-shadow: 0 10px 30px rgba(23, 63, 53, 0.25);
+      font-size: 0.85rem;
+      transform: translate(-50%, 140%);
+      opacity: 0;
+      transition: transform 220ms ease, opacity 220ms ease;
+      pointer-events: none;
+    }
+    .toast.show { transform: translate(-50%, 0); opacity: 1; }
+
+    @media (max-width: 900px) {
+      .hero-grid { grid-template-columns: 1fr; }
+      .hero-art { min-height: 420px; margin-top: 1rem; }
+      .studio-shell { grid-template-columns: 1fr; }
+      .control-panel { display: grid; grid-template-columns: 1fr 1fr; gap: 0 1.25rem; }
+      .panel-title, .generate-button, .control-footnote { grid-column: 1 / -1; }
+      .field:last-of-type { grid-column: 1 / -1; }
+      .steps, .library-grid { grid-template-columns: repeat(2, 1fr); }
+      .closing-card { grid-template-columns: 1fr; }
+      .closing-art { min-height: 160px; }
+    }
+    @media (max-width: 640px) {
+      .wrap { width: min(100% - 28px, 1160px); }
+      .nav { min-height: 68px; }
+      .nav-links a:not(.nav-cta) { display: none; }
+      .nav-cta { padding: 0.55rem 0.8rem; font-size: 0.75rem; }
+      .brand { font-size: 0.92rem; }
+      .brand-mark { width: 34px; height: 34px; }
+      .hero { padding-top: 3rem; }
+      .hero-art { min-height: 390px; }
+      .prompt-paper { width: min(100% - 30px, 330px); }
+      .floating-note { right: 0; bottom: 0; width: 160px; }
+      .section-heading { display: block; }
+      .section-heading p { margin-top: 0.8rem; }
+      .control-panel { display: block; }
+      .steps, .library-grid { grid-template-columns: 1fr; }
+      .result-top { display: block; }
+      .save-button { margin-top: 0.8rem; }
+      .footer-top, .footer-bottom { display: block; }
+      .footer-links { margin-top: 1rem; }
+      .footer-bottom p + p { margin-top: 0.4rem; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      html { scroll-behavior: auto; }
+      *, *::before, *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+      }
+      .button:hover, .library-card:hover { transform: none; }
+    }
+  </style>
+</head>
+<body>
+  <a class="skip-link" href="#studio">Skip to the prompt studio</a>
+
+  <header class="site-header">
+    <nav class="nav wrap" aria-label="Main navigation">
+      <a class="brand" href="#top" aria-label="Story Prompt Generator home">
+        <span class="brand-mark" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v3M12 18v3M3 12h3M18 12h3M5.6 5.6l2.1 2.1M16.3 16.3l2.1 2.1M18.4 5.6l-2.1 2.1M7.7 16.3l-2.1 2.1"/><circle cx="12" cy="12" r="3.2"/></svg>
+        </span>
+        <span>Story Prompt Generator</span>
+      </a>
+      <div class="nav-links">
+        <a href="#studio">Studio</a>
+        <a href="#how-it-works">How it works</a>
+        <a href="#library">Saved seeds</a>
+        <a class="nav-cta" href="#studio">Find a spark</a>
+      </div>
+    </nav>
+  </header>
+
+  <main id="top">
+    <section class="hero" aria-labelledby="hero-title">
+      <div class="wrap hero-grid">
+        <div>
+          <p class="eyebrow">A quiet studio for loud imaginations</p>
+          <h1 id="hero-title">Every story begins with a <em>small, strange spark.</em></h1>
+          <p class="hero-copy">Choose a genre and a mood. We’ll hand you a plot starter, a character with a secret, and one unexpected turn — enough to get your pen moving.</p>
+          <div class="hero-actions">
+            <a class="button button-primary" href="#studio">
+              Generate a story seed
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+            </a>
+            <a class="button button-secondary" href="#how-it-works">See how it works</a>
+          </div>
+          <p class="hero-note">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3l7 3v5c0 4.5-3 7.5-7 9-4-1.5-7-4.5-7-9V6l7-3z"/><path d="M9 12l2 2 4-4"/></svg>
+            No sign-up. No blank-page panic. Just a starting point.
+          </p>
+        </div>
+        <div class="hero-art" aria-hidden="true">
+          <div class="orbit"></div>
+          <span class="orbit-dot"></span>
+          <span class="orbit-dot second"></span>
+          <article class="prompt-paper">
+            <div class="paper-top">
+              <span class="paper-label">Today’s seed</span>
+              <span class="paper-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M4 5.5A2.5 2.5 0 016.5 3H20v16H6.5A2.5 2.5 0 004 21.5v-16z"/><path d="M4 18.5A2.5 2.5 0 016.5 16H20"/></svg></span>
+            </div>
+            <h2>The lighthouse keeper who receives letters from tomorrow.</h2>
+            <p>A cartographer arrives with a map of a coastline that does not exist yet — and her own name written in the margin.</p>
+            <div class="paper-rule"></div>
+            <div class="paper-tags">
+              <span class="paper-tag">Literary mystery</span>
+              <span class="paper-tag">Wistful</span>
+            </div>
+          </article>
+          <div class="floating-note">
+            <span>Character hook</span>
+            <strong>She remembers a town that was never built.</strong>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="studio wrap" id="studio" aria-labelledby="studio-title">
+      <div class="section-heading">
+        <div>
+          <p class="eyebrow">The prompt studio</p>
+          <h2 id="studio-title">Set the weather. Find the story.</h2>
+        </div>
+        <p>Pick the shelf you want to write from and the feeling you want to chase. Every seed is assembled fresh from a hand-built collection of story ingredients.</p>
+      </div>
+
+      <div class="studio-shell">
+        <form class="control-panel" id="prompt-form" novalidate>
+          <div class="panel-title">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 6h16M4 12h16M4 18h10"/><circle cx="18" cy="18" r="2"/></svg>
+            <h3>Your ingredients</h3>
+          </div>
+
+          <div class="field">
+            <label for="genre">Genre</label>
+            <div class="select-wrap">
+              <select id="genre" name="genre">
+                <option value="literary-mystery">Literary mystery</option>
+                <option value="fantasy">Fantasy</option>
+                <option value="science-fiction">Science fiction</option>
+                <option value="romance">Romance</option>
+                <option value="horror">Gothic horror</option>
+                <option value="historical">Historical fiction</option>
+                <option value="magical-realism">Magical realism</option>
+                <option value="surprise">Surprise me</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="field">
+            <span class="field-label" id="mood-label">Mood</span>
+            <div class="mood-grid" role="group" aria-labelledby="mood-label">
+              <button class="mood-button" type="button" data-mood="wistful" aria-pressed="true">Wistful</button>
+              <button class="mood-button" type="button" data-mood="tense" aria-pressed="false">Tense</button>
+              <button class="mood-button" type="button" data-mood="hopeful" aria-pressed="false">Hopeful</button>
+              <button class="mood-button" type="button" data-mood="eerie" aria-pressed="false">Eerie</button>
+              <button class="mood-button" type="button" data-mood="romantic" aria-pressed="false">Romantic</button>
+              <button class="mood-button" type="button" data-mood="wry" aria-pressed="false">Wry</button>
+            </div>
+          </div>
+
+          <div class="field">
+            <span class="field-label" id="length-label">Seed length</span>
+            <div class="length-row" role="group" aria-labelledby="length-label">
+              <button class="length-button" type="button" data-length="short" aria-pressed="false">Short</button>
+              <button class="length-button" type="button" data-length="medium" aria-pressed="true">Medium</button>
+              <button class="length-button" type="button" data-length="long" aria-pressed="false">Long</button>
+            </div>
+          </div>
+
+          <button class="button button-primary generate-button" type="submit">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3l1.8 5.2L19 10l-5.2 1.8L12 17l-1.8-5.2L5 10l5.2-1.8L12 3z"/><path d="M19 16l.8 2.2L22 19l-2.2.8L19 22l-.8-2.2L16 19l2.2-.8L19 16z"/></svg>
+            Generate a story seed
+          </button>
+          <p class="control-footnote">A new combination every time. Save the ones that haunt you.</p>
+        </form>
+
+        <section class="result-panel" id="result-panel" aria-labelledby="result-heading">
+          <h2 class="sr-only" id="result-heading">Your generated story seed</h2>
+          <div id="result-content">
+            <div class="empty-state">
+              <div class="empty-inner">
+                <div class="empty-icon" aria-hidden="true">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20c4-2 7-5 7-9a7 7 0 10-14 0c0 4 3 7 7 9z"/><path d="M12 6v5l3 2"/></svg>
+                </div>
+                <h3>Your next story is waiting.</h3>
+                <p>Choose your ingredients and press generate. You’ll get a plot starter, a character background, and a twist to argue with.</p>
+              </div>
+            </div>
+          </div>
+          <div class="error-box" id="error-box" role="alert" hidden>
+            <strong>Something interrupted the spark.</strong>
+            <span id="error-message">Please try generating again.</span>
+          </div>
+          <p class="result-status" id="result-status" role="status" aria-live="polite"></p>
+        </section>
+      </div>
+    </section>
+
+    <section class="how" id="how-it-works" aria-labelledby="how-title">
+      <div class="wrap">
+        <div class="section-heading">
+          <div>
+            <p class="eyebrow">How it works</p>
+            <h2 id="how-title">Three ingredients. Infinite trouble.</h2>
+          </div>
+          <p>The generator doesn’t write your novel. It gives you a door, a stranger, and a reason to walk through.</p>
+        </div>
+        <div class="steps">
+          <article class="step">
+            <span class="step-number" aria-hidden="true">01</span>
+            <h3>Choose a shelf</h3>
+            <p>From literary mystery to gothic horror, each genre has its own cast of settings, objects, and opening pressures.</p>
+          </article>
+          <article class="step">
+            <span class="step-number" aria-hidden="true">02</span>
+            <h3>Set the mood</h3>
+            <p>Wistful, tense, hopeful, eerie, romantic, or wry. The mood colors the language and the kind of trouble waiting.</p>
+          </article>
+          <article class="step">
+            <span class="step-number" aria-hidden="true">03</span>
+            <h3>Follow the thread</h3>
+            <p>Take the plot starter, borrow the character’s background, and decide what happens when the twist arrives.</p>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section class="library wrap" id="library" aria-labelledby="library-title">
+      <div class="section-heading">
+        <div>
+          <p class="eyebrow">Your saved seeds</p>
+          <h2 id="library-title">A shelf for the stories you keep.</h2>
+        </div>
+        <p>Saved seeds stay in this browser. Use them as a warm-up, a writing prompt, or a dare.</p>
+      </div>
+      <div class="library-grid" id="library-grid"></div>
+      <div class="library-empty" id="library-empty">
+        <p>No seeds saved yet. Generate one and tap the bookmark to keep it here.</p>
+        <a class="button button-secondary" href="#studio">Go to the studio</a>
+      </div>
+    </section>
+
+    <section class="closing wrap" aria-labelledby="closing-title">
+      <div class="closing-card">
+        <div>
+          <p class="eyebrow">A note for the page</p>
+          <h2 id="closing-title">You don’t need a whole story. You need a first sentence you can’t leave alone.</h2>
+          <p>These seeds are deliberately incomplete. The best part — the choice, the consequence, the voice — belongs to you.</p>
+          <a class="button button-primary" href="#studio">Find your next spark</a>
+        </div>
+        <div class="closing-art" aria-hidden="true">
+          <svg viewBox="0 0 280 220" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M30 180c35-55 70-55 105 0s70 55 115 0" stroke="#173f35" stroke-width="2" stroke-linecap="round"/>
+            <path d="M55 150c25-40 50-40 75 0s50 40 80 0" stroke="#e77b5d" stroke-width="2" stroke-linecap="round"/>
+            <circle cx="140" cy="70" r="34" fill="#fffdf7" stroke="#173f35" stroke-width="2"/>
+            <path d="M140 48v22l14 9" stroke="#173f35" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M210 40l4 10 10 4-10 4-4 10-4-10-10-4 10-4 4-10z" fill="#d9a441"/>
+            <path d="M65 55l3 7 7 3-7 3-3 7-3-7-7-3 7-3 3-7z" fill="#173f35"/>
+            <path d="M95 195h90" stroke="#173f35" stroke-width="2" stroke-linecap="round"/>
+          </svg>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="wrap">
+      <div class="footer-top">
+        <div class="footer-brand">
+          <span class="brand-mark" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v3M12 18v3M3 12h3M18 12h3M5.6 5.6l2.1 2.1M16.3 16.3l2.1 2.1M18.4 5.6l-2.1 2.1M7.7 16.3l-2.1 2.1"/><circle cx="12" cy="12" r="3.2"/></svg>
+          </span>
+          <span>Story Prompt Generator</span>
+        </div>
+        <div class="footer-links">
+          <a href="#studio">Studio</a>
+          <a href="#how-it-works">How it works</a>
+          <a href="#library">Saved seeds</a>
+          <a href="#top">Back to top</a>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        <p>A small tool for fiction writers. Your saved seeds live only in this browser.</p>
+        <p>Made with Daily AI Website Factory</p>
+      </div>
+    </div>
+  </footer>
+
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+  <script>
+    (() => {
+      "use strict";
+
+      const genres = {
+        "literary-mystery": {
+          label: "Literary mystery",
+          settings: [
+            "a shuttered seaside hotel where every room is booked under the same name",
+            "a village archive that keeps two sets of records for every family",
+            "a night train that stops at a station erased from every map",
+            "a bookshop that only sells copies of books that have not been written yet"
+          ],
+          objects: [
+            "a letter postmarked forty years from now",
+            "a photograph with one figure carefully cut out",
+            "a key tagged with a date that has not happened",
+            "a ledger where the final page is always blank"
+          ],
+          pressures: [
+            "A stranger arrives asking questions no one in town will answer.",
+            "The narrator discovers their own name in a file marked closed.",
+            "A missing person’s belongings appear on the protagonist’s doorstep.",
+            "An old debt comes due, and the only witness has vanished."
+          ],
+          characters: [
+            { name: "Mara Voss", role: "a small-town archivist", background: "She has spent eleven years cataloguing other people’s secrets and has never once been asked about her own." },
+            { name: "Elias Wren", role: "a night porter with a perfect memory", background: "He remembers every guest who ever checked in, including the ones who never arrived." },
+            { name: "June Harrow", role: "a cartographer of forgotten places", background: "She maps towns that have been deliberately removed from the record, and keeps a private list of the people who asked her to." }
+          ]
+        },
+        fantasy: {
+          label: "Fantasy",
+          settings: [
+            "a mountain city where the bells ring only for people who are about to lie",
+            "a forest that rearranges itself every time a promise is broken",
+            "a floating market that appears for one hour every seven years",
+            "a kingdom where shadows are inherited like property"
+          ],
+          objects: [
+            "a compass that points toward whatever its owner fears most",
+            "a crown that grows heavier whenever its wearer tells the truth",
+            "a door that opens only for someone who has been forgotten",
+            "a map drawn in a language that changes overnight"
+          ],
+          pressures: [
+            "The apprentice discovers the spell they were taught is a binding.",
+            "A debt to the old powers must be paid before the next moon.",
+            "The rightful heir returns, but no one remembers the bloodline.",
+            "A forbidden name is spoken aloud in the market square."
+          ],
+          characters: [
+            { name: "Sable Renn", role: "an apprentice mapmaker", background: "She can draw places that do not exist yet, and one of them is starting to draw back." },
+            { name: "Corin Vale", role: "a disgraced bell-ringer", background: "He was exiled for ringing a bell that had not been cast, and the sound still follows him." },
+            { name: "Tamsin Orr", role: "a keeper of borrowed shadows", background: "She rents out other people’s shadows by the hour and has never lost one — until now." }
+          ]
+        },
+        "science-fiction": {
+          label: "Science fiction",
+          settings: [
+            "a generation ship where the stars have been replaced by a painted ceiling",
+            "a research station orbiting a planet that sends back its own memories",
+            "a city where every citizen is assigned a different version of yesterday",
+            "a colony that receives radio messages from its own future"
+          ],
+          objects: [
+            "a memory drive labeled with tomorrow’s date",
+            "a door that opens only when the building dreams",
+            "a child’s drawing of a machine that has not been invented",
+            "a signal that repeats a voice the crew recognizes"
+          ],
+          pressures: [
+            "The system begins correcting memories that do not match the official record.",
+            "A routine scan finds a second heartbeat inside the ship’s walls.",
+            "The crew receives an evacuation order signed by someone not yet born.",
+            "An experiment succeeds, and the result is a person who remembers dying."
+          ],
+          characters: [
+            { name: "Dr. Imani Cole", role: "a shipboard archivist", background: "She maintains the official history of the voyage and has begun keeping a second, unauthorized one." },
+            { name: "Rafe Okonkwo", role: "a maintenance engineer", background: "He talks to the ship’s systems the way other people talk to old friends, and lately they have started answering." },
+            { name: "Sena Vale", role: "a xenolinguist", background: "She was hired to translate an alien signal and discovered it was a lullaby in her mother’s voice." }
+          ]
+        },
+        romance: {
+          label: "Romance",
+          settings: [
+            "a coastal town during the last week of the summer festival",
+            "a bookshop that hosts a weekly repair café for broken objects and broken hearts",
+            "a train compartment shared by two strangers on the same overnight route",
+            "a community garden where rival neighbors keep meeting at midnight"
+          ],
+          objects: [
+            "a recipe card with two different hands writing the same instructions",
+            "a borrowed coat that still smells like someone else’s winter",
+            "a mixtape labeled with a date neither of them remembers",
+            "a wedding invitation addressed to both of them"
+          ],
+          pressures: [
+            "A fake arrangement becomes real at exactly the wrong moment.",
+            "An old promise resurfaces just as a new one is about to be made.",
+            "Two people keep meeting by accident in a town too small for accidents.",
+            "A letter meant for someone else changes the course of a summer."
+          ],
+          characters: [
+            { name: "Nora Bell", role: "a baker who restores old recipes", background: "She can recreate any dish from a handwritten card, except the one her grandmother refused to write down." },
+            { name: "Theo Marsh", role: "a traveling piano tuner", background: "He fixes instruments in towns he plans to leave, and has never stayed long enough to hear one played properly." },
+            { name: "Priya Sen", role: "a wedding photographer", background: "She documents other people’s happiest days and keeps a private album of moments that almost happened." }
+          ]
+        },
+        horror: {
+          label: "Gothic horror",
+          settings: [
+            "a manor where the portraits are repainted every time a guest arrives",
+            "a fog-bound village that rings its church bell for the living and the dead alike",
+            "a sanatorium built into a cliff, where the sea can be heard speaking",
+            "a house that adds a room whenever someone tells a lie"
+          ],
+          objects: [
+            "a mirror that reflects the room as it was a century ago",
+            "a music box that plays a song no one living remembers",
+            "a guest book with fresh signatures in a room locked for decades",
+            "a photograph that develops a new figure each morning"
+          ],
+          pressures: [
+            "The house begins returning objects that were buried with their owners.",
+            "A guest checks in and is recognized by someone who died last winter.",
+            "The narrator hears their own voice begging from the cellar.",
+            "Every clock in the house stops at the same minute, every night."
+          ],
+          characters: [
+            { name: "Lenore Ash", role: "a restorer of antique clocks", background: "She was hired to repair a clock that has never needed repair, and it has begun keeping time for someone else." },
+            { name: "Silas Crowe", role: "a former groundskeeper", background: "He left the estate after finding a door in the hedge that was not there the day before." },
+            { name: "Agnes Thorne", role: "a medium who no longer believes", background: "She stopped taking clients after a session went wrong, but the house has been sending invitations in her own handwriting." }
+          ]
+        },
+        historical: {
+          label: "Historical fiction",
+          settings: [
+            "a 1920s harbor town where the tide brings in more than driftwood",
+            "a wartime railway station where departures are announced twice",
+            "a 1960s factory town on the last day before the mill closes",
+            "a rural post office during the first winter of a new century"
+          ],
+          objects: [
+            "a bundle of letters tied with a shoelace",
+            "a photograph with a date scratched out",
+            "a pocket watch that runs backward",
+            "a ration book with one extra name"
+          ],
+          pressures: [
+            "A family secret surfaces just as the town prepares to celebrate.",
+            "A stranger arrives with news that contradicts the official story.",
+            "A routine inspection uncovers something hidden in plain sight.",
+            "A letter arrives decades late and changes an inheritance."
+          ],
+          characters: [
+            { name: "Ada Finch", role: "a telegraph operator", background: "She has sent thousands of messages and kept every one that was never meant to be read." },
+            { name: "Walter Pike", role: "a mill bookkeeper", background: "He knows the true numbers behind the town’s prosperity and has been quietly correcting them for years." },
+            { name: "Rosa Lind", role: "a seamstress with a traveling clientele", background: "She carries letters between villages because the official post is watched, and she has never opened one." }
+          ]
+        },
+        "magical-realism": {
+          label: "Magical realism",
+          settings: [
+            "a town where it rains only when someone tells the truth",
+            "a family home where the furniture rearranges itself around grief",
+            "a market where memories are sold by weight",
+            "a street where every house contains a different decade"
+          ],
+          objects: [
+            "a jar of buttons that hums when a lie is told nearby",
+            "a mirror that shows the room as it will look after the funeral",
+            "a recipe that tastes like a specific summer",
+            "a key that fits every door except the one it belongs to"
+          ],
+          pressures: [
+            "The town begins to forget a person who is still alive.",
+            "A family recipe starts producing memories instead of meals.",
+            "A stranger arrives with a suitcase full of other people’s dreams.",
+            "The narrator’s shadow begins leaving the house without them."
+          ],
+          characters: [
+            { name: "Ines Marlow", role: "a baker whose bread remembers", background: "Every loaf she makes carries a memory of someone who ate it, and lately the memories are not her own." },
+            { name: "Beto Salas", role: "a repairer of broken clocks", background: "He can fix any mechanism except the one in his own chest, which has been running slow since his brother left." },
+            { name: "Mina Okafor", role: "a postmistress in a town that receives letters from itself", background: "She sorts the mail by the year it was written, and one envelope is addressed to her as a child." }
+          ]
+        }
+      };
+
+      const moods = {
+        wistful: {
+          label: "Wistful",
+          openers: [
+            "The rain had been falling for three days, and the town had begun to speak in the past tense.",
+            "She kept the light on long after the last ferry, the way her mother used to.",
+            "There are places that remember you better than you remember yourself."
+          ],
+          twists: [
+            "The person they are waiting for has been dead for years, but the letters keep arriving in their handwriting.",
+            "The object they have been protecting is the only proof that the town ever existed.",
+            "The memory they trust most turns out to belong to someone else."
+          ]
+        },
+        tense: {
+          label: "Tense",
+          openers: [
+            "The clock on the wall had been wrong for a week, and no one had dared to fix it.",
+            "There were two sets of footprints in the snow, and only one set had been made tonight.",
+            "The door was locked from the inside, which meant someone was still in the room."
+          ],
+          twists: [
+            "The person they trust most has been reporting every move to the other side.",
+            "The deadline they are racing toward was set by someone who wants them to fail.",
+            "The evidence they need is hidden in the one place they swore never to return."
+          ]
+        },
+        hopeful: {
+          label: "Hopeful",
+          openers: [
+            "The first green shoot appeared in the crack of the pavement, and the whole street stopped to look.",
+            "She had packed light, which was its own kind of optimism.",
+            "The letter said there was still time, and for once she believed it."
+          ],
+          twists: [
+            "The rescue they are waiting for is already here, but it needs their help to succeed.",
+            "The thing they thought was lost has been kept safe by someone they wronged.",
+            "The new beginning requires them to forgive the person who caused the ending."
+          ]
+        },
+        eerie: {
+          label: "Eerie",
+          openers: [
+            "The house was quiet in the way a held breath is quiet.",
+            "Every clock in the village had stopped at the same minute, and the birds had noticed.",
+            "The fog came in from the sea and did not leave when the wind changed."
+          ],
+          twists: [
+            "The voice they have been hearing is their own, recorded before they were born.",
+            "The house has been waiting for them to notice the room that was never on the plans.",
+            "The person they are looking for has been leaving signs for years, and the signs are getting closer."
+          ]
+        },
+        romantic: {
+          label: "Romantic",
+          openers: [
+            "They had agreed to meet at the station, though neither of them had said why.",
+            "The song playing in the café was the one from the summer everything changed.",
+            "She had rehearsed the sentence a hundred times, and now the moment had arrived without her."
+          ],
+          twists: [
+            "The person they are falling for is the one who left the letter they never answered.",
+            "The arrangement was supposed to be temporary, but the town has other plans.",
+            "The truth they have been hiding is the exact reason the other person came back."
+          ]
+        },
+        wry: {
+          label: "Wry",
+          openers: [
+            "The apocalypse had been scheduled for Tuesday, which was inconvenient because she had a dentist appointment.",
+            "He had inherited a haunted house, a mortgage, and a ghost with strong opinions about the wallpaper.",
+            "The town council had voted to ban prophecy, effective immediately, which was a shame because the prophecy had already been printed."
+          ],
+          twists: [
+            "The ghost turns out to be the only reliable witness, and also the prime suspect.",
+            "The prophecy was a clerical error, but the town has already built the monument.",
+            "The person sent to stop the disaster is the one who accidentally caused it."
+          ]
+        }
+      };
+
+      const lengthSettings = {
+        short: { label: "Short", extra: false },
+        medium: { label: "Medium", extra: true },
+        long: { label: "Long", extra: true }
+      };
+
+      const state = {
+        mood: "wistful",
+        length: "medium",
+        current: null,
+        saved: [],
+        lastSignature: ""
+      };
+
+      const form = document.getElementById("prompt-form");
+      const genreSelect = document.getElementById("genre");
+      const resultContent = document.getElementById("result-content");
+      const resultStatus = document.getElementById("result-status");
+      const errorBox = document.getElementById("error-box");
+      const errorMessage = document.getElementById("error-message");
+      const libraryGrid = document.getElementById("library-grid");
+      const libraryEmpty = document.getElementById("library-empty");
+      const toast = document.getElementById("toast");
+      const moodButtons = Array.from(document.querySelectorAll(".mood-button"));
+      const lengthButtons = Array.from(document.querySelectorAll(".length-button"));
+      const storageKey = "story-prompt-generator-saved-v1";
+
+      let toastTimer;
+
+      function showToast(message) {
+        window.clearTimeout(toastTimer);
+        toast.textContent = message;
+        toast.classList.add("show");
+        toastTimer = window.setTimeout(() => toast.classList.remove("show"), 2600);
+      }
+
+      function setStatus(message) {
+        resultStatus.textContent = message;
+      }
+
+      function hideError() {
+        errorBox.hidden = true;
+        errorMessage.textContent = "Please try generating again.";
+      }
+
+      function showError(message) {
+        errorMessage.textContent = message;
+        errorBox.hidden = false;
+      }
+
+      function pick(list) {
+        return list[Math.floor(Math.random() * list.length)];
+      }
+
+      function pickDifferent(list, previous) {
+        if (list.length < 2) return list[0];
+        let choice = pick(list);
+        let guard = 0;
+        while (choice === previous && guard < 8) {
+          choice = pick(list);
+          guard += 1;
+        }
+        return choice;
+      }
+
+      function resolveGenre(value) {
+        if (value === "surprise") {
+          const keys = Object.keys(genres);
+          return keys[Math.floor(Math.random() * keys.length)];
+        }
+        return genres[value] ? value : "literary-mystery";
+      }
+
+      function buildSeed() {
+        const genreKey = resolveGenre(genreSelect.value);
+        const genre = genres[genreKey];
+        const mood = moods[state.mood];
+        const length = lengthSettings[state.length];
+        const character = pick(genre.characters);
+        const setting = pick(genre.settings);
+        const object = pick(genre.objects);
+        const pressure = pick(genre.pressures);
+        const opener = pick(mood.openers);
+        const twist = pick(mood.twists);
+
+        const plot = state.length === "short"
+          ? `${opener} ${pressure}`
+          : `${opener} ${pressure} The only clue is ${object}, and it should not exist here.`;
+
+        const background = state.length === "short"
+          ? `${character.name} is ${character.role}. ${character.background}`
+          : `${character.name} is ${character.role}. ${character.background} Lately, the work has started to feel less like a job and more like a warning.`;
+
+        const extra = length.extra
+          ? ` The story should be set in ${setting}, where the ordinary rules have begun to bend.`
+          : "";
+
+        return {
+          id: `${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
+          genreKey,
+          genreLabel: genre.label,
+          moodKey: state.mood,
+          moodLabel: mood.label,
+          lengthKey: state.length,
+          lengthLabel: length.label,
+          title: buildTitle(genre, mood, character),
+          plot: plot + extra,
+          character: background,
+          twist,
+          setting,
+          object,
+          createdAt: new Date().toISOString()
+        };
+      }
+
+      function buildTitle(genre, mood, character) {
+        const titles = {
+          "literary-mystery": ["The Town That Kept Two Sets of Books", "A Map of Nowhere", "The Last Guest at the Seaside Hotel"],
+          fantasy: ["The Bell That Rang for Liars", "A Crown of Borrowed Shadows", "The Door That Opens for the Forgotten"],
+          "science-fiction": ["The Ship That Remembered Tomorrow", "A Signal in My Mother’s Voice", "The Second Heartbeat"],
+          romance: ["The Summer We Agreed to Leave", "A Recipe for Almost", "The Last Train to Somewhere"],
+          horror: ["The House Adds a Room", "A Portrait Repainted at Midnight", "The Guest Who Never Left"],
+          historical: ["The Letters We Never Sent", "The Last Day at the Mill", "A Pocket Watch Running Backward"],
+          "magical-realism": ["The Town Where It Rains Truth", "A Jar of Borrowed Memories", "The Street That Keeps Changing"]
+        };
+        const pool = titles[genre === undefined ? "literary-mystery" : Object.keys(genres).find(key => genres[key] === genre)] || titles["literary-mystery"];
+        const base = pick(pool);
+        if (mood.label === "Wry") return `${base} (and Other Inconveniences)`;
+        if (mood.label === "Eerie") return `${base}, After Midnight`;
+        return base;
+      }
+
+      function escapeHTML(value) {
+        return String(value)
+          .replace(/&/g, "&amp;")
+          .replace(/</g, "&lt;")
+          .replace(/>/g, "&gt;")
+          .replace(/"/g, "&quot;")
+          .replace(/'/g, "&#039;");
+      }
+
+      function renderSeed(seed) {
+        state.current = seed;
+        hideError();
+        const isSaved = state.saved.some(item => item.id === seed.id);
+        resultContent.innerHTML = `
+          <div class="result-top">
+            <div>
+              <p class="result-kicker">Your story seed</p>
+              <h3 class="result-title">${escapeHTML(seed.title)}</h3>
+            </div>
+            <button class="save-button" type="button" id="save-current" aria-pressed="${isSaved}" aria-label="${isSaved ? "Remove this seed from saved seeds" : "Save this seed"}">
+              <svg viewBox="0 0 24 24" fill="${isSaved ? "currentColor" : "none"}" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 4h12v17l-6-4-6 4V4z"/></svg>
+            </button>
+          </div>
+          <div class="result-tags">
+            <span class="tag tag-genre">${escapeHTML(seed.genreLabel)}</span>
+            <span class="tag tag-mood">${escapeHTML(seed.moodLabel)}</span>
+            <span class="tag tag-length">${escapeHTML(seed.lengthLabel)} seed</span>
+          </div>
+          <div class="prompt-block">
+            <h3><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 5h16v14H4z"/><path d="M8 9h8M8 13h5"/></svg>Plot starter</h3>
+            <p>${escapeHTML(seed.plot)}</p>
+          </div>
+          <div class="prompt-block">
+            <h3><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="8" r="3.5"/><path d="M5 21c0-4 3-7 7-7s7 3 7 7"/></svg>Character background</h3>
+            <p>${escapeHTML(seed.character)}</p>
+          </div>
+          <div class="twist-box">
+            <h3><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3l2.2 6.8H21l-5.5 4 2.1 6.5-5.6-4-5.6 4 2.1-6.5L3 9.8h6.8L12 3z"/></svg>The unexpected turn</h3>
+            <p>${escapeHTML(seed.twist)}</p>
+          </div>
+          <div class="result-actions">
+            <button class="button button-secondary" type="button" id="copy-seed">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="8" y="8" width="12" height="12" rx="2"/><path d="M16 8V6a2 2 0 00-2-2H6a2 2 0 00-2 2v8a2 2 0 002 2h2"/></svg>
+              Copy seed
+            </button>
+            <button class="button button-coral" type="button" id="shuffle-seed">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 7h3c4 0 6 10 10 10h3"/><path d="M17 14l3 3-3 3"/><path d="M4 17h3c1.5 0 2.7-1.4 3.8-3.2"/><path d="M14 8.5c.9-1 1.9-1.5 3-1.5h3"/><path d="M17 4l3 3-3 3"/></svg>
+              Try another
+            </button>
+          </div>
+        `;
+        setStatus("Seed generated. Make it yours.");
+        const saveButton = document.getElementById("save-current");
+        if (saveButton) saveButton.addEventListener("click", toggleSaveCurrent);
+        const copyButton = document.getElementById("copy-seed");
+        if (copyButton) copyButton.addEventListener("click", copyCurrentSeed);
+        const shuffleButton = document.getElementById("shuffle-seed");
+        if (shuffleButton) shuffleButton.addEventListener("click", generateAndRender);
+      }
+
+      function generateAndRender() {
+        try {
+          hideError();
+          const seed = buildSeed();
+          const signature = `${seed.genreKey}|${seed.moodKey}|${seed.lengthKey}|${seed.title}|${seed.plot}`;
+          if (signature === state.lastSignature) {
+            const retry = buildSeed();
+            state.lastSignature = `${retry.genreKey}|${retry.moodKey}|${retry.lengthKey}|${retry.title}|${retry.plot}`;
+            renderSeed(retry);
+          } else {
+            state.lastSignature = signature;
+            renderSeed(seed);
+          }
+        } catch (error) {
+          showError("The generator could not assemble a seed. Please try again.");
+          setStatus("Generation failed. Your previous seed is still available.");
+        }
+      }
+
+      function toggleSaveCurrent() {
+        if (!state.current) return;
+        const index = state.saved.findIndex(item => item.id === state.current.id);
+        if (index >= 0) {
+          state.saved.splice(index, 1);
+          persistSaved();
+          renderLibrary();
+          renderSeed(state.current);
+          showToast("Seed removed from your shelf.");
+          setStatus("Seed removed from saved seeds.");
+        } else {
+          state.saved.unshift(state.current);
+          persistSaved();
+          renderLibrary();
+          renderSeed(state.current);
+          showToast("Seed saved to your shelf.");
+          setStatus("Seed saved. Find it in Saved seeds below.");
+        }
+      }
+
+      function persistSaved() {
+        try {
+          window.localStorage.setItem(storageKey, JSON.stringify(state.saved.slice(0, 12)));
+        } catch (error) {
+          showToast("Saved for this session only — browser storage is unavailable.");
+        }
+      }
+
+      function loadSaved() {
+        try {
+          const raw = window.localStorage.getItem(storageKey);
+          if (!raw) return;
+          const parsed = JSON.parse(raw);
+          if (Array.isArray(parsed)) {
+            state.saved = parsed.filter(item => item && typeof item.id === "string" && typeof item.title === "string").slice(0, 12);
+          }
+        } catch (error) {
+          state.saved = [];
+        }
+      }
+
+      function renderLibrary() {
+        libraryGrid.innerHTML = "";
+        if (!state.saved.length) {
+          libraryEmpty.hidden = false;
+          libraryGrid.hidden = true;
+          return;
+        }
+        libraryEmpty.hidden = true;
+        libraryGrid.hidden = false;
+        state.saved.forEach((seed, index) => {
+          const card = document.createElement("article");
+          card.className = "library-card";
+          card.innerHTML = `
+            <span class="card-index">Seed ${String(index + 1).padStart(2, "0")} · ${escapeHTML(seed.genreLabel || "Story")}</span>
+            <h3>${escapeHTML(seed.title)}</h3>
+            <p>${escapeHTML(seed.moodLabel || "A story seed")} · ${escapeHTML(seed.lengthLabel || "Medium")} · ${escapeHTML(seed.character || "")}</p>
+            <button type="button" data-seed-id="${escapeHTML(seed.id)}">Open in studio</button>
+          `;
+          const openButton = card.querySelector("button");
+          openButton.addEventListener("click", () => {
+            renderSeed(seed);
+            document.getElementById("studio").scrollIntoView({ behavior: "smooth", block: "start" });
+            setStatus("Saved seed opened in the studio.");
+          });
+          libraryGrid.appendChild(card);
+        });
+      }
+
+      async function copyCurrentSeed() {
+        if (!state.current) return;
+        const seed = state.current;
+        const text = `${seed.title}\n\n${seed.genreLabel} · ${seed.moodLabel} · ${seed.lengthLabel}\n\nPlot starter: ${seed.plot}\n\nCharacter background: ${seed.character}\n\nUnexpected turn: ${seed.twist}`;
+        try {
+          if (navigator.clipboard && window.isSecureContext) {
+            await navigator.clipboard.writeText(text);
+          } else {
+            const area = document.createElement("textarea");
+            area.value = text;
+            area.setAttribute("readonly", "");
+            area.style.position = "fixed";
+            area.style.opacity = "0";
+            document.body.appendChild(area);
+            area.select();
+            const copied = document.execCommand("copy");
+            document.body.removeChild(area);
+            if (!copied) throw new Error("Copy command failed");
+          }
+          showToast("Seed copied to clipboard.");
+          setStatus("Seed copied. Paste it into your notebook.");
+        } catch (error) {
+          showToast("Copy is unavailable in this browser. Select the text to copy it.");
+          setStatus("Copy failed. You can select the seed text manually.");
+        }
+      }
+
+      moodButtons.forEach(button => {
+        button.addEventListener("click", () => {
+          state.mood = button.dataset.mood;
+          moodButtons.forEach(item => item.setAttribute("aria-pressed", String(item === button)));
+        });
+      });
+
+      lengthButtons.forEach(button => {
+        button.addEventListener("click", () => {
+          state.length = button.dataset.length;
+          lengthButtons.forEach(item => item.setAttribute("aria-pressed", String(item === button)));
+        });
+      });
+
+      form.addEventListener("submit", event => {
+        event.preventDefault();
+        generateAndRender();
+      });
+
+      loadSaved();
+      renderLibrary();
+    })();
+  </script>
+</body>
+</html>
