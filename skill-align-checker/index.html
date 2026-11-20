@@ -1,0 +1,807 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Skill Align Checker — Bridge Your Skills to a New Career</title>
+  <style>
+    :root {
+      --bg: #FAF9F6;
+      --surface: #FFFFFF;
+      --text: #1A1A2E;
+      --text-secondary: #5A5A72;
+      --border: #E8E6E1;
+      --primary: #2D3142;
+      --primary-hover: #20233A;
+      --accent: #E07B3C;
+      --accent-soft: #FDE8D7;
+      --match: #3D8B6A;
+      --match-soft: #D4EDE6;
+      --gap: #C9553B;
+      --gap-soft: #FDE8E0;
+      --info: #4A6FA5;
+      --info-soft: #E3EBF5;
+      --radius: 10px;
+      --shadow: 0 1px 3px rgba(26,26,46,0.06), 0 1px 2px rgba(26,26,46,0.04);
+      --shadow-lg: 0 8px 30px rgba(26,26,46,0.08);
+      --font: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+      --mono: "SF Mono", "Fira Code", "Fira Mono", Menlo, Consolas, monospace;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: var(--font);
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.6;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    a { color: inherit; text-decoration: none; }
+
+    .container {
+      max-width: 1080px;
+      margin: 0 auto;
+      padding: 0 24px;
+    }
+
+    /* ── Header ── */
+    header {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      background: rgba(250, 249, 246, 0.85);
+      backdrop-filter: blur(10px);
+      border-bottom: 1px solid var(--border);
+    }
+    .header-inner {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      height: 60px;
+    }
+    .logo {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-weight: 700;
+      font-size: 18px;
+      color: var(--text);
+    }
+    .logo-mark {
+      width: 32px;
+      height: 32px;
+      background: var(--primary);
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #fff;
+      font-size: 16px;
+    }
+    .nav-links {
+      display: flex;
+      gap: 28px;
+      list-style: none;
+    }
+    .nav-links a {
+      font-size: 14px;
+      color: var(--text-secondary);
+      font-weight: 500;
+      transition: color 0.15s;
+    }
+    .nav-links a:hover { color: var(--text); }
+    .nav-cta {
+      background: var(--primary);
+      color: #fff !important;
+      padding: 8px 18px;
+      border-radius: 6px;
+      font-weight: 600;
+      transition: background 0.15s;
+    }
+    .nav-cta:hover { background: var(--primary-hover); }
+
+    @media (max-width: 640px) {
+      .nav-links { display: none; }
+    }
+
+    /* ── Hero ── */
+    .hero {
+      padding: 56px 0 40px;
+    }
+    .hero-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 48px;
+      align-items: center;
+    }
+    .hero-eyebrow {
+      display: inline-block;
+      font-size: 13px;
+      font-weight: 600;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      color: var(--accent);
+      background: var(--accent-soft);
+      padding: 4px 12px;
+      border-radius: 20px;
+      margin-bottom: 20px;
+    }
+    .hero h1 {
+      font-size: 40px;
+      font-weight: 800;
+      line-height: 1.15;
+      letter-spacing: -0.02em;
+      margin-bottom: 16px;
+    }
+    .hero h1 span { color: var(--accent); }
+    .hero p {
+      font-size: 17px;
+      color: var(--text-secondary);
+      margin-bottom: 28px;
+      max-width: 480px;
+    }
+    .hero-stats {
+      display: flex;
+      gap: 32px;
+      margin-top: 8px;
+    }
+    .hero-stats div strong {
+      display: block;
+      font-size: 24px;
+      font-weight: 700;
+      color: var(--text);
+    }
+    .hero-stats div span {
+      font-size: 13px;
+      color: var(--text-secondary);
+    }
+
+    @media (max-width: 860px) {
+      .hero-grid { grid-template-columns: 1fr; gap: 32px; }
+      .hero h1 { font-size: 30px; }
+    }
+
+    /* ── Tool Panel ── */
+    .tool-panel {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      box-shadow: var(--shadow-lg);
+      overflow: hidden;
+    }
+    .tool-header {
+      padding: 18px 22px;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .tool-header .dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background: #E07B3C;
+    }
+    .tool-header .dot:nth-child(2) { background: #E0C03C; margin-left: -4px; }
+    .tool-header .dot:nth-child(3) { background: #3D8B6A; margin-left: -4px; }
+    .tool-header span {
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--text-secondary);
+      margin-left: 8px;
+    }
+    .tool-body { padding: 22px; }
+
+    .field { margin-bottom: 18px; }
+    .field label {
+      display: block;
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text);
+      margin-bottom: 6px;
+    }
+    .field label .hint {
+      font-weight: 400;
+      color: var(--text-secondary);
+      margin-left: 6px;
+    }
+    textarea, select {
+      width: 100%;
+      font-family: var(--font);
+      font-size: 14px;
+      color: var(--text);
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 11px 14px;
+      transition: border-color 0.15s, box-shadow 0.15s;
+      resize: vertical;
+    }
+    textarea:focus, select:focus {
+      outline: none;
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px var(--accent-soft);
+    }
+    textarea { min-height: 80px; line-height: 1.5; }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      font-family: var(--font);
+      font-size: 14px;
+      font-weight: 600;
+      padding: 11px 24px;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: background 0.15s, transform 0.1s;
+      color: #fff;
+      background: var(--primary);
+    }
+    .btn:hover { background: var(--primary-hover); }
+    .btn:active { transform: scale(0.98); }
+    .btn:disabled { background: #B0B0BE; cursor: not-allowed; }
+    .btn-block { width: 100%; }
+
+    /* ── Results ── */
+    .results { margin-top: 22px; display: none; }
+    .results.active { display: block; animation: fadeUp 0.4s ease; }
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(12px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .result-summary {
+      display: flex;
+      gap: 12px;
+      margin-bottom: 20px;
+    }
+    .stat-card {
+      flex: 1;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 14px 16px;
+      text-align: center;
+    }
+    .stat-card .num {
+      font-size: 22px;
+      font-weight: 700;
+      line-height: 1;
+      margin-bottom: 4px;
+    }
+    .stat-card.match .num { color: var(--match); }
+    .stat-card.gap .num { color: var(--gap); }
+    .stat-card.need .num { color: var(--info); }
+    .stat-card .label { font-size: 12px; color: var(--text-secondary); }
+
+    .result-section { margin-bottom: 18px; }
+    .result-section h3 {
+      font-size: 14px;
+      font-weight: 700;
+      margin-bottom: 10px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .result-section h3 .badge {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      display: inline-block;
+    }
+    .match-list .badge { background: var(--match); }
+    .gap-list .badge { background: var(--gap); }
+    .rec-list .badge { background: var(--info); }
+
+    .skill-tags { display: flex; flex-wrap: wrap; gap: 8px; }
+    .skill-tag {
+      font-family: var(--mono);
+      font-size: 13px;
+      padding: 6px 12px;
+      border-radius: 6px;
+      font-weight: 500;
+    }
+    .skill-tag.match {
+      background: var(--match-soft);
+      color: var(--match);
+      border: 1px solid #A8D5C8;
+    }
+    .skill-tag.gap {
+      background: var(--gap-soft);
+      color: var(--gap);
+      border: 1px solid #E8B4A8;
+    }
+    .skill-tag.rec {
+      background: var(--info-soft);
+      color: var(--info);
+      border: 1px solid #B8C8E8;
+    }
+
+    .rec-cards { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+    @media (max-width: 520px) { .rec-cards { grid-template-columns: 1fr; } }
+    .rec-card {
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 12px 14px;
+      font-size: 13px;
+    }
+    .rec-card strong { color: var(--text); display: block; margin-bottom: 2px; }
+    .rec-card span { color: var(--text-secondary); }
+
+    .empty-state {
+      text-align: center;
+      padding: 32px 16px;
+      color: var(--text-secondary);
+      font-size: 14px;
+    }
+    .empty-state svg { margin-bottom: 10px; opacity: 0.4; }
+
+    .error-msg {
+      display: none;
+      background: var(--gap-soft);
+      color: var(--gap);
+      font-size: 13px;
+      padding: 10px 14px;
+      border-radius: 8px;
+      margin-top: 10px;
+      border: 1px solid #E8B4A8;
+    }
+    .error-msg.active { display: block; }
+
+    /* ── How It Works ── */
+    .how-section {
+      padding: 72px 0 56px;
+      border-top: 1px solid var(--border);
+      margin-top: 64px;
+    }
+    .section-title {
+      text-align: center;
+      font-size: 28px;
+      font-weight: 700;
+      margin-bottom: 8px;
+      letter-spacing: -0.01em;
+    }
+    .section-sub {
+      text-align: center;
+      color: var(--text-secondary);
+      margin-bottom: 40px;
+      font-size: 16px;
+    }
+    .steps {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 24px;
+    }
+    .step {
+      text-align: center;
+      padding: 0 8px;
+    }
+    .step-num {
+      width: 44px;
+      height: 44px;
+      background: var(--primary);
+      color: #fff;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+      font-size: 18px;
+      margin: 0 auto 14px;
+    }
+    .step h4 { font-size: 16px; margin-bottom: 6px; }
+    .step p { font-size: 14px; color: var(--text-secondary); }
+
+    @media (max-width: 640px) {
+      .steps { grid-template-columns: 1fr; gap: 28px; }
+      .how-section { padding: 48px 0 40px; }
+    }
+
+    /* ── Footer ── */
+    footer {
+      border-top: 1px solid var(--border);
+      padding: 32px 0;
+      margin-top: 48px;
+    }
+    .footer-inner {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+    .footer-inner p { font-size: 13px; color: var(--text-secondary); }
+    .footer-credit { font-size: 12px; color: #9A9AB0; }
+
+    /* ── Utility ── */
+    .sr-only {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      padding: 0;
+      margin: -1px;
+      overflow: hidden;
+      clip: rect(0,0,0,0);
+      white-space: nowrap;
+      border: 0;
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ═══ Header ═══ -->
+  <header>
+    <div class="container header-inner">
+      <a href="#" class="logo" aria-label="Skill Align Checker home">
+        <span class="logo-mark">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+        </span>
+        Skill Align
+      </a>
+      <nav>
+        <ul class="nav-links">
+          <li><a href="#how">How It Works</a></li>
+          <li><a href="#tool" class="nav-cta">Check My Skills</a></li>
+        </ul>
+      </nav>
+    </div>
+  </header>
+
+  <!-- ═══ Hero + Tool ═══ -->
+  <section class="hero">
+    <div class="container hero-grid">
+      <!-- Left: Copy -->
+      <div>
+        <span class="hero-eyebrow">Career transition tool</span>
+        <h1>Find the gap between <span>who you are</span> and who you want to be.</h1>
+        <p>Paste the skills you already have, pick the role you're aiming for, and we'll show you exactly what's missing — with a learning path to close it.</p>
+        <div class="hero-stats">
+          <div><strong>5 min</strong><span>to complete</span></div>
+          <div><strong>Instant</strong><span>gap analysis</span></div>
+          <div><strong>Free</strong><span>no sign-up</span></div>
+        </div>
+      </div>
+
+      <!-- Right: Tool panel -->
+      <div id="tool">
+        <div class="tool-panel">
+          <div class="tool-header">
+            <span class="dot"></span>
+            <span class="dot"></span>
+            <span class="dot"></span>
+            <span>Skill Align Checker</span>
+          </div>
+          <div class="tool-body">
+            <div class="field">
+              <label for="skills-input">Your current skills <span class="hint">(comma-separated)</span></label>
+              <textarea id="skills-input" placeholder="e.g. Excel, Python, SQL, Project Management, Communication" aria-describedby="skills-hint"></textarea>
+              <div id="skills-hint" class="sr-only">Enter the skills you currently have, separated by commas</div>
+            </div>
+
+            <div class="field">
+              <label for="job-select">Target role</label>
+              <select id="job-select" aria-label="Select target job role">
+                <option value="">— Choose a role —</option>
+                <option value="frontend">Frontend Developer</option>
+                <option value="data">Data Analyst</option>
+                <option value="product">Product Manager</option>
+                <option value="marketing">Digital Marketer</option>
+                <option value="ux">UX Designer</option>
+              </select>
+            </div>
+
+            <button class="btn btn-block" id="analyze-btn" disabled>Analyze My Skills</button>
+            <div id="error-msg" class="error-msg" role="alert"></div>
+
+            <!-- Results -->
+            <div class="results" id="results" role="status" aria-live="polite">
+              <div class="result-summary">
+                <div class="stat-card match">
+                  <div class="num" id="stat-match">0</div>
+                  <div class="label">Matched</div>
+                </div>
+                <div class="stat-card gap">
+                  <div class="num" id="stat-gap">0</div>
+                  <div class="label">Gaps</div>
+                </div>
+                <div class="stat-card need">
+                  <div class="num" id="stat-need">0</div>
+                  <div class="label">To learn</div>
+                </div>
+              </div>
+
+              <div class="result-section match-list">
+                <h3><span class="badge"></span> Matched skills</h3>
+                <div class="skill-tags" id="matched-tags"></div>
+              </div>
+
+              <div class="result-section gap-list">
+                <h3><span class="badge"></span> Skill gaps</h3>
+                <div class="skill-tags" id="gap-tags"></div>
+              </div>
+
+              <div class="result-section rec-list">
+                <h3><span class="badge"></span> Recommended learning path</h3>
+                <div class="rec-cards" id="rec-cards"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══ How It Works ═══ -->
+  <section class="how-section" id="how">
+    <div class="container">
+      <h2 class="section-title">How Skill Align works</h2>
+      <p class="section-sub">Three steps from "I'm not sure where I fit" to "Here's my roadmap."</p>
+      <div class="steps">
+        <div class="step">
+          <div class="step-num">1</div>
+          <h4>List what you know</h4>
+          <p>Type every skill you have — hard or soft, tools or traits. The more honest you are, the better the match.</p>
+        </div>
+        <div class="step">
+          <div class="step-num">2</div>
+          <h4>Pick your target</h4>
+          <p>Select the role you want to move into. We compare against real-world requirements for that position.</p>
+        </div>
+        <div class="step">
+          <div class="step-num">3</div>
+          <h4>Close the gaps</h4>
+          <p>Get a clear list of what's missing and curated resources to learn each one — starting today.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══ Footer ═══ -->
+  <footer>
+    <div class="container footer-inner">
+      <p>© 2026 Skill Align Checker · Built for career changers, by career changers.</p>
+      <p class="footer-credit">Made with Daily AI Website Factory</p>
+    </div>
+  </footer>
+
+  <script>
+    /* ── Job profiles ── */
+    const JOB_PROFILES = {
+      frontend: {
+        name: "Frontend Developer",
+        required: ["HTML", "CSS", "JavaScript", "React", "Git", "Responsive Design", "Browser DevTools"],
+        recommendations: {
+          "HTML": { title: "Learn HTML & CSS", resource: "MDN Web Docs — free, reference-grade" },
+          "CSS": { title: "Master CSS Layouts", resource: "CSS-Tricks guides and Flexbox/Grid articles" },
+          "JavaScript": { title: "JavaScript Fundamentals", resource: "freeCodeCamp — interactive curriculum" },
+          "React": { title: "Get Started with React", resource: "React official tutorial (react.dev)" },
+          "Git": { title: "Version Control Basics", resource: "Pro Git Book — free online" },
+          "Responsive Design": { title: "Responsive Web Design", resource: "CSS-Tricks — mobile-first patterns" },
+          "Browser DevTools": { title: "DevTools Workbench", resource: "Chrome Developers site — debugging guide" }
+        }
+      },
+      data: {
+        name: "Data Analyst",
+        required: ["SQL", "Excel", "Python", "Data Visualization", "Statistics", "Data Cleaning", "Tableau or Power BI"],
+        recommendations: {
+          "SQL": { title: "SQL for Data Analysis", resource: "Mode Analytics SQL tutorial" },
+          "Excel": { title: "Excel for Analysts", resource: "Microsoft Learn — free modules" },
+          "Python": { title: "Python for Data Science", resource: "DataCamp — introductory track" },
+          "Data Visualization": { title: "Storytelling with Data", resource: "Storytelling with Data book + blog" },
+          "Statistics": { title: "Stats Fundamentals", resource: "Khan Academy — statistics & probability" },
+          "Data Cleaning": { title: "Data Wrangling", resource: "DataCamp — pandas & cleaning track" },
+          "Tableau or Power BI": { title: "Choose Your BI Tool", resource: "Tableau Public / Microsoft Learn for Power BI" }
+        }
+      },
+      product: {
+        name: "Product Manager",
+        required: ["Product Strategy", "User Research", "Data Analysis", "Roadmapping", "Stakeholder Management", "Agile", "Wireframing"],
+        recommendations: {
+          "Product Strategy": { title: "Product Strategy Foundations", resource: "Reforge — strategy course" },
+          "User Research": { title: "User Research Methods", resource: "Nielsen Norman Group — research reports" },
+          "Data Analysis": { title: "Analytics for PMs", resource: "Mixpanel / Amplitude academy" },
+          "Roadmapping": { title: "Prioritization Frameworks", resource: "Product School — free lessons" },
+          "Stakeholder Management": { title: "Influence Without Authority", resource: "LinkedIn Learning — communication" },
+          "Agile": { title: "Agile & Scrum Basics", resource: "Scrum.org — free guide" },
+          "Wireframing": { title: "Low-Fidelity Wireframes", resource: "Balsamiq / Figma — free tiers" }
+        }
+      },
+      marketing: {
+        name: "Digital Marketer",
+        required: ["SEO", "Content Marketing", "Google Analytics", "Social Media Strategy", "Email Marketing", "Copywriting", "PPC Advertising"],
+        recommendations: {
+          "SEO": { title: "SEO Fundamentals", resource: "Google Digital Garage — free certification" },
+          "Content Marketing": { title: "Content Strategy", resource: "HubSpot Academy — content marketing" },
+          "Google Analytics": { title: "Google Analytics 4", resource: "Google Skillshop — free courses" },
+          "Social Media Strategy": { title: "Social Media Planning", resource: "Hootsuite Academy — free modules" },
+          "Email Marketing": { title: "Email Marketing Essentials", resource: "Mailchimp Academy — free guides" },
+          "Copywriting": { title: "Copywriting Basics", resource: "Copyblogger — free articles & courses" },
+          "PPC Advertising": { title: "Google Ads Essentials", resource: "Google Skillshop — PPC certification" }
+        }
+      },
+      ux: {
+        name: "UX Designer",
+        required: ["User Research", "Wireframing", "Prototyping", "Visual Design", "Usability Testing", "Design Thinking", "Figma"],
+        recommendations: {
+          "User Research": { title: "Conduct User Interviews", resource: "Nielsen Norman Group — research" },
+          "Wireframing": { title: "Wireframe & Sketch", resource: "Figma community — free templates" },
+          "Prototyping": { title: "Interactive Prototypes", resource: "Figma / Adobe XD — official tutorials" },
+          "Visual Design": { title: "UI Design Principles", resource: "Design Systems 101 — free course" },
+          "Usability Testing": { title: "Run Usability Tests", resource: "Nielsen Norman Group — testing guide" },
+          "Design Thinking": { title: "Design Thinking Process", resource: "IDEO Design Kit — free resources" },
+          "Figma": { title: "Learn Figma", resource: "Figma YouTube channel — beginner playlist" }
+        }
+      }
+    };
+
+    /* ── Elements ── */
+    const skillsInput = document.getElementById('skills-input');
+    const jobSelect   = document.getElementById('job-select');
+    const analyzeBtn  = document.getElementById('analyze-btn');
+    const errorBox    = document.getElementById('error-msg');
+    const resultsEl   = document.getElementById('results');
+    const matchedEl   = document.getElementById('matched-tags');
+    const gapEl       = document.getElementById('gap-tags');
+    const recEl       = document.getElementById('rec-cards');
+    const statMatch   = document.getElementById('stat-match');
+    const statGap     = document.getElementById('stat-gap');
+    const statNeed    = document.getElementById('stat-need');
+
+    /* ── Enable button when both fields have content ── */
+    function checkReady() {
+      const hasSkills = skillsInput.value.trim().length > 0;
+      const hasJob = jobSelect.value.length > 0;
+      analyzeBtn.disabled = !(hasSkills && hasJob);
+    }
+    skillsInput.addEventListener('input', checkReady);
+    jobSelect.addEventListener('change', checkReady);
+
+    /* ── Normalize helper ── */
+    function norm(s) {
+      return s.trim().toLowerCase().replace(/[^a-z0-9\s]/g, '');
+    }
+
+    /* ── Fuzzy match: check if a user skill maps to a required skill ── */
+    function skillMatches(userSkill, requiredSkill) {
+      const u = norm(userSkill);
+      const r = norm(requiredSkill);
+      if (u === r) return true;
+      // Allow substring match in either direction for compound terms
+      if (u.includes(r) || r.includes(u)) return true;
+      // Handle "Tableau or Power BI" style requirements
+      const alts = r.split(' or ');
+      return alts.some(alt => u.includes(alt.trim()) || alt.trim().includes(u));
+    }
+
+    /* ── Analyze ── */
+    analyzeBtn.addEventListener('click', function () {
+      errorBox.classList.remove('active');
+      errorBox.textContent = '';
+
+      const rawSkills = skillsInput.value.trim();
+      if (!rawSkills) {
+        showError('Please enter at least one skill.');
+        return;
+      }
+      const userSkills = rawSkills.split(',').map(s => s.trim()).filter(Boolean);
+      if (userSkills.length === 0) {
+        showError('No valid skills found. Try comma-separated values.');
+        return;
+      }
+
+      const jobKey = jobSelect.value;
+      const profile = JOB_PROFILES[jobKey];
+      if (!profile) {
+        showError('Please select a target role.');
+        return;
+      }
+
+      const required = profile.required;
+      const recs = profile.recommendations;
+
+      // Match
+      const matched = [];
+      const gaps = [];
+      const usedRequired = new Set();
+
+      userSkills.forEach(us => {
+        let found = false;
+        for (let i = 0; i < required.length; i++) {
+          if (usedRequired.has(i)) continue;
+          if (skillMatches(us, required[i])) {
+            matched.push({ user: us, target: required[i] });
+            usedRequired.add(i);
+            found = true;
+            break;
+          }
+        }
+        if (!found) {
+          // User skill not mapped — still show it as "extra"
+          matched.push({ user: us, target: null, extra: true });
+        }
+      });
+
+      required.forEach((req, i) => {
+        if (!usedRequired.has(i)) gaps.push(req);
+      });
+
+      // Render
+      renderResults(matched, gaps, recs);
+    });
+
+    function renderResults(matched, gaps, recs) {
+      // Stats
+      statMatch.textContent = matched.filter(m => !m.extra).length;
+      statGap.textContent = gaps.length;
+      statNeed.textContent = gaps.length;
+
+      // Matched tags
+      matchedEl.innerHTML = '';
+      matched.forEach(m => {
+        const tag = document.createElement('span');
+        tag.className = 'skill-tag match';
+        tag.textContent = m.user + (m.target && m.target !== m.user ? ' → ' + m.target : '');
+        matchedEl.appendChild(tag);
+      });
+
+      // Gap tags
+      gapEl.innerHTML = '';
+      gaps.forEach(g => {
+        const tag = document.createElement('span');
+        tag.className = 'skill-tag gap';
+        tag.textContent = g;
+        gapEl.appendChild(tag);
+      });
+
+      // Recommendation cards
+      recEl.innerHTML = '';
+      gaps.forEach(g => {
+        const rec = recs[g];
+        if (!rec) return;
+        const card = document.createElement('div');
+        card.className = 'rec-card';
+        card.innerHTML = '<strong>' + escapeHtml(g) + '</strong>' +
+                         '<span>' + escapeHtml(rec.title) + ' — ' + escapeHtml(rec.resource) + '</span>';
+        recEl.appendChild(card);
+      });
+
+      resultsEl.classList.add('active');
+      resultsEl.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    }
+
+    function showError(msg) {
+      errorBox.textContent = msg;
+      errorBox.classList.add('active');
+      resultsEl.classList.remove('active');
+    }
+
+    function escapeHtml(str) {
+      const div = document.createElement('div');
+      div.textContent = str;
+      return div.innerHTML;
+    }
+
+    /* ── Keyboard: Enter in textarea submits ── */
+    skillsInput.addEventListener('keydown', function (e) {
+      if (e.key === 'Enter' && !e.shiftKey) {
+        e.preventDefault();
+        if (!analyzeBtn.disabled) analyzeBtn.click();
+      }
+    });
+  </script>
+</body>
+</html>
